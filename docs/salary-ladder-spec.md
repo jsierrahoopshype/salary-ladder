@@ -1,10 +1,10 @@
 # Salary Ladder: game spec
 
-**Status:** DRAFT for Jorge's approval. Nothing is built yet. No game code, no game branches, no PRs until this spec is approved.
+**Status:** APPROVED by Jorge on October 8, 2026, with the section 27 answers folded in. Building starts only after the build plan (`docs/salary-ladder-build-plan.md`) is approved.
 **Written:** October 8, 2026, from the design interview.
 **Data counts as of:** Salary Finder `data.json` built 2026-10-07 19:43 UTC (commit `72f9a98`); nba-headshots player index generated 2026-07-28.
 
-Plain-English rules for every part of the game. A developer should be able to build it from this document without guessing. Anything not yet decided is listed in section 27, with the default the build will use if Jorge doesn't change it.
+Plain-English rules for every part of the game. A developer should be able to build it from this document without guessing. Section 27 records how each item left open during the interview was settled.
 
 ---
 
@@ -188,7 +188,7 @@ How each kind of player is handled:
 - **The end screen shows:**
   - the score ("You reached $31.4M"), the player you reached, the rung, lives left and total time;
   - **"Higher than X% of today's players"** for that mode. It counts players below you plus half of those tied, out of everyone who played that mode today. It's refreshed every 5 minutes from the day's game records. Below 50 games it says "early numbers".
-  - **Personal best**: your highest dollar score ever (see section 27 for per mode vs overall), with "New personal best!" when you beat it;
+  - **Personal best**: your highest dollar score ever **in this mode** (one for Daily, one for Unlimited), with "New personal best!" when you beat it;
   - **the leaderboard prompt**: enter a display name to appear on the board (section 12);
   - **one optional tap: "Which contract would you rather have?"** comparing the last two players you saw (section 14);
   - the share button, and for Daily a link to play Unlimited.
@@ -247,7 +247,8 @@ How each kind of player is handled:
 - **All boundaries are at 9:00 AM Eastern.** Daily turns over each day. Weekly runs from Monday 9:00 AM ET. Monthly runs from the 1st at 9:00 AM ET. All-time counts since launch.
 - All-time entries are labeled with their season ("2026-27"), because the pool and the lives can change between seasons.
 - Ranking is by score, then total time (section 9).
-- Default display: top 100 rows, plus your own rank if you have a name and you're outside the top 100. Dollar display precision is listed in section 27.
+- **Display: top 50 rows per board** (same as the Daily 73-9), plus your own rank if you have a name and you're outside the top 50.
+- **Money on the boards is shown as "$31.42M"** (two decimals) next to total time. Sorting always uses the exact dollar amount.
 
 ### 12.2 Names (name-gated boards)
 
@@ -342,7 +343,7 @@ Raw game records are kept 7 days (for re-verification and abuse checks), then de
 
 ### 14.3 Getting the data out
 
-An admin-key endpoint downloads the totals as CSV. How the Trade Machine reads them is listed in section 27.
+An admin-key endpoint downloads the totals as CSV. That is how the Trade Machine gets the data for now; an automatic feed can come later.
 
 ---
 
@@ -368,7 +369,7 @@ An admin-key endpoint downloads the totals as CSV. How the Trade Machine reads t
 Kept on the device, never sent to the server unless stated:
 
 - **Streak:** current streak, last Daily played.
-- **Personal best(s):** highest dollar score.
+- **Personal bests:** highest dollar score, one for Daily and one for Unlimited.
 - **Display name and @handle:** sent only when submitting to a board.
 - **Device ID:** random. Never sent and never shown.
 - **Today's best verified game per mode** (start ticket + pick list): re-sent only for back-credit or re-verification.
@@ -461,7 +462,7 @@ Also state:
 
 ## 20. Design
 
-- **Match the look of Jorge's NBA Polymarket tracker** (colours, type, spacing, card style). Which repo or URL that is: section 27.
+- **Match the look of Jorge's NBA Polymarket tracker**, https://github.com/jsierrahoopshype/nba-polymarket (colours, type, spacing, card style). The build attaches that repo **read-only** and copies its look; it never writes to it. If it uses a web font or outside resource, the build reuses only what hoopsmatic.com already loads and flags anything new to Jorge first.
 - **Mobile first. No scrolling during play:** both cards, the timer bar, hearts, rung and current score all fit on one phone screen.
 - **Layout:**
   - **The incumbent card always stays in the same spot**, the challenger card in the other, so the eye learns where "stay" and "climb" are.
@@ -469,14 +470,14 @@ Also state:
   - **Reveal:** salaries slide in on both cards, with the gap between them.
 - **Controls:** tap either card. On desktop, also the left/right arrow keys.
 - **Accessibility:** right/wrong never uses colour alone (✓/✗ icons); text contrast meets the usual minimum; the timer is also shown as a number.
-- **No sound or vibration by default** (section 27).
+- **No sound or vibration.**
 
 ---
 
 ## 21. Promotion
 
-- **Cross-promo card** in the existing HoopsMatic games cross-promo module. It lives in another repo, so it's a separate, approved change (section 27).
-- **Social posts** on Jorge's accounts at launch. Drafted separately and confirmed by Jorge before posting.
+- **Cross-promo card** in the existing HoopsMatic games "play next" module. At build time, find where that module lives and **tell Jorge before touching it**; it's a separate, approved change on whichever repo holds it. Card text (Jorge confirms before it goes live): **"Salary Ladder: Who gets paid more? Climb to the top."**
+- **Social posts** on Jorge's accounts, drafted **after launch** and confirmed by Jorge one by one before posting. No emojis, no hashtags, no em dashes.
 - **HoopsHype articles from the collected data:** e.g. "the players fans think are paid more than they are". Built only from the anonymous totals.
 
 ---
@@ -493,13 +494,13 @@ Also state:
   - Lowest $20,000 (Caleb Homesley); highest $583,949,426 (LeBron James).
   - Most common $77,250 (33 players, all one short stint). 1,517 different totals.
 - **Prerequisites:**
-  - the pending 2025-26 salary rows are settled by the sheet owner;
+  - the 45 same-team amounts that grew by odd factors are settled by the sheet owner;
   - the Cam Whitmore merge;
   - a recount once nba-headshots is refreshed.
 - **Pending 2025-26 rows affect the career version only:**
   - 18 players in the pool have a 2025-26 figure from the temporary sheet.
-  - 60 have 2025-26 rows that the Salary Finder flags as exact repeats and counts once ($143.3M in total).
-  - The build report lists 73 repeated rows, while Jorge's note says 45; the two numbers need reconciling.
+  - **73 exact repeat rows** (same man, season, team and figure to the dollar) are already counted once by the Salary Finder. 60 career-pool players have one; they need no action.
+  - **45 same-team amounts that grew by odd factors** (for example Connaughton, Bufkin, Houstan) are a separate issue, waiting on the sheet owner. Until they're settled, career totals for those players may be wrong. This is the real blocker.
 - **Ladder length at ±10%** (simulated, never-miss player, symmetric band):
   - from the $20,000 bottom: 451 picks (189 climbs);
   - with a $20M floor (642 players): 144 picks (66 climbs);
@@ -647,6 +648,7 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 10. `rules/rules.json` at version 1: 5 lives, ±10% band, 8 s timer, start window 5th–25th percentile with at least 15 neighbours, recording on.
 11. `data/crosswalk.json` and `data/exclude.json` filled from section 24.
 12. Canonical and og:url set to https://hoopsmatic.com/salary-ladder/
+12a. Look copied from https://github.com/jsierrahoopshype/nba-polymarket (attached read-only).
 13. Sitemap entry with an accurate `<lastmod>`; sitemap listed in https://hoopsmatic.com/robots.txt; submitted in Google Search Console: https://search.google.com/search-console
 14. **Tests:**
     - The page and the server replay agree on 1,000 recorded games.
@@ -658,27 +660,27 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 
 **After launch:**
 
-16. Cross-promo card in the HoopsMatic games module (separate approved change).
-17. Launch social posts (confirmed by Jorge before posting).
+16. Cross-promo card in the HoopsMatic games "play next" module: find where it lives, tell Jorge before touching it, card text "Salary Ladder: Who gets paid more? Climb to the top." (Jorge confirms; separate approved change).
+17. Social posts drafted after launch, each confirmed by Jorge before posting. No emojis, no hashtags, no em dashes.
 18. First calibration review after at least 5,000 games and at least 1 week (section 15).
 
 ---
 
-## 27. Still undecided (default used if not changed)
+## 27. Items settled at approval (October 8, 2026)
 
-| # | Question | Default |
+| # | Question | Decision |
 |---|---|---|
-| 1 | Which repo or URL is the NBA Polymarket tracker, to copy its look? | Build session asks Jorge; nothing styled until then. |
-| 2 | Personal best: one per mode (Daily, Unlimited) or one overall? | One per mode. |
-| 3 | Leaderboard money display. | "$31.42M" (two decimals) plus total time; sorting uses the exact amount. |
-| 4 | Rows shown per board. | Top 100, plus your own rank. |
-| 5 | How the Trade Machine reads the vote totals. | Admin-key CSV download for now; automatic feed later. |
-| 6 | Which repo holds the games cross-promo module, and the card's text and image. | Separate change after launch. |
-| 7 | Launch social posts and HoopsHype article plan. | Drafted after launch data exists; Jorge confirms each post. |
-| 8 | Sound or vibration. | None. |
-| 9 | Intro screen, how-to-play and end-screen wording. | Written in the build, shown to Jorge before launch. |
-| 10 | Career-earnings version rules (floor or start rule, band, modes). | Its own short interview after the first release. |
-| 11 | Pending 2025-26 rows (73 repeated rows in the report vs the 45 Jorge mentioned). | Settled by the sheet owner before the career version. |
-| 12 | One official Daily play per device per day (section 10). | Yes. |
-| 13 | The timer keeps running when you switch apps or tabs (section 7). | Yes, no pausing. |
-| 14 | Reloading or closing mid-pick counts that pick as a timeout (section 7). | Yes. |
+| 1 | Design reference | https://github.com/jsierrahoopshype/nba-polymarket, attached read-only at build time; copy its look; mobile first. |
+| 2 | Personal best | One per mode (Daily, Unlimited). |
+| 3 | Board money display | "$31.42M" plus total time; sorting uses the exact amount. |
+| 4 | Rows per board | Top 50 plus your own rank (same as the Daily 73-9). |
+| 5 | Trade Machine data | CSV download behind the admin key. |
+| 6 | Games cross-promo | Find where the "play next" module lives at build time and tell Jorge before touching it. Card text: "Salary Ladder: Who gets paid more? Climb to the top." Jorge confirms. |
+| 7 | Social posts | Drafted after launch; Jorge confirms each one. No emojis, no hashtags, no em dashes. |
+| 8 | Sound or vibration | None. |
+| 9 | Screen wording | Written in the build, shown to Jorge before launch. |
+| 10 | Career version | Its own short interview later. |
+| 11 | Pending 2025-26 rows | Two separate issues. 73 = exact repeat rows, already counted once by the Salary Finder (no action). 45 = same-team amounts that grew by odd factors (Connaughton, Bufkin, Houstan), waiting on the sheet owner; blocks the career version only. |
+| 12 | One official Daily play per device per day | Approved. |
+| 13 | Timer keeps running when you switch apps or tabs | Approved. |
+| 14 | Reloading or closing mid-pick counts as a timeout | Approved. |
