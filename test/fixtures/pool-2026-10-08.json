@@ -1,0 +1,4035 @@
+{
+ "schema": 1,
+ "season": "2026-27",
+ "date": "2026-10-08",
+ "source": {
+  "finder_built": "2026-10-08T12:34:46.295461",
+  "roster_source": "standin",
+  "roster_built": null
+ },
+ "players": [
+  {
+   "id": 1641815,
+   "name": "Isaiah Stevens",
+   "team": "SAC",
+   "pos": "G",
+   "born": "2000-11-01",
+   "salary": 91000,
+   "img": "face-tight/1641815-isaiah-stevens.webp"
+  },
+  {
+   "id": 1629015,
+   "name": "Zhaire Smith",
+   "team": "OKC",
+   "pos": "G",
+   "born": "1999-06-04",
+   "salary": 1357763,
+   "img": "face-tight/1629015-zhaire-smith.webp"
+  },
+  {
+   "id": 1642066,
+   "name": "Myron Gardner",
+   "team": "MIA",
+   "pos": "G",
+   "born": "2001-05-21",
+   "salary": 2150917,
+   "img": "face-tight/1642066-myron-gardner.webp"
+  },
+  {
+   "id": 1642404,
+   "name": "Chaz Lanier",
+   "team": "DET",
+   "pos": "G",
+   "born": "2001-12-19",
+   "salary": 2150917,
+   "img": "face-tight/1642404-chaz-lanier.webp"
+  },
+  {
+   "id": 1642853,
+   "name": "Rasheer Fleming",
+   "team": "PHX",
+   "pos": "F",
+   "born": "2004-07-10",
+   "salary": 2150917,
+   "img": "face-tight/1642853-rasheer-fleming.webp"
+  },
+  {
+   "id": 1642869,
+   "name": "Noah Penda",
+   "team": "ORL",
+   "pos": "F",
+   "born": "2005-01-07",
+   "salary": 2150917,
+   "img": "face-tight/1642869-noah-penda.webp"
+  },
+  {
+   "id": 1642875,
+   "name": "Maxime Raynaud",
+   "team": "SAC",
+   "pos": "C",
+   "born": "2003-04-07",
+   "salary": 2150917,
+   "img": "face-tight/1642875-maxime-raynaud.webp"
+  },
+  {
+   "id": 1642876,
+   "name": "Adou Thiero",
+   "team": "LAL",
+   "pos": "F",
+   "born": "2004-05-08",
+   "salary": 2150917,
+   "img": "face-tight/1642876-adou-thiero.webp"
+  },
+  {
+   "id": 1642877,
+   "name": "Micah Peavy",
+   "team": "MEM",
+   "pos": "G",
+   "born": "2001-07-16",
+   "salary": 2150917,
+   "img": "face-tight/1642877-micah-peavy.webp"
+  },
+  {
+   "id": 1642878,
+   "name": "Tyrese Proctor",
+   "team": "CLE",
+   "pos": "G",
+   "born": "2004-01-04",
+   "salary": 2150917,
+   "img": "face-tight/1642878-tyrese-proctor.webp"
+  },
+  {
+   "id": 1642928,
+   "name": "Dylan Cardwell",
+   "team": "SAC",
+   "pos": "C",
+   "born": "2001-12-26",
+   "salary": 2150917,
+   "img": "face-tight/1642928-dylan-cardwell.webp"
+  },
+  {
+   "id": 1642954,
+   "name": "Will Richard",
+   "team": "GSW",
+   "pos": "G",
+   "born": "2002-12-24",
+   "salary": 2150917,
+   "img": "face-tight/1642954-will-richard.webp"
+  },
+  {
+   "id": 1630619,
+   "name": "Moussa Cisse",
+   "team": "DAL",
+   "pos": "C",
+   "born": "2002-09-10",
+   "salary": 2185116,
+   "img": "face-tight/1630619-moussa-cisse.webp"
+  },
+  {
+   "id": 1641736,
+   "name": "Reece Beekman",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2001-10-08",
+   "salary": 2185116,
+   "img": "face-tight/1641736-reece-beekman.webp"
+  },
+  {
+   "id": 1641779,
+   "name": "Jalen Bridges",
+   "team": "CHI",
+   "pos": "F",
+   "born": "2001-05-14",
+   "salary": 2185116,
+   "img": "face-tight/1641779-jalen-bridges.webp"
+  },
+  {
+   "id": 1642893,
+   "name": "Alex Toohey",
+   "team": "GSW",
+   "pos": null,
+   "born": null,
+   "salary": 2185116,
+   "img": "face-tight/1642893-alex-toohey.webp"
+  },
+  {
+   "id": 1642918,
+   "name": "Alijah Martin",
+   "team": "TOR",
+   "pos": "G",
+   "born": "2001-12-26",
+   "salary": 2185116,
+   "img": "face-tight/1642918-alijah-martin.webp"
+  },
+  {
+   "id": 1642938,
+   "name": "Curtis Jones",
+   "team": "CLE",
+   "pos": "G",
+   "born": "2001-10-04",
+   "salary": 2185116,
+   "img": "face-tight/1642938-curtis-jones.webp"
+  },
+  {
+   "id": 1642939,
+   "name": "Miles Kelly",
+   "team": "GSW",
+   "pos": "G",
+   "born": "2003-01-26",
+   "salary": 2185116,
+   "img": "face-tight/1642939-miles-kelly.webp"
+  },
+  {
+   "id": 1642955,
+   "name": "Kadary Richmond",
+   "team": "CLE",
+   "pos": "G",
+   "born": "2001-08-25",
+   "salary": 2185116,
+   "img": "face-tight/1642955-kadary-richmond.webp"
+  },
+  {
+   "id": 1643007,
+   "name": "Taelon Peter",
+   "team": "SAS",
+   "pos": "G",
+   "born": "2002-02-27",
+   "salary": 2185116,
+   "img": "face-tight/1643007-taelon-peter.webp"
+  },
+  {
+   "id": 1631255,
+   "name": "Karlo Matković",
+   "team": "NOP",
+   "pos": "F-C",
+   "born": "2001-03-30",
+   "salary": 2296271,
+   "img": "face-tight/1631255-karlo-matkovi.webp"
+  },
+  {
+   "id": 1641737,
+   "name": "Adem Bona",
+   "team": "PHI",
+   "pos": "F",
+   "born": "2003-03-28",
+   "salary": 2296271,
+   "img": "face-tight/1641737-adem-bona.webp"
+  },
+  {
+   "id": 1641796,
+   "name": "Pelle Larsson",
+   "team": "MIA",
+   "pos": "G",
+   "born": "2001-02-23",
+   "salary": 2296271,
+   "img": "face-tight/1641796-pelle-larsson.webp"
+  },
+  {
+   "id": 1642277,
+   "name": "Johnny Furphy",
+   "team": "IND",
+   "pos": "G",
+   "born": "2004-12-07",
+   "salary": 2296271,
+   "img": "face-tight/1642277-johnny-furphy.webp"
+  },
+  {
+   "id": 1642278,
+   "name": "Tyler Kolek",
+   "team": "NYK",
+   "pos": "G",
+   "born": "2001-03-27",
+   "salary": 2296271,
+   "img": "face-tight/1642278-tyler-kolek.webp"
+  },
+  {
+   "id": 1642345,
+   "name": "Oso Ighodaro",
+   "team": "PHX",
+   "pos": "F",
+   "born": "2002-07-14",
+   "salary": 2296271,
+   "img": "face-tight/1642345-oso-ighodaro.webp"
+  },
+  {
+   "id": 1642347,
+   "name": "Jamal Shead",
+   "team": "TOR",
+   "pos": "G",
+   "born": "2002-07-24",
+   "salary": 2296271,
+   "img": "face-tight/1642347-jamal-shead.webp"
+  },
+  {
+   "id": 1642353,
+   "name": "Cam Christie",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2005-07-24",
+   "salary": 2296271,
+   "img": "face-tight/1642353-cam-christie.webp"
+  },
+  {
+   "id": 1642355,
+   "name": "Bronny James",
+   "team": "LAL",
+   "pos": "G",
+   "born": "2004-10-06",
+   "salary": 2296271,
+   "img": "face-tight/1642355-bronny-james.webp"
+  },
+  {
+   "id": 1642377,
+   "name": "Jaylen Wells",
+   "team": "MEM",
+   "pos": "F",
+   "born": "2003-08-26",
+   "salary": 2296271,
+   "img": "face-tight/1642377-jaylen-wells.webp"
+  },
+  {
+   "id": 1642419,
+   "name": "Jamison Battle",
+   "team": "TOR",
+   "pos": "F",
+   "born": "2001-05-10",
+   "salary": 2296271,
+   "img": "face-tight/1642419-jamison-battle.webp"
+  },
+  {
+   "id": 1631159,
+   "name": "Leonard Miller",
+   "team": "CHI",
+   "pos": "F",
+   "born": "2003-11-26",
+   "salary": 2406205,
+   "img": "face-tight/1631159-leonard-miller.webp"
+  },
+  {
+   "id": 1631218,
+   "name": "Trayce Jackson-Davis",
+   "team": "TOR",
+   "pos": "F",
+   "born": "2000-02-22",
+   "salary": 2406205,
+   "img": "face-tight/1631218-trayce-jackson-davis.webp"
+  },
+  {
+   "id": 1631243,
+   "name": "Mouhamed Gueye",
+   "team": "ATL",
+   "pos": "F",
+   "born": "2002-11-09",
+   "salary": 2406205,
+   "img": "face-tight/1631243-mouhamed-gueye.webp"
+  },
+  {
+   "id": 1641713,
+   "name": "GG Jackson",
+   "team": "MEM",
+   "pos": "F",
+   "born": "2004-12-17",
+   "salary": 2406205,
+   "img": "face-tight/1641713-gg-jackson.webp"
+  },
+  {
+   "id": 1641775,
+   "name": "Jordan Walsh",
+   "team": "BOS",
+   "pos": "G",
+   "born": "2004-03-03",
+   "salary": 2406205,
+   "img": "face-tight/1641775-jordan-walsh.webp"
+  },
+  {
+   "id": 1641854,
+   "name": "Craig Porter Jr.",
+   "team": "CLE",
+   "pos": "G",
+   "born": "2000-02-26",
+   "salary": 2406205,
+   "img": "face-tight/1641854-craig-porter-jr.webp"
+  },
+  {
+   "id": 1641750,
+   "name": "Ryan Kalkbrenner",
+   "team": "CHA",
+   "pos": "C",
+   "born": "2002-01-17",
+   "salary": 2411090,
+   "img": "face-tight/1641750-ryan-kalkbrenner.webp"
+  },
+  {
+   "id": 1641772,
+   "name": "Nae'Qwan Tomlin",
+   "team": "CLE",
+   "pos": "F",
+   "born": "2000-12-10",
+   "salary": 2411090,
+   "img": "face-tight/1641772-naeqwan-tomlin.webp"
+  },
+  {
+   "id": 1642285,
+   "name": "Cam Spencer",
+   "team": "MEM",
+   "pos": "G",
+   "born": "2000-04-06",
+   "salary": 2411090,
+   "img": "face-tight/1642285-cam-spencer.webp"
+  },
+  {
+   "id": 1642348,
+   "name": "Justin Edwards",
+   "team": "PHI",
+   "pos": "F",
+   "born": "2003-12-16",
+   "salary": 2411090,
+   "img": "face-tight/1642348-justin-edwards.webp"
+  },
+  {
+   "id": 1642449,
+   "name": "Tolu Smith",
+   "team": "DET",
+   "pos": "F",
+   "born": "2000-07-26",
+   "salary": 2411090,
+   "img": "face-tight/1642449-tolu-smith.webp"
+  },
+  {
+   "id": 1642883,
+   "name": "Sion James",
+   "team": "CHA",
+   "pos": "G",
+   "born": "2002-12-04",
+   "salary": 2411090,
+   "img": "face-tight/1642883-sion-james.webp"
+  },
+  {
+   "id": 1631113,
+   "name": "Kennedy Chandler",
+   "team": "PHX",
+   "pos": "G",
+   "born": "2002-09-16",
+   "salary": 2449421,
+   "img": "face-tight/1631113-kennedy-chandler.webp"
+  },
+  {
+   "id": 1631127,
+   "name": "Harrison Ingram",
+   "team": "UTA",
+   "pos": "F",
+   "born": "2002-11-27",
+   "salary": 2449421,
+   "img": "face-tight/1631127-harrison-ingram.webp"
+  },
+  {
+   "id": 1631166,
+   "name": "Drew Timme",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2000-09-09",
+   "salary": 2449421,
+   "img": "face-tight/1631166-drew-timme.webp"
+  },
+  {
+   "id": 1631211,
+   "name": "Trevor Keels",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2003-08-26",
+   "salary": 2449421,
+   "img": "face-tight/1631211-trevor-keels.webp"
+  },
+  {
+   "id": 1641754,
+   "name": "Seth Lundy",
+   "team": "DAL",
+   "pos": "G-F",
+   "born": "2000-04-02",
+   "salary": 2449421,
+   "img": "face-tight/1641754-seth-lundy.webp"
+  },
+  {
+   "id": 1641778,
+   "name": "Leaky Black",
+   "team": "SAC",
+   "pos": "F",
+   "born": "1999-06-14",
+   "salary": 2449421,
+   "img": "face-tight/1641778-leaky-black.webp"
+  },
+  {
+   "id": 1641794,
+   "name": "Dillon Jones",
+   "team": "PHI",
+   "pos": "F",
+   "born": "2001-10-29",
+   "salary": 2449421,
+   "img": "face-tight/1641794-dillon-jones.webp"
+  },
+  {
+   "id": 1641801,
+   "name": "Emanuel Miller",
+   "team": "DEN",
+   "pos": "F",
+   "born": "2000-06-19",
+   "salary": 2449421,
+   "img": "face-tight/1641801-emanuel-miller.webp"
+  },
+  {
+   "id": 1641803,
+   "name": "Tristen Newton",
+   "team": "SAC",
+   "pos": "G",
+   "born": "2001-04-26",
+   "salary": 2449421,
+   "img": "face-tight/1641803-tristen-newton.webp"
+  },
+  {
+   "id": 1641807,
+   "name": "Norchad Omier",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2001-08-28",
+   "salary": 2449421,
+   "img": "face-tight/1641807-norchad-omier.webp"
+  },
+  {
+   "id": 1641810,
+   "name": "Antonio Reeves",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2000-11-20",
+   "salary": 2449421,
+   "img": "face-tight/1641810-antonio-reeves.webp"
+  },
+  {
+   "id": 1642269,
+   "name": "Devin Carter",
+   "team": "BOS",
+   "pos": "G",
+   "born": "2002-03-18",
+   "salary": 2449421,
+   "img": "face-tight/1642269-devin-carter.webp"
+  },
+  {
+   "id": 1642382,
+   "name": "Branden Carlson",
+   "team": "POR",
+   "pos": "C",
+   "born": "1999-06-14",
+   "salary": 2449421,
+   "img": "face-tight/1642382-branden-carlson.webp"
+  },
+  {
+   "id": 1642384,
+   "name": "Isaiah Crawford",
+   "team": "HOU",
+   "pos": "F",
+   "born": "2001-11-01",
+   "salary": 2449421,
+   "img": "face-tight/1642384-isaiah-crawford.webp"
+  },
+  {
+   "id": 1642530,
+   "name": "Yuki Kawamura",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2001-05-02",
+   "salary": 2449421,
+   "img": "face-tight/1642530-yuki-kawamura.webp"
+  },
+  {
+   "id": 1631342,
+   "name": "Daeqwon Plowden",
+   "team": "SAC",
+   "pos": "G",
+   "born": "1998-08-29",
+   "salary": 2449422,
+   "img": "face-tight/1631342-daeqwon-plowden.webp"
+  },
+  {
+   "id": 1630590,
+   "name": "Scotty Pippen Jr.",
+   "team": "MEM",
+   "pos": "G",
+   "born": "2000-11-10",
+   "salary": 2461462,
+   "img": "face-tight/1630590-scotty-pippen-jr.webp"
+  },
+  {
+   "id": 1631217,
+   "name": "Moussa Diabaté",
+   "team": "CHA",
+   "pos": "F",
+   "born": "2002-01-21",
+   "salary": 2461462,
+   "img": "face-tight/1631217-moussa-diabat.webp"
+  },
+  {
+   "id": 1631321,
+   "name": "Sidy Cissoko",
+   "team": "POR",
+   "pos": "G",
+   "born": "2004-04-02",
+   "salary": 2497812,
+   "img": "face-tight/1631321-sidy-cissoko.webp"
+  },
+  {
+   "id": 1641765,
+   "name": "Olivier-Maxence Prosper",
+   "team": "MEM",
+   "pos": "F",
+   "born": "2002-07-03",
+   "salary": 2497812,
+   "img": "face-tight/1641765-olivier-maxence-prosper.webp"
+  },
+  {
+   "id": 1629605,
+   "name": "Tacko Fall",
+   "team": "PHI",
+   "pos": "C",
+   "born": "1995-12-10",
+   "salary": 2537526,
+   "img": "face-tight/1629605-tacko-fall.webp"
+  },
+  {
+   "id": 1631131,
+   "name": "Oscar Tshiebwe",
+   "team": "HOU",
+   "pos": "F-C",
+   "born": "1999-11-27",
+   "salary": 2537526,
+   "img": "face-tight/1631131-oscar-tshiebwe.webp"
+  },
+  {
+   "id": 1631250,
+   "name": "Pete Nance",
+   "team": "MIL",
+   "pos": "F",
+   "born": "2000-02-19",
+   "salary": 2537526,
+   "img": "face-tight/1631250-pete-nance.webp"
+  },
+  {
+   "id": 1631306,
+   "name": "Cole Swider",
+   "team": "LAL",
+   "pos": "F",
+   "born": "1999-05-08",
+   "salary": 2537526,
+   "img": "face-tight/1631306-cole-swider.webp"
+  },
+  {
+   "id": 1631311,
+   "name": "Lester Quinones",
+   "team": "MIA",
+   "pos": "G",
+   "born": "2000-11-16",
+   "salary": 2537526,
+   "img": "face-tight/1631311-lester-quinones.webp"
+  },
+  {
+   "id": 1641723,
+   "name": "Kobe Bufkin",
+   "team": "NOP",
+   "pos": "G",
+   "born": "2003-09-21",
+   "salary": 2537526,
+   "img": "face-tight/1641723-kobe-bufkin.webp"
+  },
+  {
+   "id": 1641753,
+   "name": "Chris Livingston",
+   "team": "WAS",
+   "pos": "F",
+   "born": "2003-10-15",
+   "salary": 2537526,
+   "img": "face-tight/1641753-chris-livingston.webp"
+  },
+  {
+   "id": 1641763,
+   "name": "Julian Phillips",
+   "team": "HOU",
+   "pos": "F",
+   "born": "2003-11-05",
+   "salary": 2537526,
+   "img": "face-tight/1641763-julian-phillips.webp"
+  },
+  {
+   "id": 1641809,
+   "name": "Drew Peterson",
+   "team": "CHI",
+   "pos": "F",
+   "born": "1999-11-09",
+   "salary": 2537526,
+   "img": "face-tight/1641809-drew-peterson.webp"
+  },
+  {
+   "id": 1641871,
+   "name": "Duop Reath",
+   "team": "PHX",
+   "pos": "C",
+   "born": "1996-06-26",
+   "salary": 2537526,
+   "img": "face-tight/1641871-duop-reath.webp"
+  },
+  {
+   "id": 1630696,
+   "name": "Dru Smith",
+   "team": "MIA",
+   "pos": "G",
+   "born": "1997-12-30",
+   "salary": 2584539,
+   "img": "face-tight/1630696-dru-smith.webp"
+  },
+  {
+   "id": 1631121,
+   "name": "Bryce McGowens",
+   "team": "NOP",
+   "pos": "G",
+   "born": "2002-11-08",
+   "salary": 2584539,
+   "img": "face-tight/1631121-bryce-mcgowens.webp"
+  },
+  {
+   "id": 1631123,
+   "name": "Jamaree Bouyea",
+   "team": "PHX",
+   "pos": "G",
+   "born": "1999-06-27",
+   "salary": 2584539,
+   "img": "face-tight/1631123-jamaree-bouyea.webp"
+  },
+  {
+   "id": 1631133,
+   "name": "Jabari Walker",
+   "team": "PHI",
+   "pos": "F",
+   "born": "2002-07-30",
+   "salary": 2584539,
+   "img": "face-tight/1631133-jabari-walker.webp"
+  },
+  {
+   "id": 1631245,
+   "name": "Quenton Jackson",
+   "team": "IND",
+   "pos": "G",
+   "born": "1998-09-15",
+   "salary": 2584539,
+   "img": "face-tight/1631245-quenton-jackson.webp"
+  },
+  {
+   "id": 1631288,
+   "name": "Jamal Cain",
+   "team": "ORL",
+   "pos": "F",
+   "born": "1999-03-20",
+   "salary": 2584539,
+   "img": "face-tight/1631288-jamal-cain.webp"
+  },
+  {
+   "id": 1642885,
+   "name": "Mohamed Diawara",
+   "team": "NYK",
+   "pos": "F",
+   "born": "2005-04-29",
+   "salary": 2622139,
+   "img": "face-tight/1642885-mohamed-diawara.webp"
+  },
+  {
+   "id": 1642920,
+   "name": "Kobe Sanders",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2002-05-30",
+   "salary": 2622139,
+   "img": "face-tight/1642920-kobe-sanders.webp"
+  },
+  {
+   "id": 1630314,
+   "name": "Brandon Williams",
+   "team": "GSW",
+   "pos": "G",
+   "born": "1999-11-22",
+   "salary": 2625627,
+   "img": "face-tight/1630314-brandon-williams.webp"
+  },
+  {
+   "id": 1630527,
+   "name": "Brandon Boston",
+   "team": "CHI",
+   "pos": "G",
+   "born": "2001-11-28",
+   "salary": 2625627,
+   "img": "face-tight/1630527-brandon-boston.webp"
+  },
+  {
+   "id": 1630534,
+   "name": "Ochai Agbaji",
+   "team": "NYK",
+   "pos": "G",
+   "born": "2000-04-20",
+   "salary": 2625627,
+   "img": "face-tight/1630534-ochai-agbaji.webp"
+  },
+  {
+   "id": 1631103,
+   "name": "Malaki Branham",
+   "team": "ORL",
+   "pos": "F",
+   "born": "2003-05-12",
+   "salary": 2625627,
+   "img": "face-tight/1631103-malaki-branham.webp"
+  },
+  {
+   "id": 1631104,
+   "name": "Blake Wesley",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2003-03-16",
+   "salary": 2625627,
+   "img": "face-tight/1631104-blake-wesley.webp"
+  },
+  {
+   "id": 1631110,
+   "name": "Jeremy Sochan",
+   "team": "POR",
+   "pos": "F",
+   "born": "2003-05-20",
+   "salary": 2625627,
+   "img": "face-tight/1631110-jeremy-sochan.webp"
+  },
+  {
+   "id": 1631115,
+   "name": "Orlando Robinson",
+   "team": "CHI",
+   "pos": "C",
+   "born": "2000-07-10",
+   "salary": 2625627,
+   "img": "face-tight/1631115-orlando-robinson.webp"
+  },
+  {
+   "id": 1631120,
+   "name": "JD Davison",
+   "team": "ORL",
+   "pos": "G",
+   "born": "2002-10-03",
+   "salary": 2625627,
+   "img": "face-tight/1631120-jd-davison.webp"
+  },
+  {
+   "id": 1631132,
+   "name": "Christian Koloko",
+   "team": "NOP",
+   "pos": "C",
+   "born": "2000-06-20",
+   "salary": 2625627,
+   "img": "face-tight/1631132-christian-koloko.webp"
+  },
+  {
+   "id": 1631207,
+   "name": "Dalen Terry",
+   "team": "GSW",
+   "pos": "F",
+   "born": "2002-07-12",
+   "salary": 2625627,
+   "img": "face-tight/1631207-dalen-terry.webp"
+  },
+  {
+   "id": 1631216,
+   "name": "Caleb Houstan",
+   "team": "NOP",
+   "pos": "G",
+   "born": "2003-01-09",
+   "salary": 2625627,
+   "img": "face-tight/1631216-caleb-houstan.webp"
+  },
+  {
+   "id": 1631323,
+   "name": "Simone Fontecchio",
+   "team": "MIA",
+   "pos": "F",
+   "born": "1995-12-09",
+   "salary": 2625627,
+   "img": "face-tight/1631323-simone-fontecchio.webp"
+  },
+  {
+   "id": 1629674,
+   "name": "Neemias Queta",
+   "team": "BOS",
+   "pos": "C",
+   "born": "1999-07-13",
+   "salary": 2667944,
+   "img": "face-tight/1629674-neemias-queta.webp"
+  },
+  {
+   "id": 1630249,
+   "name": "Vít Krejčí",
+   "team": "POR",
+   "pos": "G",
+   "born": "2000-06-19",
+   "salary": 2667944,
+   "img": "face-tight/1630249-vt-krej.webp"
+  },
+  {
+   "id": 1630551,
+   "name": "Justin Champagnie",
+   "team": "WAS",
+   "pos": "G-F",
+   "born": "2001-06-29",
+   "salary": 2667944,
+   "img": "face-tight/1630551-justin-champagnie.webp"
+  },
+  {
+   "id": 1630643,
+   "name": "Jay Huff",
+   "team": "IND",
+   "pos": "C",
+   "born": "1997-08-25",
+   "salary": 2667944,
+   "img": "face-tight/1630643-jay-huff.webp"
+  },
+  {
+   "id": 1631248,
+   "name": "Baylor Scheierman",
+   "team": "BOS",
+   "pos": "G",
+   "born": "2000-09-26",
+   "salary": 2744040,
+   "img": "face-tight/1631248-baylor-scheierman.webp"
+  },
+  {
+   "id": 1642268,
+   "name": "Isaiah Collier",
+   "team": "UTA",
+   "pos": "G",
+   "born": "2004-10-08",
+   "salary": 2763960,
+   "img": "face-tight/1642268-isaiah-collier.webp"
+  },
+  {
+   "id": 1642346,
+   "name": "Ryan Dunn",
+   "team": "PHX",
+   "pos": "F",
+   "born": "2003-01-07",
+   "salary": 2784240,
+   "img": "face-tight/1642346-ryan-dunn.webp"
+  },
+  {
+   "id": 1630568,
+   "name": "Luka Garza",
+   "team": "BOS",
+   "pos": "C",
+   "born": "1998-12-27",
+   "salary": 2801346,
+   "img": "face-tight/1630568-luka-garza.webp"
+  },
+  {
+   "id": 1630579,
+   "name": "Jericho Sims",
+   "team": "MIL",
+   "pos": "C",
+   "born": "1998-10-20",
+   "salary": 2801346,
+   "img": "face-tight/1630579-jericho-sims.webp"
+  },
+  {
+   "id": 1630695,
+   "name": "Micah Potter",
+   "team": "POR",
+   "pos": "C",
+   "born": "1998-04-06",
+   "salary": 2801346,
+   "img": "face-tight/1630695-micah-potter.webp"
+  },
+  {
+   "id": 1626209,
+   "name": "Mario Hezonja",
+   "team": "CLE",
+   "pos": "F-G",
+   "born": "1995-02-25",
+   "salary": 2845883,
+   "img": "face-tight/1626209-mario-hezonja.webp"
+  },
+  {
+   "id": 1629646,
+   "name": "Charles Bassey",
+   "team": "GSW",
+   "pos": "C-F",
+   "born": "2000-10-28",
+   "salary": 2845883,
+   "img": "face-tight/1629646-charles-bassey.webp"
+  },
+  {
+   "id": 1630231,
+   "name": "KJ Martin",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2001-01-06",
+   "salary": 2845883,
+   "img": "face-tight/1630231-kj-martin.webp"
+  },
+  {
+   "id": 1630533,
+   "name": "Ziaire Williams",
+   "team": "LAL",
+   "pos": "F",
+   "born": "2001-09-12",
+   "salary": 2845883,
+   "img": "face-tight/1630533-ziaire-williams.webp"
+  },
+  {
+   "id": 1630570,
+   "name": "Trendon Watford",
+   "team": "NOP",
+   "pos": "F",
+   "born": "2000-11-09",
+   "salary": 2845883,
+   "img": "face-tight/1630570-trendon-watford.webp"
+  },
+  {
+   "id": 1630538,
+   "name": "Bones Hyland",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2000-09-14",
+   "salary": 2846555,
+   "img": "face-tight/1630538-bones-hyland.webp"
+  },
+  {
+   "id": 1642349,
+   "name": "Ajay Mitchell",
+   "team": "OKC",
+   "pos": "G",
+   "born": "2002-06-25",
+   "salary": 2850000,
+   "img": "face-tight/1642349-ajay-mitchell.webp"
+  },
+  {
+   "id": 1642949,
+   "name": "Yanic Konan Niederhäuser",
+   "team": "LAC",
+   "pos": "C",
+   "born": "2003-03-14",
+   "salary": 2880960,
+   "img": "face-tight/1642949-yanic-konan-niederhuser.webp"
+  },
+  {
+   "id": 1642862,
+   "name": "Liam McNeeley",
+   "team": "CHA",
+   "pos": "F",
+   "born": "2005-10-10",
+   "salary": 2902080,
+   "img": "face-tight/1642862-liam-mcneeley.webp"
+  },
+  {
+   "id": 1642864,
+   "name": "Hugo González",
+   "team": "BOS",
+   "pos": "G",
+   "born": "2006-02-05",
+   "salary": 2923560,
+   "img": "face-tight/1642864-hugo-gonzlez.webp"
+  },
+  {
+   "id": 1642874,
+   "name": "Danny Wolf",
+   "team": "BKN",
+   "pos": "C",
+   "born": "2004-05-05",
+   "salary": 2941440,
+   "img": "face-tight/1642874-danny-wolf.webp"
+  },
+  {
+   "id": 1642359,
+   "name": "Pacôme Dadiet",
+   "team": "NYK",
+   "pos": "F",
+   "born": "2005-07-27",
+   "salary": 2983680,
+   "img": "face-tight/1642359-pacme-dadiet.webp"
+  },
+  {
+   "id": 1641774,
+   "name": "Tristan Vukcevic",
+   "team": "WAS",
+   "pos": "F",
+   "born": "2003-03-11",
+   "salary": 3000000,
+   "img": "face-tight/1641774-tristan-vukcevic.webp"
+  },
+  {
+   "id": 1642271,
+   "name": "Kyle Filipowski",
+   "team": "UTA",
+   "pos": "C",
+   "born": "2003-11-07",
+   "salary": 3000000,
+   "img": "face-tight/1642271-kyle-filipowski.webp"
+  },
+  {
+   "id": 1642879,
+   "name": "Ben Saraf",
+   "team": "BKN",
+   "pos": "G",
+   "born": "2006-04-14",
+   "salary": 3028560,
+   "img": "face-tight/1642879-ben-saraf.webp"
+  },
+  {
+   "id": 1629312,
+   "name": "Haywood Highsmith",
+   "team": "PHX",
+   "pos": "F",
+   "born": "1996-12-09",
+   "salary": 3066143,
+   "img": "face-tight/1629312-haywood-highsmith.webp"
+  },
+  {
+   "id": 1630164,
+   "name": "James Wiseman",
+   "team": "NYK",
+   "pos": "C",
+   "born": "2001-03-31",
+   "salary": 3066143,
+   "img": "face-tight/1630164-james-wiseman.webp"
+  },
+  {
+   "id": 1630208,
+   "name": "Nick Richards",
+   "team": "MIA",
+   "pos": "C",
+   "born": "1997-11-29",
+   "salary": 3066143,
+   "img": "face-tight/1630208-nick-richards.webp"
+  },
+  {
+   "id": 1630256,
+   "name": "Jae'Sean Tate",
+   "team": "HOU",
+   "pos": "F",
+   "born": "1995-10-28",
+   "salary": 3066143,
+   "img": "face-tight/1630256-jaesean-tate.webp"
+  },
+  {
+   "id": 1630264,
+   "name": "Anthony Gill",
+   "team": "WAS",
+   "pos": "F",
+   "born": "1992-10-17",
+   "salary": 3066143,
+   "img": "face-tight/1630264-anthony-gill.webp"
+  },
+  {
+   "id": 1641740,
+   "name": "Jaylen Clark",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2001-10-13",
+   "salary": 3086420,
+   "img": "face-tight/1641740-jaylen-clark.webp"
+  },
+  {
+   "id": 1642273,
+   "name": "Kyshawn George",
+   "team": "WAS",
+   "pos": "F",
+   "born": "2003-12-02",
+   "salary": 3108000,
+   "img": "face-tight/1642273-kyshawn-george.webp"
+  },
+  {
+   "id": 1642859,
+   "name": "Jase Richardson",
+   "team": "ORL",
+   "pos": "G",
+   "born": "2005-10-16",
+   "salary": 3132360,
+   "img": "face-tight/1642859-jase-richardson.webp"
+  },
+  {
+   "id": 1631199,
+   "name": "Ron Harper Jr.",
+   "team": "BOS",
+   "pos": "F",
+   "born": "2000-04-12",
+   "salary": 3150752,
+   "img": "face-tight/1631199-ron-harper-jr.webp"
+  },
+  {
+   "id": 1642358,
+   "name": "AJ Johnson",
+   "team": "NOP",
+   "pos": "G",
+   "born": "2004-12-01",
+   "salary": 3237120,
+   "img": "face-tight/1642358-aj-johnson.webp"
+  },
+  {
+   "id": 1642363,
+   "name": "Nique Clifford",
+   "team": "SAC",
+   "pos": "G",
+   "born": "2002-02-09",
+   "salary": 3263400,
+   "img": "face-tight/1642363-nique-clifford.webp"
+  },
+  {
+   "id": 1628372,
+   "name": "Dennis Smith Jr.",
+   "team": "MIA",
+   "pos": "G",
+   "born": "1997-11-25",
+   "salary": 3286399,
+   "img": "face-tight/1628372-dennis-smith-jr.webp"
+  },
+  {
+   "id": 1628995,
+   "name": "Kevin Knox II",
+   "team": "ORL",
+   "pos": "F",
+   "born": "1999-08-11",
+   "salary": 3286399,
+   "img": "face-tight/1628995-kevin-knox-ii.webp"
+  },
+  {
+   "id": 1629022,
+   "name": "Lonnie Walker IV",
+   "team": "DEN",
+   "pos": "G-F",
+   "born": "1998-12-14",
+   "salary": 3286399,
+   "img": "face-tight/1629022-lonnie-walker-iv.webp"
+  },
+  {
+   "id": 1629162,
+   "name": "Jordan McLaughlin",
+   "team": "SAS",
+   "pos": "G",
+   "born": "1996-04-09",
+   "salary": 3286399,
+   "img": "face-tight/1629162-jordan-mclaughlin.webp"
+  },
+  {
+   "id": 1629680,
+   "name": "Matisse Thybulle",
+   "team": "LAL",
+   "pos": "G-F",
+   "born": "1997-03-04",
+   "salary": 3286399,
+   "img": "face-tight/1629680-matisse-thybulle.webp"
+  },
+  {
+   "id": 1641747,
+   "name": "DaRon Holmes II",
+   "team": "DEN",
+   "pos": "F",
+   "born": "2002-08-15",
+   "salary": 3372120,
+   "img": "face-tight/1641747-daron-holmes-ii.webp"
+  },
+  {
+   "id": 1642854,
+   "name": "Asa Newell",
+   "team": "ATL",
+   "pos": "F",
+   "born": "2005-10-05",
+   "salary": 3399480,
+   "img": "face-tight/1642854-asa-newell.webp"
+  },
+  {
+   "id": 1630574,
+   "name": "Ariel Hukporti",
+   "team": "PHI",
+   "pos": "C",
+   "born": "2002-04-12",
+   "salary": 3400000,
+   "img": "face-tight/1630574-ariel-hukporti.webp"
+  },
+  {
+   "id": 1631230,
+   "name": "Dominick Barlow",
+   "team": "PHI",
+   "pos": "F",
+   "born": "2003-05-26",
+   "salary": 3415000,
+   "img": "face-tight/1631230-dominick-barlow.webp"
+  },
+  {
+   "id": 1628396,
+   "name": "Tony Bradley",
+   "team": "NYK",
+   "pos": "C-F",
+   "born": "1998-01-08",
+   "salary": 3506659,
+   "img": "face-tight/1628396-tony-bradley.webp"
+  },
+  {
+   "id": 1628963,
+   "name": "Marvin Bagley III",
+   "team": "DEN",
+   "pos": "F",
+   "born": "1999-03-14",
+   "salary": 3506659,
+   "img": "face-tight/1628963-marvin-bagley-iii.webp"
+  },
+  {
+   "id": 1628964,
+   "name": "Mo Bamba",
+   "team": "UTA",
+   "pos": "C",
+   "born": "1998-05-12",
+   "salary": 3506659,
+   "img": "face-tight/1628964-mo-bamba.webp"
+  },
+  {
+   "id": 1628971,
+   "name": "Bruce Brown",
+   "team": "NYK",
+   "pos": "G-F",
+   "born": "1996-08-15",
+   "salary": 3506659,
+   "img": "face-tight/1628971-bruce-brown.webp"
+  },
+  {
+   "id": 1628975,
+   "name": "Jevon Carter",
+   "team": "ORL",
+   "pos": "G",
+   "born": "1995-09-14",
+   "salary": 3506659,
+   "img": "face-tight/1628975-jevon-carter.webp"
+  },
+  {
+   "id": 1629234,
+   "name": "Drew Eubanks",
+   "team": "NYK",
+   "pos": "F-C",
+   "born": "1997-02-01",
+   "salary": 3506659,
+   "img": "face-tight/1629234-drew-eubanks.webp"
+  },
+  {
+   "id": 1642274,
+   "name": "Yves Missi",
+   "team": "NOP",
+   "pos": "C",
+   "born": "2004-05-14",
+   "salary": 3512760,
+   "img": "face-tight/1642274-yves-missi.webp"
+  },
+  {
+   "id": 203901,
+   "name": "Elfrid Payton",
+   "team": "SAC",
+   "pos": "G",
+   "born": "1994-02-22",
+   "salary": 3524115,
+   "img": "face-tight/203901-elfrid-payton.webp"
+  },
+  {
+   "id": 203992,
+   "name": "Bogdan Bogdanović",
+   "team": "HOU",
+   "pos": "G",
+   "born": "1992-08-18",
+   "salary": 3524115,
+   "img": "face-tight/203992-bogdan-bogdanovi.webp"
+  },
+  {
+   "id": 1627732,
+   "name": "Ben Simmons",
+   "team": "SAC",
+   "pos": "G-F",
+   "born": "1996-07-20",
+   "salary": 3524115,
+   "img": "face-tight/1627732-ben-simmons.webp"
+  },
+  {
+   "id": 1628418,
+   "name": "Thomas Bryant",
+   "team": "CLE",
+   "pos": "C-F",
+   "born": "1997-07-31",
+   "salary": 3524115,
+   "img": "face-tight/1628418-thomas-bryant.webp"
+  },
+  {
+   "id": 1642962,
+   "name": "Drake Powell",
+   "team": "BKN",
+   "pos": "G-F",
+   "born": "2005-09-08",
+   "salary": 3540600,
+   "img": "face-tight/1642962-drake-powell.webp"
+  },
+  {
+   "id": 1642281,
+   "name": "Jaylon Tyson",
+   "team": "CLE",
+   "pos": "G-F",
+   "born": "2002-12-02",
+   "salary": 3658560,
+   "img": "face-tight/1642281-jaylon-tyson.webp"
+  },
+  {
+   "id": 1642860,
+   "name": "Will Riley",
+   "team": "WAS",
+   "pos": "F",
+   "born": "2006-02-10",
+   "salary": 3688320,
+   "img": "face-tight/1642860-will-riley.webp"
+  },
+  {
+   "id": 1642266,
+   "name": "Ja'Kobe Walter",
+   "team": "TOR",
+   "pos": "G",
+   "born": "2004-09-04",
+   "salary": 3811800,
+   "img": "face-tight/1642266-jakobe-walter.webp"
+  },
+  {
+   "id": 203914,
+   "name": "Gary Harris",
+   "team": "DET",
+   "pos": "G",
+   "born": "1994-09-14",
+   "salary": 3815861,
+   "img": "face-tight/203914-gary-harris.webp"
+  },
+  {
+   "id": 1626192,
+   "name": "Pat Connaughton",
+   "team": "CHA",
+   "pos": "G",
+   "born": "1993-01-06",
+   "salary": 3815861,
+   "img": "face-tight/1626192-pat-connaughton.webp"
+  },
+  {
+   "id": 1627752,
+   "name": "Taurean Prince",
+   "team": "DET",
+   "pos": "F",
+   "born": "1994-03-22",
+   "salary": 3815861,
+   "img": "face-tight/1627752-taurean-prince.webp"
+  },
+  {
+   "id": 1642857,
+   "name": "Kasparas Jakučionis",
+   "team": "MIL",
+   "pos": "G",
+   "born": "2006-05-29",
+   "salary": 3841680,
+   "img": "face-tight/1642857-kasparas-jakuionis.webp"
+  },
+  {
+   "id": 1629004,
+   "name": "Svi Mykhailiuk",
+   "team": "UTA",
+   "pos": "G-F",
+   "born": "1997-06-10",
+   "salary": 3850000,
+   "img": "face-tight/1629004-svi-mykhailiuk.webp"
+  },
+  {
+   "id": 2544,
+   "name": "LeBron James",
+   "team": "PHI",
+   "pos": "F",
+   "born": "1984-12-30",
+   "salary": 3876529,
+   "img": "face-tight/2544-lebron-james.webp"
+  },
+  {
+   "id": 201144,
+   "name": "Mike Conley",
+   "team": "BOS",
+   "pos": "G",
+   "born": "1987-10-11",
+   "salary": 3876529,
+   "img": "face-tight/201144-mike-conley.webp"
+  },
+  {
+   "id": 201599,
+   "name": "DeAndre Jordan",
+   "team": "NOP",
+   "pos": "C",
+   "born": "1988-07-21",
+   "salary": 3876529,
+   "img": "face-tight/201599-deandre-jordan.webp"
+  },
+  {
+   "id": 201942,
+   "name": "DeMar DeRozan",
+   "team": "DEN",
+   "pos": "G-F",
+   "born": "1989-08-07",
+   "salary": 3876529,
+   "img": "face-tight/201942-demar-derozan.webp"
+  },
+  {
+   "id": 201949,
+   "name": "James Johnson",
+   "team": "IND",
+   "pos": "F",
+   "born": "1987-02-20",
+   "salary": 3876529,
+   "img": "face-tight/201949-james-johnson.webp"
+  },
+  {
+   "id": 202696,
+   "name": "Nikola Vučević",
+   "team": "ORL",
+   "pos": "C",
+   "born": "1990-10-24",
+   "salary": 3876529,
+   "img": "face-tight/202696-nikola-vuevi.webp"
+  },
+  {
+   "id": 203083,
+   "name": "Andre Drummond",
+   "team": "NYK",
+   "pos": "C",
+   "born": "1993-08-10",
+   "salary": 3876529,
+   "img": "face-tight/203083-andre-drummond.webp"
+  },
+  {
+   "id": 203484,
+   "name": "Kentavious Caldwell-Pope",
+   "team": "PHI",
+   "pos": "G",
+   "born": "1993-02-18",
+   "salary": 3876529,
+   "img": "face-tight/203484-kentavious-caldwell-pope.webp"
+  },
+  {
+   "id": 203903,
+   "name": "Jordan Clarkson",
+   "team": "NYK",
+   "pos": "G",
+   "born": "1992-06-07",
+   "salary": 3876529,
+   "img": "face-tight/203903-jordan-clarkson.webp"
+  },
+  {
+   "id": 203937,
+   "name": "Kyle Anderson",
+   "team": "TOR",
+   "pos": "F-G",
+   "born": "1993-09-20",
+   "salary": 3876529,
+   "img": "face-tight/203937-kyle-anderson.webp"
+  },
+  {
+   "id": 203939,
+   "name": "Dwight Powell",
+   "team": "DAL",
+   "pos": "F-C",
+   "born": "1991-07-20",
+   "salary": 3876529,
+   "img": "face-tight/203939-dwight-powell.webp"
+  },
+  {
+   "id": 1626145,
+   "name": "Tyus Jones",
+   "team": "DEN",
+   "pos": "G",
+   "born": "1996-05-10",
+   "salary": 3876529,
+   "img": "face-tight/1626145-tyus-jones.webp"
+  },
+  {
+   "id": 1626168,
+   "name": "Trey Lyles",
+   "team": "MIN",
+   "pos": "F",
+   "born": "1995-11-05",
+   "salary": 3876529,
+   "img": "face-tight/1626168-trey-lyles.webp"
+  },
+  {
+   "id": 1626172,
+   "name": "Kevon Looney",
+   "team": "LAL",
+   "pos": "F",
+   "born": "1996-02-06",
+   "salary": 3876529,
+   "img": "face-tight/1626172-kevon-looney.webp"
+  },
+  {
+   "id": 1626204,
+   "name": "Larry Nance Jr.",
+   "team": "IND",
+   "pos": "F-C",
+   "born": "1993-01-01",
+   "salary": 3876529,
+   "img": "face-tight/1626204-larry-nance-jr.webp"
+  },
+  {
+   "id": 1627777,
+   "name": "Georges Niang",
+   "team": "GSW",
+   "pos": "F",
+   "born": "1993-06-17",
+   "salary": 3876529,
+   "img": "face-tight/1627777-georges-niang.webp"
+  },
+  {
+   "id": 1627780,
+   "name": "Gary Payton II",
+   "team": "GSW",
+   "pos": "G",
+   "born": "1992-12-01",
+   "salary": 3876529,
+   "img": "face-tight/1627780-gary-payton-ii.webp"
+  },
+  {
+   "id": 1629750,
+   "name": "Javonte Green",
+   "team": "DET",
+   "pos": "G",
+   "born": "1993-07-23",
+   "salary": 3943679,
+   "img": "face-tight/1629750-javonte-green.webp"
+  },
+  {
+   "id": 1630540,
+   "name": "Miles McBride",
+   "team": "NYK",
+   "pos": "G",
+   "born": "2000-09-08",
+   "salary": 3956523,
+   "img": "face-tight/1630540-miles-mcbride.webp"
+  },
+  {
+   "id": 1641783,
+   "name": "Tristan da Silva",
+   "team": "ORL",
+   "pos": "F",
+   "born": "2001-05-15",
+   "salary": 3991200,
+   "img": "face-tight/1641783-tristan-da-silva.webp"
+  },
+  {
+   "id": 1631157,
+   "name": "Ryan Rollins",
+   "team": "MIL",
+   "pos": "G",
+   "born": "2002-07-03",
+   "salary": 4000000,
+   "img": "face-tight/1631157-ryan-rollins.webp"
+  },
+  {
+   "id": 1642450,
+   "name": "Daniss Jenkins",
+   "team": "DET",
+   "pos": "G",
+   "born": "2001-08-17",
+   "salary": 4000000,
+   "img": "face-tight/1642450-daniss-jenkins.webp"
+  },
+  {
+   "id": 1642849,
+   "name": "Nolan Traore",
+   "team": "BKN",
+   "pos": "G",
+   "born": "2006-05-28",
+   "salary": 4002000,
+   "img": "face-tight/1642849-nolan-traore.webp"
+  },
+  {
+   "id": 1642261,
+   "name": "Dalton Knecht",
+   "team": "LAL",
+   "pos": "F",
+   "born": "2001-04-19",
+   "salary": 4201080,
+   "img": "face-tight/1642261-dalton-knecht.webp"
+  },
+  {
+   "id": 1642866,
+   "name": "Joan Beringer",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2006-11-01",
+   "salary": 4411200,
+   "img": "face-tight/1642866-joan-beringer.webp"
+  },
+  {
+   "id": 1642272,
+   "name": "Jared McCain",
+   "team": "OKC",
+   "pos": "G",
+   "born": "2004-02-20",
+   "salary": 4422600,
+   "img": "face-tight/1642272-jared-mccain.webp"
+  },
+  {
+   "id": 1630631,
+   "name": "Jose Alvarado",
+   "team": "NYK",
+   "pos": "G",
+   "born": "1998-04-12",
+   "salary": 4439656,
+   "img": "face-tight/1630631-jose-alvarado.webp"
+  },
+  {
+   "id": 1631169,
+   "name": "Josh Minott",
+   "team": "BKN",
+   "pos": "F",
+   "born": "2002-11-25",
+   "salary": 4500000,
+   "img": "face-tight/1631169-josh-minott.webp"
+  },
+  {
+   "id": 1630611,
+   "name": "Gui Santos",
+   "team": "GSW",
+   "pos": "F",
+   "born": "2002-06-22",
+   "salary": 4629630,
+   "img": "face-tight/1630611-gui-santos.webp"
+  },
+  {
+   "id": 1642905,
+   "name": "Yang Hansen",
+   "team": "POR",
+   "pos": "C",
+   "born": "2005-06-26",
+   "salary": 4643520,
+   "img": "face-tight/1642905-yang-hansen.webp"
+  },
+  {
+   "id": 1642276,
+   "name": "Kel'el Ware",
+   "team": "MIL",
+   "pos": "C",
+   "born": "2004-04-20",
+   "salary": 4654920,
+   "img": "face-tight/1642276-kelel-ware.webp"
+  },
+  {
+   "id": 1631124,
+   "name": "Julian Strawther",
+   "team": "DEN",
+   "pos": "G",
+   "born": "2002-04-18",
+   "salary": 4826931,
+   "img": "face-tight/1631124-julian-strawther.webp"
+  },
+  {
+   "id": 1641729,
+   "name": "Brice Sensabaugh",
+   "team": "UTA",
+   "pos": "F",
+   "born": "2003-10-30",
+   "salary": 4862237,
+   "img": "face-tight/1641729-brice-sensabaugh.webp"
+  },
+  {
+   "id": 1642850,
+   "name": "Thomas Sorber",
+   "team": "OKC",
+   "pos": null,
+   "born": null,
+   "salary": 4887720,
+   "img": "face-tight/1642850-thomas-sorber.webp"
+  },
+  {
+   "id": 1642267,
+   "name": "Bub Carrington",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2005-07-21",
+   "salary": 4900560,
+   "img": "face-tight/1642267-bub-carrington.webp"
+  },
+  {
+   "id": 1629026,
+   "name": "Kenrich Williams",
+   "team": "OKC",
+   "pos": "G-F",
+   "born": "1994-12-02",
+   "salary": 5000000,
+   "img": "face-tight/1629026-kenrich-williams.webp"
+  },
+  {
+   "id": 1641767,
+   "name": "Ben Sheppard",
+   "team": "IND",
+   "pos": "G",
+   "born": "2001-07-16",
+   "salary": 5031668,
+   "img": "face-tight/1641767-ben-sheppard.webp"
+  },
+  {
+   "id": 1642868,
+   "name": "Carter Bryant",
+   "team": "SAS",
+   "pos": "F",
+   "born": "2005-11-26",
+   "salary": 5145360,
+   "img": "face-tight/1642868-carter-bryant.webp"
+  },
+  {
+   "id": 1631204,
+   "name": "Marcus Sasser",
+   "team": "DAL",
+   "pos": "G",
+   "born": "2000-09-21",
+   "salary": 5198983,
+   "img": "face-tight/1631204-marcus-sasser.webp"
+  },
+  {
+   "id": 1641757,
+   "name": "Jordan Miller",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2000-01-23",
+   "salary": 5300000,
+   "img": "face-tight/1641757-jordan-miller.webp"
+  },
+  {
+   "id": 1631200,
+   "name": "Kris Murray",
+   "team": "MEM",
+   "pos": "F",
+   "born": "2000-08-19",
+   "salary": 5315004,
+   "img": "face-tight/1631200-kris-murray.webp"
+  },
+  {
+   "id": 1629645,
+   "name": "Kevin Porter Jr.",
+   "team": "MIL",
+   "pos": "G-F",
+   "born": "2000-05-04",
+   "salary": 5390700,
+   "img": "face-tight/1629645-kevin-porter-jr.webp"
+  },
+  {
+   "id": 1641730,
+   "name": "Noah Clowney",
+   "team": "BKN",
+   "pos": "F",
+   "born": "2004-07-14",
+   "salary": 5414034,
+   "img": "face-tight/1641730-noah-clowney.webp"
+  },
+  {
+   "id": 1642852,
+   "name": "Derik Queen",
+   "team": "NOP",
+   "pos": "C",
+   "born": "2004-12-27",
+   "salary": 5416080,
+   "img": "face-tight/1642852-derik-queen.webp"
+  },
+  {
+   "id": 1642260,
+   "name": "Nikola Topić",
+   "team": "OKC",
+   "pos": "G",
+   "born": "2005-08-10",
+   "salary": 5429760,
+   "img": "face-tight/1642260-nikola-topi.webp"
+  },
+  {
+   "id": 1630173,
+   "name": "Precious Achiuwa",
+   "team": "SAC",
+   "pos": "F",
+   "born": "1999-09-19",
+   "salary": 5477000,
+   "img": "face-tight/1630173-precious-achiuwa.webp"
+  },
+  {
+   "id": 1629013,
+   "name": "Landry Shamet",
+   "team": "NYK",
+   "pos": "G",
+   "born": "1997-03-13",
+   "salary": 5490967,
+   "img": "face-tight/1629013-landry-shamet.webp"
+  },
+  {
+   "id": 203114,
+   "name": "Khris Middleton",
+   "team": "WAS",
+   "pos": "F",
+   "born": "1991-08-12",
+   "salary": 5591122,
+   "img": "face-tight/203114-khris-middleton.webp"
+  },
+  {
+   "id": 202691,
+   "name": "Klay Thompson",
+   "team": "MIA",
+   "pos": "G",
+   "born": "1990-02-08",
+   "salary": 5600000,
+   "img": "face-tight/202691-klay-thompson.webp"
+  },
+  {
+   "id": 1630194,
+   "name": "Paul Reed",
+   "team": "DET",
+   "pos": "F",
+   "born": "1999-06-14",
+   "salary": 5602689,
+   "img": "face-tight/1630194-paul-reed.webp"
+  },
+  {
+   "id": 1641764,
+   "name": "Brandin Podziemski",
+   "team": "GSW",
+   "pos": "G",
+   "born": "2003-02-25",
+   "salary": 5679458,
+   "img": "face-tight/1641764-brandin-podziemski.webp"
+  },
+  {
+   "id": 1627739,
+   "name": "Kris Dunn",
+   "team": "LAC",
+   "pos": "G",
+   "born": "1994-03-18",
+   "salary": 5684800,
+   "img": "face-tight/1627739-kris-dunn.webp"
+  },
+  {
+   "id": 1642855,
+   "name": "Noa Essengue",
+   "team": "CHI",
+   "pos": "F",
+   "born": "2006-12-18",
+   "salary": 5701200,
+   "img": "face-tight/1642855-noa-essengue.webp"
+  },
+  {
+   "id": 1641824,
+   "name": "Matas Buzelis",
+   "team": "CHI",
+   "pos": "F",
+   "born": "2004-10-13",
+   "salary": 5715360,
+   "img": "face-tight/1641824-matas-buzelis.webp"
+  },
+  {
+   "id": 1631172,
+   "name": "Ousmane Dieng",
+   "team": "MIL",
+   "pos": "F",
+   "born": "2003-05-21",
+   "salary": 5750000,
+   "img": "face-tight/1631172-ousmane-dieng.webp"
+  },
+  {
+   "id": 1630692,
+   "name": "Jordan Goodwin",
+   "team": "PHX",
+   "pos": "G",
+   "born": "1998-10-23",
+   "salary": 5864198,
+   "img": "face-tight/1630692-jordan-goodwin.webp"
+  },
+  {
+   "id": 1631170,
+   "name": "Jaime Jaquez Jr.",
+   "team": "MIL",
+   "pos": "G",
+   "born": "2001-02-18",
+   "salary": 5939141,
+   "img": "face-tight/1631170-jaime-jaquez-jr.webp"
+  },
+  {
+   "id": 1629006,
+   "name": "Josh Okogie",
+   "team": "UTA",
+   "pos": "G",
+   "born": "1998-09-01",
+   "salary": 6000000,
+   "img": "face-tight/1629006-josh-okogie.webp"
+  },
+  {
+   "id": 1629014,
+   "name": "Anfernee Simons",
+   "team": "PHI",
+   "pos": "G",
+   "born": "1999-06-08",
+   "salary": 6000000,
+   "img": "face-tight/1629014-anfernee-simons.webp"
+  },
+  {
+   "id": 1629637,
+   "name": "Jaxson Hayes",
+   "team": "UTA",
+   "pos": "C-F",
+   "born": "2000-05-23",
+   "salary": 6000000,
+   "img": "face-tight/1629637-jaxson-hayes.webp"
+  },
+  {
+   "id": 1630702,
+   "name": "Jaden Hardy",
+   "team": "LAL",
+   "pos": "G",
+   "born": "2002-07-05",
+   "salary": 6000000,
+   "img": "face-tight/1630702-jaden-hardy.webp"
+  },
+  {
+   "id": 1631222,
+   "name": "Jake LaRavia",
+   "team": "LAL",
+   "pos": "F",
+   "born": "2001-11-03",
+   "salary": 6000000,
+   "img": "face-tight/1631222-jake-laravia.webp"
+  },
+  {
+   "id": 1642461,
+   "name": "Spencer Jones",
+   "team": "DEN",
+   "pos": "F",
+   "born": "2001-06-14",
+   "salary": 6000000,
+   "img": "face-tight/1642461-spencer-jones.webp"
+  },
+  {
+   "id": 1642907,
+   "name": "Cedric Coward",
+   "team": "MEM",
+   "pos": "G",
+   "born": "2003-09-11",
+   "salary": 6001080,
+   "img": "face-tight/1642907-cedric-coward.webp"
+  },
+  {
+   "id": 1642262,
+   "name": "Cody Williams",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2004-11-20",
+   "salary": 6015600,
+   "img": "face-tight/1642262-cody-williams.webp"
+  },
+  {
+   "id": 203935,
+   "name": "Marcus Smart",
+   "team": "HOU",
+   "pos": "G",
+   "born": "1994-03-06",
+   "salary": 6064000,
+   "img": "face-tight/203935-marcus-smart.webp"
+  },
+  {
+   "id": 1628379,
+   "name": "Luke Kennard",
+   "team": "PHX",
+   "pos": "G",
+   "born": "1996-06-24",
+   "salary": 6064000,
+   "img": "face-tight/1628379-luke-kennard.webp"
+  },
+  {
+   "id": 1629001,
+   "name": "De'Anthony Melton",
+   "team": "GSW",
+   "pos": "G",
+   "born": "1998-05-28",
+   "salary": 6064000,
+   "img": "face-tight/1629001-deanthony-melton.webp"
+  },
+  {
+   "id": 1630228,
+   "name": "Jonathan Kuminga",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2002-10-06",
+   "salary": 6064000,
+   "img": "face-tight/1630228-jonathan-kuminga.webp"
+  },
+  {
+   "id": 203501,
+   "name": "Tim Hardaway Jr.",
+   "team": "MIA",
+   "pos": "G-F",
+   "born": "1992-03-16",
+   "salary": 6065000,
+   "img": "face-tight/203501-tim-hardaway-jr.webp"
+  },
+  {
+   "id": 1642863,
+   "name": "Khaman Maluach",
+   "team": "PHX",
+   "pos": "C",
+   "born": "2006-09-14",
+   "salary": 6316680,
+   "img": "face-tight/1642863-khaman-maluach.webp"
+  },
+  {
+   "id": 1641744,
+   "name": "Zach Edey",
+   "team": "MEM",
+   "pos": "C",
+   "born": "2002-05-14",
+   "salary": 6332760,
+   "img": "face-tight/1641744-zach-edey.webp"
+  },
+  {
+   "id": 203078,
+   "name": "Bradley Beal",
+   "team": "LAC",
+   "pos": "G",
+   "born": "1993-06-28",
+   "salary": 6424800,
+   "img": "face-tight/203078-bradley-beal.webp"
+  },
+  {
+   "id": 1630180,
+   "name": "Saddiq Bey",
+   "team": "NOP",
+   "pos": "G-F",
+   "born": "1999-04-09",
+   "salary": 6557080,
+   "img": "face-tight/1630180-saddiq-bey.webp"
+  },
+  {
+   "id": 1641718,
+   "name": "Keyonte George",
+   "team": "UTA",
+   "pos": "G",
+   "born": "2003-11-08",
+   "salary": 6563925,
+   "img": "face-tight/1641718-keyonte-george.webp"
+  },
+  {
+   "id": 1642867,
+   "name": "Collin Murray-Boyles",
+   "team": "TOR",
+   "pos": "F",
+   "born": "2005-06-10",
+   "salary": 6649560,
+   "img": "face-tight/1642867-collin-murray-boyles.webp"
+  },
+  {
+   "id": 201143,
+   "name": "Al Horford",
+   "team": "GSW",
+   "pos": "C-F",
+   "born": "1986-06-03",
+   "salary": 6822000,
+   "img": "face-tight/201143-al-horford.webp"
+  },
+  {
+   "id": 1630543,
+   "name": "Isaiah Jackson",
+   "team": "LAC",
+   "pos": "F",
+   "born": "2002-01-10",
+   "salary": 7000000,
+   "img": "face-tight/1630543-isaiah-jackson.webp"
+  },
+  {
+   "id": 203991,
+   "name": "Clint Capela",
+   "team": "HOU",
+   "pos": "C",
+   "born": "1994-05-18",
+   "salary": 7035000,
+   "img": "face-tight/203991-clint-capela.webp"
+  },
+  {
+   "id": 1641711,
+   "name": "Gradey Dick",
+   "team": "LAC",
+   "pos": "G-F",
+   "born": "2003-11-20",
+   "salary": 7131510,
+   "img": "face-tight/1641711-gradey-dick.webp"
+  },
+  {
+   "id": 1642856,
+   "name": "Egor Dëmin",
+   "team": "BKN",
+   "pos": "G",
+   "born": "2006-03-03",
+   "salary": 7233720,
+   "img": "face-tight/1642856-egor-dmin.webp"
+  },
+  {
+   "id": 1641726,
+   "name": "Dereck Lively II",
+   "team": "DAL",
+   "pos": "C",
+   "born": "2004-02-12",
+   "salary": 7239130,
+   "img": "face-tight/1641726-dereck-lively-ii.webp"
+  },
+  {
+   "id": 1641717,
+   "name": "Cason Wallace",
+   "team": "OKC",
+   "pos": "G",
+   "born": "2003-11-07",
+   "salary": 7420806,
+   "img": "face-tight/1641717-cason-wallace.webp"
+  },
+  {
+   "id": 1630192,
+   "name": "Zeke Nnaji",
+   "team": "DEN",
+   "pos": "F-C",
+   "born": "2001-01-09",
+   "salary": 7466667,
+   "img": "face-tight/1630192-zeke-nnaji.webp"
+  },
+  {
+   "id": 1631097,
+   "name": "Bennedict Mathurin",
+   "team": "NOP",
+   "pos": "G-F",
+   "born": "2002-06-19",
+   "salary": 7500000,
+   "img": "face-tight/1631097-bennedict-mathurin.webp"
+  },
+  {
+   "id": 1642270,
+   "name": "Donovan Clingan",
+   "team": "POR",
+   "pos": "C",
+   "born": "2004-02-23",
+   "salary": 7519920,
+   "img": "face-tight/1642270-donovan-clingan.webp"
+  },
+  {
+   "id": 1629048,
+   "name": "Goga Bitadze",
+   "team": "ORL",
+   "pos": "C-F",
+   "born": "1999-07-20",
+   "salary": 7608696,
+   "img": "face-tight/1629048-goga-bitadze.webp"
+  },
+  {
+   "id": 1630202,
+   "name": "Payton Pritchard",
+   "team": "BOS",
+   "pos": "G",
+   "born": "1998-01-28",
+   "salary": 7767857,
+   "img": "face-tight/1630202-payton-pritchard.webp"
+  },
+  {
+   "id": 1631119,
+   "name": "Jaylin Williams",
+   "team": "OKC",
+   "pos": "F",
+   "born": "2002-06-29",
+   "salary": 7774648,
+   "img": "face-tight/1631119-jaylin-williams.webp"
+  },
+  {
+   "id": 1641707,
+   "name": "Taylor Hendricks",
+   "team": "MEM",
+   "pos": "F",
+   "born": "2003-11-22",
+   "salary": 7805900,
+   "img": "face-tight/1641707-taylor-hendricks.webp"
+  },
+  {
+   "id": 1642847,
+   "name": "Jeremiah Fears",
+   "team": "NOP",
+   "pos": "G",
+   "born": "2006-10-14",
+   "salary": 7896240,
+   "img": "face-tight/1642847-jeremiah-fears.webp"
+  },
+  {
+   "id": 203084,
+   "name": "Harrison Barnes",
+   "team": "SAS",
+   "pos": "F",
+   "born": "1992-05-30",
+   "salary": 8000000,
+   "img": "face-tight/203084-harrison-barnes.webp"
+  },
+  {
+   "id": 1630200,
+   "name": "Tre Jones",
+   "team": "CHI",
+   "pos": "G",
+   "born": "2000-01-08",
+   "salary": 8000000,
+   "img": "face-tight/1630200-tre-jones.webp"
+  },
+  {
+   "id": 1630544,
+   "name": "Tre Mann",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2001-02-03",
+   "salary": 8000000,
+   "img": "face-tight/1630544-tre-mann.webp"
+  },
+  {
+   "id": 1626162,
+   "name": "Kelly Oubre Jr.",
+   "team": "IND",
+   "pos": "F-G",
+   "born": "1995-12-09",
+   "salary": 8050000,
+   "img": "face-tight/1626162-kelly-oubre-jr.webp"
+  },
+  {
+   "id": 1629028,
+   "name": "Deandre Ayton",
+   "team": "WAS",
+   "pos": "C",
+   "born": "1998-07-23",
+   "salary": 8104000,
+   "img": "face-tight/1629028-deandre-ayton.webp"
+  },
+  {
+   "id": 1642275,
+   "name": "Tidjane Salaün",
+   "team": "CHA",
+   "pos": "F",
+   "born": "2005-08-10",
+   "salary": 8237880,
+   "img": "face-tight/1642275-tidjane-salan.webp"
+  },
+  {
+   "id": 1631108,
+   "name": "Max Christie",
+   "team": "DAL",
+   "pos": "G",
+   "born": "2003-02-10",
+   "salary": 8285714,
+   "img": "face-tight/1631108-max-christie.webp"
+  },
+  {
+   "id": 1641716,
+   "name": "Jarace Walker",
+   "team": "IND",
+   "pos": "F",
+   "born": "2003-09-04",
+   "salary": 8478541,
+   "img": "face-tight/1641716-jarace-walker.webp"
+  },
+  {
+   "id": 1628380,
+   "name": "Zach Collins",
+   "team": "CHI",
+   "pos": "F-C",
+   "born": "1997-11-19",
+   "salary": 8500000,
+   "img": "face-tight/1628380-zach-collins.webp"
+  },
+  {
+   "id": 1642848,
+   "name": "Tre Johnson",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2006-03-07",
+   "salary": 8649600,
+   "img": "face-tight/1642848-tre-johnson.webp"
+  },
+  {
+   "id": 1629021,
+   "name": "Moritz Wagner",
+   "team": "BKN",
+   "pos": "F-C",
+   "born": "1997-04-26",
+   "salary": 9000000,
+   "img": "face-tight/1629021-moritz-wagner.webp"
+  },
+  {
+   "id": 1629731,
+   "name": "Dean Wade",
+   "team": "PHI",
+   "pos": "F-C",
+   "born": "1996-11-20",
+   "salary": 9000000,
+   "img": "face-tight/1629731-dean-wade.webp"
+  },
+  {
+   "id": 1631165,
+   "name": "Keon Ellis",
+   "team": "BKN",
+   "pos": "G",
+   "born": "2000-01-08",
+   "salary": 9000000,
+   "img": "face-tight/1631165-keon-ellis.webp"
+  },
+  {
+   "id": 1630598,
+   "name": "Aaron Wiggins",
+   "team": "ATL",
+   "pos": "G",
+   "born": "1999-01-02",
+   "salary": 9028038,
+   "img": "face-tight/1630598-aaron-wiggins.webp"
+  },
+  {
+   "id": 1641842,
+   "name": "Ronald Holland II",
+   "team": "DET",
+   "pos": "F",
+   "born": "2005-07-07",
+   "salary": 9069600,
+   "img": "face-tight/1641842-ronald-holland-ii.webp"
+  },
+  {
+   "id": 1630241,
+   "name": "Sam Merrill",
+   "team": "CLE",
+   "pos": "G",
+   "born": "1996-05-15",
+   "salary": 9160715,
+   "img": "face-tight/1630241-sam-merrill.webp"
+  },
+  {
+   "id": 201572,
+   "name": "Brook Lopez",
+   "team": "LAC",
+   "pos": "C",
+   "born": "1988-04-01",
+   "salary": 9187500,
+   "img": "face-tight/201572-brook-lopez.webp"
+  },
+  {
+   "id": 1629660,
+   "name": "Ty Jerome",
+   "team": "MEM",
+   "pos": "G-F",
+   "born": "1997-07-08",
+   "salary": 9220050,
+   "img": "face-tight/1629660-ty-jerome.webp"
+  },
+  {
+   "id": 1641731,
+   "name": "Bilal Coulibaly",
+   "team": "WAS",
+   "pos": "G",
+   "born": "2004-07-26",
+   "salary": 9240012,
+   "img": "face-tight/1641731-bilal-coulibaly.webp"
+  },
+  {
+   "id": 1629012,
+   "name": "Collin Sexton",
+   "team": "LAL",
+   "pos": "G",
+   "born": "1999-01-04",
+   "salary": 9366000,
+   "img": "face-tight/1629012-collin-sexton.webp"
+  },
+  {
+   "id": 1630188,
+   "name": "Jalen Smith",
+   "team": "CHI",
+   "pos": "F-C",
+   "born": "2000-03-16",
+   "salary": 9428571,
+   "img": "face-tight/1630188-jalen-smith.webp"
+  },
+  {
+   "id": 1630230,
+   "name": "Naji Marshall",
+   "team": "DAL",
+   "pos": "F",
+   "born": "1998-01-24",
+   "salary": 9428571,
+   "img": "face-tight/1630230-naji-marshall.webp"
+  },
+  {
+   "id": 1642366,
+   "name": "Quinten Post",
+   "team": "MEM",
+   "pos": "C",
+   "born": "2000-03-21",
+   "salary": 9500000,
+   "img": "face-tight/1642366-quinten-post.webp"
+  },
+  {
+   "id": 1628989,
+   "name": "Kevin Huerter",
+   "team": "DET",
+   "pos": "G-F",
+   "born": "1998-08-27",
+   "salary": 9507042,
+   "img": "face-tight/1628989-kevin-huerter.webp"
+  },
+  {
+   "id": 1642846,
+   "name": "Ace Bailey",
+   "team": "UTA",
+   "pos": "F",
+   "born": "2006-08-13",
+   "salary": 9523080,
+   "img": "face-tight/1642846-ace-bailey.webp"
+  },
+  {
+   "id": 1627741,
+   "name": "Buddy Hield",
+   "team": "CHI",
+   "pos": "G",
+   "born": "1992-12-17",
+   "salary": 9658536,
+   "img": "face-tight/1627741-buddy-hield.webp"
+  },
+  {
+   "id": 1630549,
+   "name": "Day'Ron Sharpe",
+   "team": "BKN",
+   "pos": "C",
+   "born": "2001-11-06",
+   "salary": 10000000,
+   "img": "face-tight/1630549-dayron-sharpe.webp"
+  },
+  {
+   "id": 1628997,
+   "name": "Caleb Martin",
+   "team": "DAL",
+   "pos": "F",
+   "born": "1995-09-28",
+   "salary": 10001494,
+   "img": "face-tight/1628997-caleb-martin.webp"
+  },
+  {
+   "id": 1642264,
+   "name": "Stephon Castle",
+   "team": "SAS",
+   "pos": "G",
+   "born": "2004-11-01",
+   "salary": 10015920,
+   "img": "face-tight/1642264-stephon-castle.webp"
+  },
+  {
+   "id": 1631260,
+   "name": "AJ Green",
+   "team": "MIL",
+   "pos": "G",
+   "born": "1999-09-27",
+   "salary": 10044644,
+   "img": "face-tight/1631260-aj-green.webp"
+  },
+  {
+   "id": 1641710,
+   "name": "Anthony Black",
+   "team": "ORL",
+   "pos": "G",
+   "born": "2004-01-20",
+   "salary": 10106315,
+   "img": "face-tight/1641710-anthony-black.webp"
+  },
+  {
+   "id": 1628436,
+   "name": "Luke Kornet",
+   "team": "SAS",
+   "pos": "C-F",
+   "born": "1995-07-15",
+   "salary": 10450000,
+   "img": "face-tight/1628436-luke-kornet.webp"
+  },
+  {
+   "id": 1627884,
+   "name": "Derrick Jones Jr.",
+   "team": "LAC",
+   "pos": "F",
+   "born": "1997-02-15",
+   "salary": 10476190,
+   "img": "face-tight/1627884-derrick-jones-jr.webp"
+  },
+  {
+   "id": 1642851,
+   "name": "Kon Knueppel",
+   "team": "CHA",
+   "pos": "G-F",
+   "born": "2005-08-03",
+   "salary": 10516560,
+   "img": "face-tight/1642851-kon-knueppel.webp"
+  },
+  {
+   "id": 1631221,
+   "name": "Collin Gillespie",
+   "team": "PHX",
+   "pos": "G",
+   "born": "1999-06-25",
+   "salary": 10714286,
+   "img": "face-tight/1631221-collin-gillespie.webp"
+  },
+  {
+   "id": 1630573,
+   "name": "Sam Hauser",
+   "team": "BOS",
+   "pos": "F",
+   "born": "1997-12-08",
+   "salary": 10848215,
+   "img": "face-tight/1630573-sam-hauser.webp"
+  },
+  {
+   "id": 1626220,
+   "name": "Royce O'Neale",
+   "team": "CHA",
+   "pos": "F",
+   "born": "1993-06-05",
+   "salary": 10875000,
+   "img": "face-tight/1626220-royce-oneale.webp"
+  },
+  {
+   "id": 204456,
+   "name": "T.J. McConnell",
+   "team": "IND",
+   "pos": "G",
+   "born": "1992-03-25",
+   "salary": 11000000,
+   "img": "face-tight/204456-tj-mcconnell.webp"
+  },
+  {
+   "id": 1630174,
+   "name": "Aaron Nesmith",
+   "team": "IND",
+   "pos": "G-F",
+   "born": "1999-10-16",
+   "salary": 11000000,
+   "img": "face-tight/1630174-aaron-nesmith.webp"
+  },
+  {
+   "id": 1642263,
+   "name": "Reed Sheppard",
+   "team": "HOU",
+   "pos": "G",
+   "born": "2004-06-24",
+   "salary": 11108880,
+   "img": "face-tight/1642263-reed-sheppard.webp"
+  },
+  {
+   "id": 1641709,
+   "name": "Ausar Thompson",
+   "team": "DET",
+   "pos": "G-F",
+   "born": "2003-01-30",
+   "salary": 11117925,
+   "img": "face-tight/1641709-ausar-thompson.webp"
+  },
+  {
+   "id": 1630198,
+   "name": "Isaiah Joe",
+   "team": "DET",
+   "pos": "G",
+   "born": "1999-07-02",
+   "salary": 11323006,
+   "img": "face-tight/1630198-isaiah-joe.webp"
+  },
+  {
+   "id": 203994,
+   "name": "Jusuf Nurkić",
+   "team": "UTA",
+   "pos": "C",
+   "born": "1994-08-23",
+   "salary": 11458333,
+   "img": "face-tight/203994-jusuf-nurki.webp"
+  },
+  {
+   "id": 1628371,
+   "name": "Jonathan Isaac",
+   "team": "ORL",
+   "pos": "F",
+   "born": "1997-10-03",
+   "salary": 11524115,
+   "img": "face-tight/1628371-jonathan-isaac.webp"
+  },
+  {
+   "id": 1642845,
+   "name": "VJ Edgecombe",
+   "team": "PHI",
+   "pos": "G",
+   "born": "2005-07-30",
+   "salary": 11663880,
+   "img": "face-tight/1642845-vj-edgecombe.webp"
+  },
+  {
+   "id": 1631109,
+   "name": "Mark Williams",
+   "team": "PHX",
+   "pos": "C",
+   "born": "2001-12-16",
+   "salary": 11728395,
+   "img": "face-tight/1631109-mark-williams.webp"
+  },
+  {
+   "id": 1630171,
+   "name": "Isaac Okoro",
+   "team": "CHI",
+   "pos": "F-G",
+   "born": "2001-01-26",
+   "salary": 11814814,
+   "img": "face-tight/1630171-isaac-okoro.webp"
+  },
+  {
+   "id": 1641708,
+   "name": "Amen Thompson",
+   "team": "HOU",
+   "pos": "G-F",
+   "born": "2003-01-30",
+   "salary": 12258609,
+   "img": "face-tight/1641708-amen-thompson.webp"
+  },
+  {
+   "id": 1642259,
+   "name": "Alex Sarr",
+   "team": "WAS",
+   "pos": "C",
+   "born": "2005-04-26",
+   "salary": 12370680,
+   "img": "face-tight/1642259-alex-sarr.webp"
+  },
+  {
+   "id": 1630558,
+   "name": "Davion Mitchell",
+   "team": "MIA",
+   "pos": "G",
+   "born": "1998-09-05",
+   "salary": 12400000,
+   "img": "face-tight/1630558-davion-mitchell.webp"
+  },
+  {
+   "id": 1629020,
+   "name": "Jarred Vanderbilt",
+   "team": "LAL",
+   "pos": "F",
+   "born": "1999-04-03",
+   "salary": 12428571,
+   "img": "face-tight/1629020-jarred-vanderbilt.webp"
+  },
+  {
+   "id": 1630541,
+   "name": "Moses Moody",
+   "team": "GSW",
+   "pos": "G",
+   "born": "2002-05-31",
+   "salary": 12500000,
+   "img": "face-tight/1630541-moses-moody.webp"
+  },
+  {
+   "id": 1628978,
+   "name": "Donte DiVincenzo",
+   "team": "MIN",
+   "pos": "G",
+   "born": "1997-01-31",
+   "salary": 12535000,
+   "img": "face-tight/1628978-donte-divincenzo.webp"
+  },
+  {
+   "id": 1642844,
+   "name": "Dylan Harper",
+   "team": "SAS",
+   "pos": "G",
+   "born": "2006-03-02",
+   "salary": 12989040,
+   "img": "face-tight/1642844-dylan-harper.webp"
+  },
+  {
+   "id": 203500,
+   "name": "Steven Adams",
+   "team": "HOU",
+   "pos": "C",
+   "born": "1993-07-20",
+   "salary": 13000000,
+   "img": "face-tight/203500-steven-adams.webp"
+  },
+  {
+   "id": 1630572,
+   "name": "Sandro Mamukelashvili",
+   "team": "LAL",
+   "pos": "F-C",
+   "born": "1999-05-23",
+   "salary": 13000000,
+   "img": "face-tight/1630572-sandro-mamukelashvili.webp"
+  },
+  {
+   "id": 1630166,
+   "name": "Deni Avdija",
+   "team": "POR",
+   "pos": "F",
+   "born": "2001-01-03",
+   "salary": 13125000,
+   "img": "face-tight/1630166-deni-avdija.webp"
+  },
+  {
+   "id": 203081,
+   "name": "Damian Lillard",
+   "team": "POR",
+   "pos": "G",
+   "born": "1990-07-15",
+   "salary": 13398800,
+   "img": "face-tight/203081-damian-lillard.webp"
+  },
+  {
+   "id": 1630703,
+   "name": "Scoot Henderson",
+   "team": "POR",
+   "pos": "G",
+   "born": "2004-02-03",
+   "salary": 13585523,
+   "img": "face-tight/1630703-scoot-henderson.webp"
+  },
+  {
+   "id": 1642258,
+   "name": "Zaccharie Risacher",
+   "team": "DAL",
+   "pos": "F",
+   "born": "2005-04-08",
+   "salary": 13826040,
+   "img": "face-tight/1642258-zaccharie-risacher.webp"
+  },
+  {
+   "id": 1629656,
+   "name": "Quentin Grimes",
+   "team": "LAL",
+   "pos": "G",
+   "born": "2000-05-08",
+   "salary": 13953489,
+   "img": "face-tight/1629656-quentin-grimes.webp"
+  },
+  {
+   "id": 1630557,
+   "name": "Corey Kispert",
+   "team": "ATL",
+   "pos": "F",
+   "born": "1999-03-03",
+   "salary": 13975000,
+   "img": "face-tight/1630557-corey-kispert.webp"
+  },
+  {
+   "id": 1629057,
+   "name": "Robert Williams III",
+   "team": "POR",
+   "pos": "C-F",
+   "born": "1997-10-17",
+   "salary": 14000000,
+   "img": "face-tight/1629057-robert-williams-iii.webp"
+  },
+  {
+   "id": 1629060,
+   "name": "Rui Hachimura",
+   "team": "LAC",
+   "pos": "F",
+   "born": "1998-02-08",
+   "salary": 14000000,
+   "img": "face-tight/1629060-rui-hachimura.webp"
+  },
+  {
+   "id": 1631106,
+   "name": "Tari Eason",
+   "team": "HOU",
+   "pos": "F",
+   "born": "2001-05-10",
+   "salary": 14053356,
+   "img": "face-tight/1631106-tari-eason.webp"
+  },
+  {
+   "id": 1629111,
+   "name": "Jock Landale",
+   "team": "ATL",
+   "pos": "C",
+   "born": "1995-10-25",
+   "salary": 14100000,
+   "img": "face-tight/1629111-jock-landale.webp"
+  },
+  {
+   "id": 1627827,
+   "name": "Dorian Finney-Smith",
+   "team": "ATL",
+   "pos": "F",
+   "born": "1993-05-04",
+   "salary": 14196974,
+   "img": "face-tight/1627827-dorian-finney-smith.webp"
+  },
+  {
+   "id": 1629684,
+   "name": "Grant Williams",
+   "team": "CHA",
+   "pos": "F",
+   "born": "1998-11-30",
+   "salary": 14265750,
+   "img": "face-tight/1629684-grant-williams.webp"
+  },
+  {
+   "id": 1629638,
+   "name": "Nickeil Alexander-Walker",
+   "team": "ATL",
+   "pos": "G",
+   "born": "1998-09-02",
+   "salary": 14403710,
+   "img": "face-tight/1629638-nickeil-alexander-walker.webp"
+  },
+  {
+   "id": 1642843,
+   "name": "Cooper Flagg",
+   "team": "DAL",
+   "pos": "F",
+   "born": "2006-12-21",
+   "salary": 14517480,
+   "img": "face-tight/1642843-cooper-flagg.webp"
+  },
+  {
+   "id": 1626171,
+   "name": "Bobby Portis",
+   "team": "MIA",
+   "pos": "F",
+   "born": "1995-02-10",
+   "salary": 14521414,
+   "img": "face-tight/1626171-bobby-portis.webp"
+  },
+  {
+   "id": 1630182,
+   "name": "Josh Green",
+   "team": "UTA",
+   "pos": "G",
+   "born": "2000-11-16",
+   "salary": 14679012,
+   "img": "face-tight/1630182-josh-green.webp"
+  },
+  {
+   "id": 203471,
+   "name": "Dennis Schröder",
+   "team": "CHA",
+   "pos": "G",
+   "born": "1993-09-15",
+   "salary": 14809200,
+   "img": "face-tight/203471-dennis-schrder.webp"
+  },
+  {
+   "id": 1627747,
+   "name": "Caris LeVert",
+   "team": "MIL",
+   "pos": "G",
+   "born": "1994-08-25",
+   "salary": 14809200,
+   "img": "face-tight/1627747-caris-levert.webp"
+  },
+  {
+   "id": 1630529,
+   "name": "Herbert Jones",
+   "team": "NOP",
+   "pos": "F",
+   "born": "1998-10-06",
+   "salary": 14898786,
+   "img": "face-tight/1630529-herbert-jones.webp"
+  },
+  {
+   "id": 1630167,
+   "name": "Obi Toppin",
+   "team": "IND",
+   "pos": "F",
+   "born": "1998-03-04",
+   "salary": 15000000,
+   "img": "face-tight/1630167-obi-toppin.webp"
+  },
+  {
+   "id": 1630191,
+   "name": "Isaiah Stewart",
+   "team": "MEM",
+   "pos": "F-C",
+   "born": "2001-05-22",
+   "salary": 15000000,
+   "img": "face-tight/1630191-isaiah-stewart.webp"
+  },
+  {
+   "id": 202699,
+   "name": "Tobias Harris",
+   "team": "SAS",
+   "pos": "F",
+   "born": "1992-07-15",
+   "salary": 15044000,
+   "img": "face-tight/202699-tobias-harris.webp"
+  },
+  {
+   "id": 1629011,
+   "name": "Mitchell Robinson",
+   "team": "BOS",
+   "pos": "C-F",
+   "born": "1998-04-01",
+   "salary": 15044000,
+   "img": "face-tight/1629011-mitchell-robinson.webp"
+  },
+  {
+   "id": 1641706,
+   "name": "Brandon Miller",
+   "team": "CHA",
+   "pos": "F",
+   "born": "2002-11-22",
+   "salary": 15104626,
+   "img": "face-tight/1641706-brandon-miller.webp"
+  },
+  {
+   "id": 1629018,
+   "name": "Gary Trent Jr.",
+   "team": "MIL",
+   "pos": "G",
+   "born": "1999-01-18",
+   "salary": 15200000,
+   "img": "face-tight/1629018-gary-trent-jr.webp"
+  },
+  {
+   "id": 1630577,
+   "name": "Julian Champagnie",
+   "team": "SAS",
+   "pos": "F",
+   "born": "2001-06-29",
+   "salary": 15350000,
+   "img": "face-tight/1630577-julian-champagnie.webp"
+  },
+  {
+   "id": 1629611,
+   "name": "Terance Mann",
+   "team": "BKN",
+   "pos": "G-F",
+   "born": "1996-10-18",
+   "salary": 15500000,
+   "img": "face-tight/1629611-terance-mann.webp"
+  },
+  {
+   "id": 1629130,
+   "name": "Duncan Robinson",
+   "team": "DET",
+   "pos": "F",
+   "born": "1994-04-22",
+   "salary": 15992957,
+   "img": "face-tight/1629130-duncan-robinson.webp"
+  },
+  {
+   "id": 1630168,
+   "name": "Onyeka Okongwu",
+   "team": "ATL",
+   "pos": "F-C",
+   "born": "2000-12-11",
+   "salary": 16120000,
+   "img": "face-tight/1630168-onyeka-okongwu.webp"
+  },
+  {
+   "id": 1631107,
+   "name": "Nikola Jović",
+   "team": "MIA",
+   "pos": "F",
+   "born": "2003-06-09",
+   "salary": 16200000,
+   "img": "face-tight/1631107-nikola-jovi.webp"
+  },
+  {
+   "id": 1629622,
+   "name": "Max Strus",
+   "team": "LAC",
+   "pos": "G-F",
+   "born": "1996-03-28",
+   "salary": 16660836,
+   "img": "face-tight/1629622-max-strus.webp"
+  },
+  {
+   "id": 1641705,
+   "name": "Victor Wembanyama",
+   "team": "SAS",
+   "pos": "F-C",
+   "born": "2004-01-04",
+   "salary": 16868246,
+   "img": "face-tight/1641705-victor-wembanyama.webp"
+  },
+  {
+   "id": 1628381,
+   "name": "John Collins",
+   "team": "DET",
+   "pos": "F-C",
+   "born": "1997-09-23",
+   "salary": 17000000,
+   "img": "face-tight/1628381-john-collins.webp"
+  },
+  {
+   "id": 1630583,
+   "name": "Santi Aldama",
+   "team": "DAL",
+   "pos": "F-C",
+   "born": "2001-01-10",
+   "salary": 17007043,
+   "img": "face-tight/1630583-santi-aldama.webp"
+  },
+  {
+   "id": 1629652,
+   "name": "Luguentz Dort",
+   "team": "ATL",
+   "pos": "G",
+   "born": "1999-04-19",
+   "salary": 17222222,
+   "img": "face-tight/1629652-luguentz-dort.webp"
+  },
+  {
+   "id": 1629655,
+   "name": "Daniel Gafford",
+   "team": "DAL",
+   "pos": "F-C",
+   "born": "1998-10-01",
+   "salary": 17263584,
+   "img": "face-tight/1629655-daniel-gafford.webp"
+  },
+  {
+   "id": 1629640,
+   "name": "Keldon Johnson",
+   "team": "SAS",
+   "pos": "F-G",
+   "born": "1999-10-11",
+   "salary": 18000000,
+   "img": "face-tight/1629640-keldon-johnson.webp"
+  },
+  {
+   "id": 1630172,
+   "name": "Patrick Williams",
+   "team": "CHI",
+   "pos": "F",
+   "born": "2001-08-26",
+   "salary": 18000000,
+   "img": "face-tight/1630172-patrick-williams.webp"
+  },
+  {
+   "id": 1641739,
+   "name": "Toumani Camara",
+   "team": "POR",
+   "pos": "F",
+   "born": "2000-05-08",
+   "salary": 18080358,
+   "img": "face-tight/1641739-toumani-camara.webp"
+  },
+  {
+   "id": 1628976,
+   "name": "Wendell Carter Jr.",
+   "team": "ORL",
+   "pos": "C-F",
+   "born": "1999-04-16",
+   "salary": 18102000,
+   "img": "face-tight/1628976-wendell-carter-jr.webp"
+  },
+  {
+   "id": 1628960,
+   "name": "Grayson Allen",
+   "team": "CHA",
+   "pos": "G",
+   "born": "1995-10-08",
+   "salary": 18125000,
+   "img": "face-tight/1628960-grayson-allen.webp"
+  },
+  {
+   "id": 1630245,
+   "name": "Ayo Dosunmu",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2000-01-17",
+   "salary": 19310345,
+   "img": "face-tight/1630245-ayo-dosunmu.webp"
+  },
+  {
+   "id": 1627751,
+   "name": "Jakob Poeltl",
+   "team": "TOR",
+   "pos": "C",
+   "born": "1995-10-15",
+   "salary": 19500000,
+   "img": "face-tight/1627751-jakob-poeltl.webp"
+  },
+  {
+   "id": 1627936,
+   "name": "Alex Caruso",
+   "team": "OKC",
+   "pos": "G",
+   "born": "1994-02-28",
+   "salary": 19550160,
+   "img": "face-tight/1627936-alex-caruso.webp"
+  },
+  {
+   "id": 1629614,
+   "name": "Andrew Nembhard",
+   "team": "IND",
+   "pos": "G-F",
+   "born": "2000-01-16",
+   "salary": 19550160,
+   "img": "face-tight/1629614-andrew-nembhard.webp"
+  },
+  {
+   "id": 1629023,
+   "name": "P.J. Washington",
+   "team": "DAL",
+   "pos": "F",
+   "born": "1998-08-23",
+   "salary": 19813044,
+   "img": "face-tight/1629023-pj-washington.webp"
+  },
+  {
+   "id": 204001,
+   "name": "Kristaps Porziņģis",
+   "team": "GSW",
+   "pos": "F-C",
+   "born": "1995-08-02",
+   "salary": 20000000,
+   "img": "face-tight/204001-kristaps-porziis.webp"
+  },
+  {
+   "id": 1631101,
+   "name": "Shaedon Sharpe",
+   "team": "POR",
+   "pos": "G",
+   "born": "2003-05-30",
+   "salary": 20089286,
+   "img": "face-tight/1631101-shaedon-sharpe.webp"
+  },
+  {
+   "id": 1628370,
+   "name": "Malik Monk",
+   "team": "SAC",
+   "pos": "G",
+   "born": "1998-02-04",
+   "salary": 20190035,
+   "img": "face-tight/1628370-malik-monk.webp"
+  },
+  {
+   "id": 1627826,
+   "name": "Ivica Zubac",
+   "team": "IND",
+   "pos": "C",
+   "born": "1997-03-18",
+   "salary": 20342140,
+   "img": "face-tight/1627826-ivica-zubac.webp"
+  },
+  {
+   "id": 1631212,
+   "name": "Peyton Watson",
+   "team": "CLE",
+   "pos": "G",
+   "born": "2002-09-11",
+   "salary": 20465116,
+   "img": "face-tight/1631212-peyton-watson.webp"
+  },
+  {
+   "id": 1628398,
+   "name": "Kyle Kuzma",
+   "team": "MIL",
+   "pos": "F",
+   "born": "1995-07-24",
+   "salary": 20490152,
+   "img": "face-tight/1628398-kyle-kuzma.webp"
+  },
+  {
+   "id": 1628404,
+   "name": "Josh Hart",
+   "team": "NYK",
+   "pos": "G",
+   "born": "1995-03-06",
+   "salary": 20923760,
+   "img": "face-tight/1628404-josh-hart.webp"
+  },
+  {
+   "id": 1628415,
+   "name": "Dillon Brooks",
+   "team": "PHX",
+   "pos": "G-F",
+   "born": "1996-01-22",
+   "salary": 20992727,
+   "img": "face-tight/1628415-dillon-brooks.webp"
+  },
+  {
+   "id": 203468,
+   "name": "CJ McCollum",
+   "team": "ATL",
+   "pos": "G",
+   "born": "1991-09-19",
+   "salary": 21000000,
+   "img": "face-tight/203468-cj-mccollum.webp"
+  },
+  {
+   "id": 1626181,
+   "name": "Norman Powell",
+   "team": "CHI",
+   "pos": "G",
+   "born": "1993-05-25",
+   "salary": 21500000,
+   "img": "face-tight/1626181-norman-powell.webp"
+  },
+  {
+   "id": 1631128,
+   "name": "Christian Braun",
+   "team": "DEN",
+   "pos": "G",
+   "born": "2001-04-17",
+   "salary": 21551726,
+   "img": "face-tight/1631128-christian-braun.webp"
+  },
+  {
+   "id": 1628970,
+   "name": "Miles Bridges",
+   "team": "PHX",
+   "pos": "F",
+   "born": "1998-03-21",
+   "salary": 22826087,
+   "img": "face-tight/1628970-miles-bridges.webp"
+  },
+  {
+   "id": 1629661,
+   "name": "Cameron Johnson",
+   "team": "DEN",
+   "pos": "F",
+   "born": "1996-03-03",
+   "salary": 23062500,
+   "img": "face-tight/1629661-cameron-johnson.webp"
+  },
+  {
+   "id": 1628392,
+   "name": "Isaiah Hartenstein",
+   "team": "OKC",
+   "pos": "C-F",
+   "born": "1998-05-05",
+   "salary": 23148148,
+   "img": "face-tight/1628392-isaiah-hartenstein.webp"
+  },
+  {
+   "id": 1629675,
+   "name": "Naz Reid",
+   "team": "CHA",
+   "pos": "C-F",
+   "born": "1999-08-26",
+   "salary": 23275862,
+   "img": "face-tight/1629675-naz-reid.webp"
+  },
+  {
+   "id": 1629651,
+   "name": "Nic Claxton",
+   "team": "CHI",
+   "pos": "C",
+   "born": "1999-04-17",
+   "salary": 23320738,
+   "img": "face-tight/1629651-nic-claxton.webp"
+  },
+  {
+   "id": 1631095,
+   "name": "Jabari Smith Jr.",
+   "team": "HOU",
+   "pos": "F",
+   "born": "2003-05-13",
+   "salary": 23643411,
+   "img": "face-tight/1631095-jabari-smith-jr.webp"
+  },
+  {
+   "id": 1631099,
+   "name": "Keegan Murray",
+   "team": "SAC",
+   "pos": "F",
+   "born": "2000-08-19",
+   "salary": 24137936,
+   "img": "face-tight/1631099-keegan-murray.webp"
+  },
+  {
+   "id": 1629631,
+   "name": "De'Andre Hunter",
+   "team": "SAC",
+   "pos": "F-G",
+   "born": "1997-12-02",
+   "salary": 24910714,
+   "img": "face-tight/1629631-deandre-hunter.webp"
+  },
+  {
+   "id": 1627832,
+   "name": "Fred VanVleet",
+   "team": "HOU",
+   "pos": "G",
+   "born": "1994-02-25",
+   "salary": 25000000,
+   "img": "face-tight/1627832-fred-vanvleet.webp"
+  },
+  {
+   "id": 1630581,
+   "name": "Josh Giddey",
+   "team": "CHI",
+   "pos": "G",
+   "born": "2002-10-10",
+   "salary": 25000000,
+   "img": "face-tight/1630581-josh-giddey.webp"
+  },
+  {
+   "id": 1630700,
+   "name": "Dyson Daniels",
+   "team": "ATL",
+   "pos": "G",
+   "born": "2003-03-17",
+   "salary": 25000000,
+   "img": "face-tight/1630700-dyson-daniels.webp"
+  },
+  {
+   "id": 1630183,
+   "name": "Jaden McDaniels",
+   "team": "MIN",
+   "pos": "F",
+   "born": "2000-09-29",
+   "salary": 26200001,
+   "img": "face-tight/1630183-jaden-mcdaniels.webp"
+  },
+  {
+   "id": 1626167,
+   "name": "Myles Turner",
+   "team": "MIL",
+   "pos": "C-F",
+   "born": "1996-03-24",
+   "salary": 26584164,
+   "img": "face-tight/1626167-myles-turner.webp"
+  },
+  {
+   "id": 1629632,
+   "name": "Coby White",
+   "team": "CHA",
+   "pos": "G",
+   "born": "2000-02-16",
+   "salary": 26811593,
+   "img": "face-tight/1629632-coby-white.webp"
+  },
+  {
+   "id": 1630530,
+   "name": "Trey Murphy III",
+   "team": "NOP",
+   "pos": "F",
+   "born": "2000-06-18",
+   "salary": 27000000,
+   "img": "face-tight/1630530-trey-murphy-iii.webp"
+  },
+  {
+   "id": 1630170,
+   "name": "Devin Vassell",
+   "team": "SAS",
+   "pos": "G-F",
+   "born": "2000-08-23",
+   "salary": 27500000,
+   "img": "face-tight/1630170-devin-vassell.webp"
+  },
+  {
+   "id": 203110,
+   "name": "Draymond Green",
+   "team": "GSW",
+   "pos": "F",
+   "born": "1990-03-04",
+   "salary": 27678571,
+   "img": "face-tight/203110-draymond-green.webp"
+  },
+  {
+   "id": 1628386,
+   "name": "Jarrett Allen",
+   "team": "CLE",
+   "pos": "C",
+   "born": "1998-04-21",
+   "salary": 28000000,
+   "img": "face-tight/1628386-jarrett-allen.webp"
+  },
+  {
+   "id": 1629628,
+   "name": "RJ Barrett",
+   "team": "TOR",
+   "pos": "F-G",
+   "born": "2000-06-14",
+   "salary": 29616071,
+   "img": "face-tight/1629628-rj-barrett.webp"
+  },
+  {
+   "id": 1630552,
+   "name": "Jalen Johnson",
+   "team": "ATL",
+   "pos": "F",
+   "born": "2001-12-18",
+   "salary": 30000000,
+   "img": "face-tight/1630552-jalen-johnson.webp"
+  },
+  {
+   "id": 1631117,
+   "name": "Walker Kessler",
+   "team": "LAL",
+   "pos": "C",
+   "born": "2001-07-26",
+   "salary": 30108821,
+   "img": "face-tight/1631117-walker-kessler.webp"
+  },
+  {
+   "id": 203952,
+   "name": "Andrew Wiggins",
+   "team": "MIA",
+   "pos": "F",
+   "born": "1995-02-23",
+   "salary": 30169644,
+   "img": "face-tight/203952-andrew-wiggins.webp"
+  },
+  {
+   "id": 1628401,
+   "name": "Derrick White",
+   "team": "BOS",
+   "pos": "G",
+   "born": "1994-07-02",
+   "salary": 30348000,
+   "img": "face-tight/1628401-derrick-white.webp"
+  },
+  {
+   "id": 201935,
+   "name": "James Harden",
+   "team": "CLE",
+   "pos": "G",
+   "born": "1989-08-26",
+   "salary": 30647619,
+   "img": "face-tight/201935-james-harden.webp"
+  },
+  {
+   "id": 203932,
+   "name": "Aaron Gordon",
+   "team": "DEN",
+   "pos": "F",
+   "born": "1995-09-16",
+   "salary": 31978037,
+   "img": "face-tight/203932-aaron-gordon.webp"
+  },
+  {
+   "id": 1630591,
+   "name": "Jalen Suggs",
+   "team": "ORL",
+   "pos": "G",
+   "born": "2001-06-03",
+   "salary": 32400000,
+   "img": "face-tight/1630591-jalen-suggs.webp"
+  },
+  {
+   "id": 1630193,
+   "name": "Immanuel Quickley",
+   "team": "TOR",
+   "pos": "G",
+   "born": "1999-06-17",
+   "salary": 32500000,
+   "img": "face-tight/1630193-immanuel-quickley.webp"
+  },
+  {
+   "id": 1627749,
+   "name": "Dejounte Murray",
+   "team": "NOP",
+   "pos": "G",
+   "born": "1996-09-19",
+   "salary": 32785071,
+   "img": "face-tight/1627749-dejounte-murray.webp"
+  },
+  {
+   "id": 1629639,
+   "name": "Tyler Herro",
+   "team": "MIL",
+   "pos": "G",
+   "born": "2000-01-20",
+   "salary": 33000000,
+   "img": "face-tight/1629639-tyler-herro.webp"
+  },
+  {
+   "id": 203944,
+   "name": "Julius Randle",
+   "team": "BKN",
+   "pos": "F-C",
+   "born": "1994-11-29",
+   "salary": 33333334,
+   "img": "face-tight/203944-julius-randle.webp"
+  },
+  {
+   "id": 1628969,
+   "name": "Mikal Bridges",
+   "team": "NYK",
+   "pos": "G-F",
+   "born": "1996-08-30",
+   "salary": 33482145,
+   "img": "face-tight/1628969-mikal-bridges.webp"
+  },
+  {
+   "id": 1629673,
+   "name": "Jordan Poole",
+   "team": "NOP",
+   "pos": "G",
+   "born": "1999-06-19",
+   "salary": 34044642,
+   "img": "face-tight/1629673-jordan-poole.webp"
+  },
+  {
+   "id": 203924,
+   "name": "Jerami Grant",
+   "team": "MEM",
+   "pos": "F",
+   "born": "1994-03-12",
+   "salary": 34206898,
+   "img": "face-tight/203924-jerami-grant.webp"
+  },
+  {
+   "id": 201950,
+   "name": "Jrue Holiday",
+   "team": "POR",
+   "pos": "G",
+   "born": "1990-06-12",
+   "salary": 34800000,
+   "img": "face-tight/201950-jrue-holiday.webp"
+  },
+  {
+   "id": 1630578,
+   "name": "Alperen Sengun",
+   "team": "HOU",
+   "pos": "C",
+   "born": "2002-07-25",
+   "salary": 35642202,
+   "img": "face-tight/1630578-alperen-sengun.webp"
+  },
+  {
+   "id": 1630224,
+   "name": "Jalen Green",
+   "team": "PHX",
+   "pos": "G",
+   "born": "2002-02-09",
+   "salary": 36251166,
+   "img": "face-tight/1630224-jalen-green.webp"
+  },
+  {
+   "id": 203497,
+   "name": "Rudy Gobert",
+   "team": "MIN",
+   "pos": "C",
+   "born": "1992-06-26",
+   "salary": 36500000,
+   "img": "face-tight/203497-rudy-gobert.webp"
+  },
+  {
+   "id": 1628973,
+   "name": "Jalen Brunson",
+   "team": "NYK",
+   "pos": "G",
+   "born": "1996-08-31",
+   "salary": 37739521,
+   "img": "face-tight/1628973-jalen-brunson.webp"
+  },
+  {
+   "id": 1630217,
+   "name": "Desmond Bane",
+   "team": "ORL",
+   "pos": "G",
+   "born": "1998-06-25",
+   "salary": 39446090,
+   "img": "face-tight/1630217-desmond-bane.webp"
+  },
+  {
+   "id": 202681,
+   "name": "Kyrie Irving",
+   "team": "DAL",
+   "pos": "G",
+   "born": "1992-03-23",
+   "salary": 39491282,
+   "img": "face-tight/202681-kyrie-irving.webp"
+  },
+  {
+   "id": 1627742,
+   "name": "Brandon Ingram",
+   "team": "LAC",
+   "pos": "F",
+   "born": "1997-09-02",
+   "salary": 40000000,
+   "img": "face-tight/1627742-brandon-ingram.webp"
+  },
+  {
+   "id": 1631105,
+   "name": "Jalen Duren",
+   "team": "DET",
+   "pos": "C",
+   "born": "2003-11-18",
+   "salary": 40160643,
+   "img": "face-tight/1631105-jalen-duren.webp"
+  },
+  {
+   "id": 1630163,
+   "name": "LaMelo Ball",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2001-08-22",
+   "salary": 40770520,
+   "img": "face-tight/1630163-lamelo-ball.webp"
+  },
+  {
+   "id": 1630178,
+   "name": "Tyrese Maxey",
+   "team": "PHI",
+   "pos": "G",
+   "born": "2000-11-04",
+   "salary": 40770520,
+   "img": "face-tight/1630178-tyrese-maxey.webp"
+  },
+  {
+   "id": 1628983,
+   "name": "Shai Gilgeous-Alexander",
+   "team": "OKC",
+   "pos": "G",
+   "born": "1998-07-12",
+   "salary": 40806150,
+   "img": "face-tight/1628983-shai-gilgeous-alexander.webp"
+  },
+  {
+   "id": 1629008,
+   "name": "Michael Porter Jr.",
+   "team": "BKN",
+   "pos": "F",
+   "born": "1998-06-29",
+   "salary": 40806150,
+   "img": "face-tight/1629008-michael-porter-jr.webp"
+  },
+  {
+   "id": 1630559,
+   "name": "Austin Reaves",
+   "team": "LAL",
+   "pos": "G",
+   "born": "1998-05-29",
+   "salary": 41240250,
+   "img": "face-tight/1630559-austin-reaves.webp"
+  },
+  {
+   "id": 1631094,
+   "name": "Paolo Banchero",
+   "team": "ORL",
+   "pos": "F",
+   "born": "2002-11-12",
+   "salary": 41240250,
+   "img": "face-tight/1631094-paolo-banchero.webp"
+  },
+  {
+   "id": 1631096,
+   "name": "Chet Holmgren",
+   "team": "OKC",
+   "pos": "C-F",
+   "born": "2002-05-01",
+   "salary": 41240250,
+   "img": "face-tight/1631096-chet-holmgren.webp"
+  },
+  {
+   "id": 1631114,
+   "name": "Jalen Williams",
+   "team": "OKC",
+   "pos": "G-F",
+   "born": "2001-04-14",
+   "salary": 41240250,
+   "img": "face-tight/1631114-jalen-williams.webp"
+  },
+  {
+   "id": 1630532,
+   "name": "Franz Wagner",
+   "team": "ORL",
+   "pos": "F",
+   "born": "2001-08-27",
+   "salary": 41754690,
+   "img": "face-tight/1630532-franz-wagner.webp"
+  },
+  {
+   "id": 1630567,
+   "name": "Scottie Barnes",
+   "team": "TOR",
+   "pos": "F-G",
+   "born": "2001-08-01",
+   "salary": 41754690,
+   "img": "face-tight/1630567-scottie-barnes.webp"
+  },
+  {
+   "id": 1629627,
+   "name": "Zion Williamson",
+   "team": "NOP",
+   "pos": "F",
+   "born": "2000-07-06",
+   "salary": 42166510,
+   "img": "face-tight/1629627-zion-williamson.webp"
+  },
+  {
+   "id": 1629630,
+   "name": "Ja Morant",
+   "team": "POR",
+   "pos": "G",
+   "born": "1999-08-10",
+   "salary": 42166510,
+   "img": "face-tight/1629630-ja-morant.webp"
+  },
+  {
+   "id": 1629636,
+   "name": "Darius Garland",
+   "team": "LAC",
+   "pos": "G",
+   "born": "2000-01-26",
+   "salary": 42166510,
+   "img": "face-tight/1629636-darius-garland.webp"
+  },
+  {
+   "id": 1628384,
+   "name": "OG Anunoby",
+   "team": "NYK",
+   "pos": "F-G",
+   "born": "1997-07-17",
+   "salary": 42500000,
+   "img": "face-tight/1628384-og-anunoby.webp"
+  },
+  {
+   "id": 201142,
+   "name": "Kevin Durant",
+   "team": "HOU",
+   "pos": "F",
+   "born": "1988-09-29",
+   "salary": 43902439,
+   "img": "face-tight/201142-kevin-durant.webp"
+  },
+  {
+   "id": 1627734,
+   "name": "Domantas Sabonis",
+   "team": "SAC",
+   "pos": "F-C",
+   "born": "1996-05-03",
+   "salary": 45472000,
+   "img": "face-tight/1627734-domantas-sabonis.webp"
+  },
+  {
+   "id": 1628374,
+   "name": "Lauri Markkanen",
+   "team": "UTA",
+   "pos": "F-C",
+   "born": "1997-05-22",
+   "salary": 46113154,
+   "img": "face-tight/1628374-lauri-markkanen.webp"
+  },
+  {
+   "id": 1627783,
+   "name": "Pascal Siakam",
+   "team": "IND",
+   "pos": "F",
+   "born": "1994-04-02",
+   "salary": 48924624,
+   "img": "face-tight/1627783-pascal-siakam.webp"
+  },
+  {
+   "id": 1630162,
+   "name": "Anthony Edwards",
+   "team": "MIN",
+   "pos": "G",
+   "born": "2001-08-05",
+   "salary": 48924624,
+   "img": "face-tight/1630162-anthony-edwards.webp"
+  },
+  {
+   "id": 1630169,
+   "name": "Tyrese Haliburton",
+   "team": "IND",
+   "pos": "G",
+   "born": "2000-02-29",
+   "salary": 48924624,
+   "img": "face-tight/1630169-tyrese-haliburton.webp"
+  },
+  {
+   "id": 203897,
+   "name": "Zach LaVine",
+   "team": "SAC",
+   "pos": "G",
+   "born": "1995-03-10",
+   "salary": 48967380,
+   "img": "face-tight/203897-zach-lavine.webp"
+  },
+  {
+   "id": 1628991,
+   "name": "Jaren Jackson Jr.",
+   "team": "UTA",
+   "pos": "F-C",
+   "born": "1999-09-15",
+   "salary": 49000000,
+   "img": "face-tight/1628991-jaren-jackson-jr.webp"
+  },
+  {
+   "id": 1628368,
+   "name": "De'Aaron Fox",
+   "team": "SAS",
+   "pos": "G",
+   "born": "1997-12-20",
+   "salary": 49488300,
+   "img": "face-tight/1628368-deaaron-fox.webp"
+  },
+  {
+   "id": 1628389,
+   "name": "Bam Adebayo",
+   "team": "MIA",
+   "pos": "C-F",
+   "born": "1997-07-18",
+   "salary": 49488300,
+   "img": "face-tight/1628389-bam-adebayo.webp"
+  },
+  {
+   "id": 1629027,
+   "name": "Trae Young",
+   "team": "WAS",
+   "pos": "G",
+   "born": "1998-09-19",
+   "salary": 49488300,
+   "img": "face-tight/1629027-trae-young.webp"
+  },
+  {
+   "id": 1627750,
+   "name": "Jamal Murray",
+   "team": "DEN",
+   "pos": "G",
+   "born": "1997-02-23",
+   "salary": 50105628,
+   "img": "face-tight/1627750-jamal-murray.webp"
+  },
+  {
+   "id": 1628378,
+   "name": "Donovan Mitchell",
+   "team": "CLE",
+   "pos": "G",
+   "born": "1996-09-07",
+   "salary": 50105628,
+   "img": "face-tight/1628378-donovan-mitchell.webp"
+  },
+  {
+   "id": 1630595,
+   "name": "Cade Cunningham",
+   "team": "DET",
+   "pos": "G",
+   "born": "2001-09-25",
+   "salary": 50105628,
+   "img": "face-tight/1630595-cade-cunningham.webp"
+  },
+  {
+   "id": 1630596,
+   "name": "Evan Mobley",
+   "team": "CLE",
+   "pos": "C",
+   "born": "2001-06-18",
+   "salary": 50105628,
+   "img": "face-tight/1630596-evan-mobley.webp"
+  },
+  {
+   "id": 202695,
+   "name": "Kawhi Leonard",
+   "team": "TOR",
+   "pos": "F",
+   "born": "1991-06-29",
+   "salary": 50300000,
+   "img": "face-tight/202695-kawhi-leonard.webp"
+  },
+  {
+   "id": 1629029,
+   "name": "Luka Dončić",
+   "team": "LAL",
+   "pos": "G",
+   "born": "1999-02-28",
+   "salary": 51033600,
+   "img": "face-tight/1629029-luka-doni.webp"
+  },
+  {
+   "id": 202331,
+   "name": "Paul George",
+   "team": "BOS",
+   "pos": "F",
+   "born": "1990-05-02",
+   "salary": 54126380,
+   "img": "face-tight/202331-paul-george.webp"
+  },
+  {
+   "id": 202710,
+   "name": "Jimmy Butler III",
+   "team": "GSW",
+   "pos": "F",
+   "born": "1989-09-14",
+   "salary": 56832773,
+   "img": "face-tight/202710-jimmy-butler-iii.webp"
+  },
+  {
+   "id": 1626157,
+   "name": "Karl-Anthony Towns",
+   "team": "NYK",
+   "pos": "C-F",
+   "born": "1995-11-15",
+   "salary": 57078728,
+   "img": "face-tight/1626157-karl-anthony-towns.webp"
+  },
+  {
+   "id": 1626164,
+   "name": "Devin Booker",
+   "team": "PHX",
+   "pos": "G",
+   "born": "1996-10-30",
+   "salary": 57078728,
+   "img": "face-tight/1626164-devin-booker.webp"
+  },
+  {
+   "id": 203954,
+   "name": "Joel Embiid",
+   "team": "PHI",
+   "pos": "C-F",
+   "born": "1994-03-16",
+   "salary": 57736350,
+   "img": "face-tight/203954-joel-embiid.webp"
+  },
+  {
+   "id": 1627759,
+   "name": "Jaylen Brown",
+   "team": "PHI",
+   "pos": "G-F",
+   "born": "1996-10-24",
+   "salary": 57736350,
+   "img": "face-tight/1627759-jaylen-brown.webp"
+  },
+  {
+   "id": 203076,
+   "name": "Anthony Davis",
+   "team": "WAS",
+   "pos": "F-C",
+   "born": "1993-03-11",
+   "salary": 58456566,
+   "img": "face-tight/203076-anthony-davis.webp"
+  },
+  {
+   "id": 203507,
+   "name": "Giannis Antetokounmpo",
+   "team": "MIA",
+   "pos": "F",
+   "born": "1994-12-06",
+   "salary": 58456566,
+   "img": "face-tight/203507-giannis-antetokounmpo.webp"
+  },
+  {
+   "id": 1628369,
+   "name": "Jayson Tatum",
+   "team": "BOS",
+   "pos": "F-G",
+   "born": "1998-03-03",
+   "salary": 58456566,
+   "img": "face-tight/1628369-jayson-tatum.webp"
+  },
+  {
+   "id": 203999,
+   "name": "Nikola Jokić",
+   "team": "DEN",
+   "pos": "C",
+   "born": "1995-02-19",
+   "salary": 59033114,
+   "img": "face-tight/203999-nikola-joki.webp"
+  },
+  {
+   "id": 201939,
+   "name": "Stephen Curry",
+   "team": "GSW",
+   "pos": "G",
+   "born": "1988-03-14",
+   "salary": 62587158,
+   "img": "face-tight/201939-stephen-curry.webp"
+  }
+ ]
+}
