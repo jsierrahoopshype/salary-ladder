@@ -409,6 +409,10 @@ Every read and write is wrapped so the game still works if the browser blocks st
 - **The game page** is served by this repo on GitHub Pages, at https://hoopsmatic.com/salary-ladder/ through the shared hoopsmatic.com Worker.
 - **Shared Worker change:** adding the `/salary-ladder/` route touches the shared Worker (https://github.com/jsierrahoopshype/hoopsmatic-worker), which Jorge shares with Alberto. **The build prompt for that step must start by checking exactly where the Worker stands:** main's latest commit, recent merges, open PRs, unmerged branches, and deploy status. **Never deploy anything that isn't pushed first.**
 - **The game's own server code runs in its own Workers** (game-check and leaderboard), on the route `hoopsmatic.com/salary-ladder/api/*`, deployed separately from the shared Worker. A crash in game code can't break the rest of the site.
+- **Deploys happen only through GitHub Actions, never from anyone's computer.**
+  - The shared Worker already deploys through its own Action when a change is merged to its `main`.
+  - The game's two Workers deploy through an Action in this repo whenever `workers/` or the shared game logic changes on `main`.
+  - Merging is the deploy; nothing unmerged is ever deployed.
 - **Storage:**
   - Cloudflare D1 (database) holds game records, totals and used one-time codes.
   - A Durable Object holds leaderboard rows (as in 73-9).
@@ -641,8 +645,8 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 
 **Build and setup:**
 
-6. **Shared Worker route** for `/salary-ladder/`, preceded by the Worker state check: main's latest commit, recent merges, open PRs, unmerged branches, deploy status. https://github.com/jsierrahoopshype/hoopsmatic-worker. Never deploy anything unpushed.
-7. Game-check and leaderboard Workers deployed on `hoopsmatic.com/salary-ladder/api/*`, with **new** secrets (signing secret, admin key), never 73-9's.
+6. **Shared Worker route** for `/salary-ladder/`, preceded by the Worker state check: main's latest commit, recent merges, open PRs, unmerged branches, deploy status. https://github.com/jsierrahoopshype/hoopsmatic-worker. It deploys through its own GitHub Action on merge; never deploy anything unmerged.
+7. Game-check and leaderboard Workers deployed by this repo's GitHub Action on `hoopsmatic.com/salary-ladder/api/*`, with **new** secrets (signing secret, admin key) added in the Cloudflare dashboard, never 73-9's.
 8. D1 database and Durable Object created; the once-a-day totals job scheduled.
 9. Daily data job running in this repo (GitHub Actions), with its first snapshot and first Daily puzzle built and checked.
 10. `rules/rules.json` at version 1: 5 lives, ±10% band, 8 s timer, start window 5th–25th percentile with at least 15 neighbours, recording on.
