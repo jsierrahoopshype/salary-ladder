@@ -1,0 +1,12 @@
+{
+  "name": "salary-ladder",
+  "private": true,
+  "type": "module",
+  "description": "Salary Ladder, a HoopsMatic game. No dependencies: Node's built-in test runner only.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test",
+    "simulate": "node tools/simulate.mjs",
+    "daily-job": "node scripts/daily-job.mjs"
+  }
+}

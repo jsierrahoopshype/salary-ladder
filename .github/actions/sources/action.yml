@@ -1,0 +1,15 @@
+name: Fetch data sources (read-only)
+description: >
+  Shallow, partial clones of the Salary Finder and nba-headshots: only the
+  files the pipeline reads, and the headshot file list without the images.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        git clone -q --depth 1 --filter=blob:none --sparse https://github.com/jsierrahoopshype/salary-season-finder "$RUNNER_TEMP/finder"
+        git -C "$RUNNER_TEMP/finder" sparse-checkout set --no-cone /data/data.json /data/roster_status.json /data_sources/salaries_future.csv /data_sources/bio.csv
+        git clone -q --depth 1 --filter=blob:none --sparse https://github.com/jsierrahoopshype/nba-headshots "$RUNNER_TEMP/heads"
+        git -C "$RUNNER_TEMP/heads" sparse-checkout set --no-cone /players/metadata/legends.json /players/metadata/players_all.json
+        echo "FINDER=$RUNNER_TEMP/finder" >> "$GITHUB_ENV"
+        echo "HEADSHOTS=$RUNNER_TEMP/heads" >> "$GITHUB_ENV"

@@ -1,0 +1,186 @@
+{
+  "readme": "Salary-data name -> NBA ID, for every match the automatic rules may not make (spec 4.2 and 24). Only Jorge adds entries. Optional seasons_from/seasons_to limit an entry to a range of seasons. same_person_as marks a second spelling of a man another name already matches.",
+  "entries": [
+    {
+      "name": "Nicolas Claxton",
+      "nba_id": 1629651,
+      "why": "spelling: headshot index spells him Nic Claxton",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Patrick Mills",
+      "nba_id": 201988,
+      "why": "spelling: headshot index spells him Patty Mills",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Herb Jones",
+      "nba_id": 1630529,
+      "why": "spelling: headshot index spells him Herbert Jones",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Steve Smith",
+      "nba_id": 120,
+      "why": "spelling: headshot index spells him Steven Smith (1991 #5, Michigan St)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Louis Williams",
+      "nba_id": 101150,
+      "why": "spelling: headshot index spells him Lou Williams",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Juan Hernangomez",
+      "nba_id": 1627823,
+      "why": "spelling: headshot index spells him Juancho Hernangomez",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Ishmael Smith",
+      "nba_id": 202397,
+      "why": "spelling: headshot index spells him Ish Smith",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Josh Primo",
+      "nba_id": 1630563,
+      "why": "spelling: headshot index spells him Joshua Primo",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Santiago Aldama",
+      "nba_id": 1630583,
+      "why": "spelling: headshot index spells him Santi Aldama",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Sviatoslav Mykhailiuk",
+      "nba_id": 1629004,
+      "why": "spelling: headshot index spells him Svi Mykhailiuk",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Louis Amundson",
+      "nba_id": 200811,
+      "why": "spelling: headshot index spells him Lou Amundson",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Wesley Iwundu",
+      "nba_id": 1628411,
+      "why": "spelling: headshot index spells him Wes Iwundu",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Ishmail Wainright",
+      "nba_id": 1630688,
+      "why": "spelling: headshot index spells him Ish Wainright",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Raymond Spalding",
+      "nba_id": 1629034,
+      "why": "spelling: headshot index spells him Ray Spalding",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Walter Lemon Jr",
+      "nba_id": 1627215,
+      "why": "spelling: headshot index spells him Walt Lemon Jr.",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Vince Hunter",
+      "nba_id": 1626205,
+      "why": "spelling: headshot index spells him Vincent Hunter",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Eli Ndiaye",
+      "nba_id": 1642947,
+      "why": "spelling: headshot index spells him Eli John Ndiaye",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Cameron Whitmore",
+      "nba_id": 1641715,
+      "why": "spelling: same man as Cam Whitmore; his 2024-25 row is filed under this spelling",
+      "approved": "Jorge, 2026-10-08",
+      "same_person_as": "Cam Whitmore"
+    },
+    {
+      "name": "Dennis Schroeder",
+      "nba_id": 203471,
+      "why": "hand entry: headshot index spells him Dennis Schröder",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Ron Holland",
+      "nba_id": 1641842,
+      "why": "hand entry: headshot index spells him Ronald Holland II",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Carlton Carrington",
+      "nba_id": 1642267,
+      "why": "hand entry: headshot index spells him Bub Carrington",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "BJ Boston",
+      "nba_id": 1630527,
+      "why": "hand entry: headshot index spells him Brandon Boston",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Jabari Smith",
+      "nba_id": 1631095,
+      "why": "father/son: salary data drops the Jr.; plain name matches the father (2074)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Kevin Porter",
+      "nba_id": 1629645,
+      "why": "father/son: salary data drops the Jr.; plain name matches the father (77876)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Gerald Henderson",
+      "nba_id": 201945,
+      "why": "same name, settled by era; the other man is 76993 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Johnny Davis",
+      "nba_id": 1631098,
+      "why": "same name, settled by era; the other man is 76526 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Brandon Williams",
+      "nba_id": 1630314,
+      "why": "same name, settled by era; the other man is 1585 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "Nate Williams",
+      "nba_id": 1631466,
+      "why": "same name, settled by era; the other man is 78561 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "David Johnson",
+      "nba_id": 1630525,
+      "why": "same name, settled by era; the other man is 77139 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    },
+    {
+      "name": "George King",
+      "nba_id": 1628994,
+      "why": "same name, settled by era; the other man is 77268 (older, no headshot)",
+      "approved": "Jorge, 2026-10-08"
+    }
+  ]
+}

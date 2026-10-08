@@ -132,8 +132,8 @@ LAUNCH (gate below)
   - **Daily puzzle builder:** `daily/YYYY-MM-DD.json`. It never overwrites an existing file.
   - **`rules/rules.json`** version 1: 5 lives, ±10%, 8 s, start window 5th–25th percentile with at least 15 neighbours, recording on.
   - **One shared game-logic module (JavaScript)** used by both the page and the server: challenger, start, seeding, lives, timer rules, score, replay.
-  - **`tools/simulate.py`** for calibration later.
-  - **The daily GitHub Action** (07:30 UTC, retries until 10:00 UTC, opens an issue when something's wrong). It's built but **switched off** until C2.
+  - **`tools/simulate.mjs`** for calibration later (JavaScript, so it runs the same game code).
+  - **The daily GitHub Action**: tries every hour from 10:17 to 23:17 UTC, builds tomorrow's Daily once today's Salary Finder data is in, falls back to yesterday's at 22:00 UTC, and opens an issue when something's wrong or a new name appears. It's built but **switched off** until C2.
   - **A stand-in for the roster file** until A1 lands: current team and status from the future-salaries sheet. Switching to `roster_status.json` is one setting.
   - **Tests,** run automatically on every PR: matching (including the father/son cases), the ~66-climb ladder check, seed reproducibility, file immutability.
 - **Jorge does:** review and merge the PR.
@@ -246,7 +246,7 @@ LAUNCH (gate below)
 - **What it does:**
   - switches from the stand-in to `roster_status.json`;
   - recounts the pool and re-runs the ~66-climb check;
-  - **switches on** the 07:30 UTC daily Action;
+  - **switches on** the hourly daily Action;
   - builds and checks the first real snapshot and Daily puzzle;
   - points the page at `https://hoopsmatic.com/salary-ladder/api/`, so scores, rankings, boards and votes start working.
 - **Jorge does:** review and merge.
@@ -289,7 +289,7 @@ Launch only when all of these are true:
 
 - **D1. "Play next" cross-promo card.** The session for whichever repo holds the module (from C1's report) tells Jorge exactly what it will change before touching anything. Card text, which Jorge confirms: "Salary Ladder: Who gets paid more? Climb to the top."
 - **D2. Social post drafts.** For whichever accounts Jorge chooses; **each one confirmed by Jorge before posting**. No emojis, no hashtags, no em dashes, one idea per post.
-- **D3. First calibration review** (salary-ladder; rules file only). After at least 5,000 games and at least a week: read the accuracy totals, run `tools/simulate.py`, recommend lives. During a season lives only go up. Jorge decides.
+- **D3. First calibration review** (salary-ladder; rules file only). After at least 5,000 games and at least a week: read the accuracy totals, run `tools/simulate.mjs`, recommend lives. During a season lives only go up. Jorge decides.
 - **D4. Career-earnings version.** Its own short interview first. It needs the 45 same-team amounts settled by the sheet owner, the Cam Whitmore merge, and a recount after A2.
 
 ---

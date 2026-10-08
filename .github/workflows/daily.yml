@@ -1,0 +1,61 @@
+name: Daily data
+
+# Builds tomorrow's Daily once today's Salary Finder data is in (spec 17).
+# The Finder's "06:00 UTC" build has landed between 09:45 and 18:35 UTC, so
+# this tries every hour from 10:17 to 23:17 UTC; each try exits quickly if
+# there's nothing to do. Off until pipeline/config.json daily_job_enabled is
+# true (build plan C2).
+
+on:
+  schedule:
+    - cron: '17 10-23 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Run even while the job is switched off
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: daily-data
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        name: Is the job switched on?
+        run: |
+          on=$(node -e "console.log(require('./pipeline/config.json').daily_job_enabled)")
+          if [ "$on" = "true" ] || [ "${{ inputs.force }}" = "true" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; else echo "Switched off."; fi
+      - if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - if: steps.gate.outputs.run == 'true'
+        uses: ./.github/actions/sources
+      - if: steps.gate.outputs.run == 'true'
+        name: Build
+        run: node scripts/daily-job.mjs --finder "$FINDER" --headshots "$HEADSHOTS" ${{ inputs.force && '--force' || '' }}
+      - if: always() && steps.gate.outputs.run == 'true'
+        name: Summary
+        run: cat build/summary.md >> "$GITHUB_STEP_SUMMARY" || true
+      - if: steps.gate.outputs.run == 'true'
+        name: Save new files
+        run: |
+          git add data daily
+          if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Daily data $(date -u +%F)"
+          git push
+      - if: always() && steps.gate.outputs.run == 'true' && hashFiles('build/issue.md') != ''
+        name: Tell Jorge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue create --title "$(head -1 build/issue.md | sed 's/^## //')" --body-file build/issue.md

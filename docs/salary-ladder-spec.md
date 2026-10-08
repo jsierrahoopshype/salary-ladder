@@ -213,7 +213,7 @@ How each kind of player is handled:
   - Each day has one frozen puzzle file, `daily/YYYY-MM-DD.json`. It holds the date, the Daily number, the rules version, the start player, a random seed, and the full pool with that day's salaries, teams, positions and birth dates.
   - Each challenger is chosen from the seed, the pick number and the current incumbent, so anyone making the same choices sees the same players.
 - **Frozen all day:**
-  - The puzzle file is built in the morning from that day's salary data and never rewritten. The build refuses to overwrite an existing daily file.
+  - The puzzle file for a date is built **the day before**, from that day's salary data, and never rewritten. The build refuses to overwrite an existing daily file. (The Salary Finder's "06:00 UTC" build actually lands between about 09:45 and 18:35 UTC, so building on the morning of the Daily itself would often miss it.)
   - A trade or waiver later in the day shows up in the next day's puzzle.
   - The end screen says "Salaries as of Oct 8".
 - **Streak:**
@@ -359,7 +359,7 @@ An admin-key endpoint downloads the totals as CSV. That is how the Trade Machine
   - **The band stays at ±10%**: changing it changes the ladder length.
 - **Calibration:**
   - Real accuracy comes from the section 14.2 totals.
-  - The simulator used to write this spec is committed as `tools/simulate.py`. Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers.
+  - The simulator used to write this spec is committed as `tools/simulate.mjs` (JavaScript, so it runs the exact game code the page and server use). Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers.
 - **Target:** about 1 in 1,000 players reaches the top. With 5 lives that needs the best players to be right about **89%** of the time on salaries within 10% of each other (section 23). Jorge's view: regulars will learn the ~448-player pool over the season, so that is realistic. Measure after launch.
 
 ---
@@ -382,17 +382,17 @@ Every read and write is wrapped so the game still works if the browser blocks st
 
 ## 17. Keeping salaries fresh
 
-1. **Daily job in this repo (GitHub Action), 07:30 UTC:**
-   - It checks that the Salary Finder's `data.json` (and `roster_status.json`) say they were built today.
-   - If not, it retries until about 10:00 UTC. Then it keeps yesterday's data and opens a GitHub issue.
-2. **It builds a small dated copy of the pool**, about 45 KB, e.g. `data/snapshots/2026-27/2026-10-08.json`, with only what the game needs: NBA ID, display name, team, position, birth date, game salary. **Dated copies are kept forever**; they're what verification and the Trade Machine totals rely on.
+1. **Daily job in this repo (GitHub Action), every hour from 10:17 to 23:17 UTC:**
+   - Over the 40 days before October 8, 2026, the Salary Finder's "06:00 UTC" build landed between 09:45 and 13:12 UTC, once at 18:35. So the job keeps checking until the Finder's `data.json` (and `roster_status.json`) say they were built today. Each check that finds nothing to do exits in seconds.
+   - If today's data still isn't in at 22:00 UTC, it keeps yesterday's data and opens a GitHub issue.
+2. **It builds a small dated copy of the pool**, about 80 KB, e.g. `data/snapshots/2026-27/2026-10-08.json`, with only what the game needs: NBA ID, display name, team, position, birth date, game salary. **Dated copies are kept forever**; they're what verification and the Trade Machine totals rely on.
 3. **Safety checks before publishing.** It refuses to publish, keeps yesterday's copy and opens an issue if:
    - the pool size changed by more than 10% from yesterday;
    - the top salary changed without a matching roster change;
    - the money doesn't add up: current salary plus dead money must equal `data.json`.
 
    New unmatched names are left out and listed in an issue.
-4. **It builds today's Daily puzzle** from that copy, about 5 hours before the 9 AM ET release. If today's data never arrived, it builds from yesterday's copy so a Daily always exists. It never overwrites an existing puzzle file.
+4. **It builds tomorrow's Daily puzzle** from that copy, so each Daily is ready 15 hours or more before its 9 AM ET release, and its salaries are as of the day before. If today's data never arrived, it builds from yesterday's copy so a Daily always exists. It never overwrites an existing puzzle file. New names that can't be matched are listed in `data/review.json`; an issue opens only when a name is new.
 5. **Trades and waivers:**
    - A traded player shows his new team from the next copy on.
    - A waived player who signs elsewhere counts only his new contract.
