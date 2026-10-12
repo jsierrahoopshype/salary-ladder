@@ -1,0 +1,11 @@
+{
+  "season": "2026-27",
+  "roster_source": "standin",
+  "daily_job_enabled": false,
+  "daily_number_start": null,
+  "finder_repo": "jsierrahoopshype/salary-season-finder",
+  "headshots_repo": "jsierrahoopshype/nba-headshots",
+  "headshots_base_url": "https://jsierrahoopshype.github.io/nba-headshots/players/headshots/",
+  "max_pool_change": 0.10,
+  "fallback_after_utc_hour": 22
+}

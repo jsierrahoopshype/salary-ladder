@@ -85,6 +85,13 @@ The approved crosswalk entries are listed in section 24.
 - **Two-team players count only the team they play for now.** Examples: Damian Lillard $13,398,800 (Portland; `data.json` adds Milwaukee's dead money for $35.9M), Bradley Beal $6,424,800 (Clippers), Klay Thompson $5,600,000 (Miami).
 - **The headshot index's team is out of date** for 169 of the 524. The game always takes the team from the salary data or roster file, never from the headshot index.
 
+**Update, October 12, 2026** (Salary Finder rebuilt with PRs #65–#69: abbreviated names like "G. Antetokounmpo" now match full names, 14 new stand-in bios, repeated 2025-26 rows deleted). Rebuilt with the A3 pipeline on that day's data:
+- **Game pool: 446 players** (447 on October 8). Left: Isaiah Stevens, Miles Kelly, Lester Quinones, Christian Koloko, Dennis Smith Jr. Joined: Kylor Kelley, Johni Broome, Jahmyl Telfort, Alondes Williams. No salary or team changes for anyone who stayed.
+- 2026-27 rows: 639 (638). **0 names need a decision.** 83 new players are waiting for the NBA's player list / nba-headshots refresh (77 on October 8); 2 matched players still have no headshot (Phillip Wheeler, Malik Williams).
+- **Crosswalk:** none of the 30 entries now matches automatically, so all stay. One name changed: the Finder now files Nate Williams under his full name, **Jeenathan Williams** (NBA ID 1631466, same rows plus a 2022-23 Portland row). He has no 2026-27 salary, so the 2026-27 game is unaffected; the career version needs the entry renamed (section 27).
+- **Cameron Whitmore** is still a separate name in `data.json` (his 2024-25 row), so the merge stays.
+- Alex Toohey and Thomas Sorber now have birth dates, from the Finder's `bio_overrides.json`.
+
 ---
 
 ## 5. Player pool rules (2026-27)
@@ -213,7 +220,7 @@ How each kind of player is handled:
   - Each day has one frozen puzzle file, `daily/YYYY-MM-DD.json`. It holds the date, the Daily number, the rules version, the start player, a random seed, and the full pool with that day's salaries, teams, positions and birth dates.
   - Each challenger is chosen from the seed, the pick number and the current incumbent, so anyone making the same choices sees the same players.
 - **Frozen all day:**
-  - The puzzle file is built in the morning from that day's salary data and never rewritten. The build refuses to overwrite an existing daily file.
+  - The puzzle file for a date is built **the day before**, from that day's salary data, and never rewritten. The build refuses to overwrite an existing daily file. (The Salary Finder's "06:00 UTC" build actually lands between about 09:45 and 18:35 UTC, so building on the morning of the Daily itself would often miss it.)
   - A trade or waiver later in the day shows up in the next day's puzzle.
   - The end screen says "Salaries as of Oct 8".
 - **Streak:**
@@ -359,7 +366,7 @@ An admin-key endpoint downloads the totals as CSV. That is how the Trade Machine
   - **The band stays at ±10%**: changing it changes the ladder length.
 - **Calibration:**
   - Real accuracy comes from the section 14.2 totals.
-  - The simulator used to write this spec is committed as `tools/simulate.py`. Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers.
+  - The simulator used to write this spec is committed as `tools/simulate.mjs` (JavaScript, so it runs the exact game code the page and server use). Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers.
 - **Target:** about 1 in 1,000 players reaches the top. With 5 lives that needs the best players to be right about **89%** of the time on salaries within 10% of each other (section 23). Jorge's view: regulars will learn the ~448-player pool over the season, so that is realistic. Measure after launch.
 
 ---
@@ -382,17 +389,17 @@ Every read and write is wrapped so the game still works if the browser blocks st
 
 ## 17. Keeping salaries fresh
 
-1. **Daily job in this repo (GitHub Action), 07:30 UTC:**
-   - It checks that the Salary Finder's `data.json` (and `roster_status.json`) say they were built today.
-   - If not, it retries until about 10:00 UTC. Then it keeps yesterday's data and opens a GitHub issue.
-2. **It builds a small dated copy of the pool**, about 45 KB, e.g. `data/snapshots/2026-27/2026-10-08.json`, with only what the game needs: NBA ID, display name, team, position, birth date, game salary. **Dated copies are kept forever**; they're what verification and the Trade Machine totals rely on.
+1. **Daily job in this repo (GitHub Action), every hour from 10:17 to 23:17 UTC:**
+   - Over the 40 days before October 8, 2026, the Salary Finder's "06:00 UTC" build landed between 09:45 and 13:12 UTC, once at 18:35. So the job keeps checking until the Finder's `data.json` (and `roster_status.json`) say they were built today. Each check that finds nothing to do exits in seconds.
+   - If today's data still isn't in at 22:00 UTC, it keeps yesterday's data and opens a GitHub issue.
+2. **It builds a small dated copy of the pool**, about 80 KB, e.g. `data/snapshots/2026-27/2026-10-08.json`, with only what the game needs: NBA ID, display name, team, position, birth date, game salary. **Dated copies are kept forever**; they're what verification and the Trade Machine totals rely on.
 3. **Safety checks before publishing.** It refuses to publish, keeps yesterday's copy and opens an issue if:
    - the pool size changed by more than 10% from yesterday;
    - the top salary changed without a matching roster change;
    - the money doesn't add up: current salary plus dead money must equal `data.json`.
 
    New unmatched names are left out and listed in an issue.
-4. **It builds today's Daily puzzle** from that copy, about 5 hours before the 9 AM ET release. If today's data never arrived, it builds from yesterday's copy so a Daily always exists. It never overwrites an existing puzzle file.
+4. **It builds tomorrow's Daily puzzle** from that copy, so each Daily is ready 15 hours or more before its 9 AM ET release, and its salaries are as of the day before. If today's data never arrived, it builds from yesterday's copy so a Daily always exists. It never overwrites an existing puzzle file. New names that can't be matched are listed in `data/review.json`; an issue opens only when a name is new.
 5. **Trades and waivers:**
    - A traded player shows his new team from the next copy on.
    - A waived player who signs elsewhere counts only his new contract.
@@ -501,10 +508,8 @@ Also state:
   - the 45 same-team amounts that grew by odd factors are settled by the sheet owner;
   - the Cam Whitmore merge;
   - a recount once nba-headshots is refreshed.
-- **Pending 2025-26 rows affect the career version only:**
-  - 18 players in the pool have a 2025-26 figure from the temporary sheet.
-  - **73 exact repeat rows** (same man, season, team and figure to the dollar) are already counted once by the Salary Finder. 60 career-pool players have one; they need no action.
-  - **45 same-team amounts that grew by odd factors** (for example Connaughton, Bufkin, Houstan) are a separate issue, waiting on the sheet owner. Until they're settled, career totals for those players may be wrong. This is the real blocker.
+- **Pending 2025-26 rows affect the career version only.** As of the Salary Finder's October 12, 2026 build, the career version **waits only on the 45 same-team amounts that grew by odd factors** (for example Connaughton, Bufkin, Houstan), which are with the sheet owner. Until they're settled, career totals for those players may be wrong.
+  - Resolved since this spec was first written: the repeated 2025-26 rows were deleted from the sheet (the Finder now reports 0), and no 2025-26 figures are filled from the temporary sheet any more.
 - **Ladder length at ±10%** (simulated, never-miss player, symmetric band):
   - from the $20,000 bottom: 451 picks (189 climbs);
   - with a $20M floor (642 players): 144 picks (66 climbs);
@@ -627,7 +632,7 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
   - `current_salary`: what his current team pays him.
   - `dead_money`: a list of `{team, amount}` owed by former teams.
   - `total`: must equal his `data.json` 2026-27 salary.
-  - `birth_date`: from the Finder's bio sheet (YYYY-MM-DD), for exact age on the cards.
+  - `birth_date`: from the Finder's bio sheet (YYYY-MM-DD), **plus `data/bio_overrides.json`** for players the bio sheet has no row for (the Finder added 14 such 2025-26 players in October 2026), for exact age on the cards.
 - **Built-in check:** for every player, `current_salary` + the sum of `dead_money` = `total` = the `data.json` salary. Otherwise the Finder build flags it.
 - **How the game uses it:** section 5.
 
@@ -684,7 +689,8 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 | 8 | Sound or vibration | None. |
 | 9 | Screen wording | Written in the build, shown to Jorge before launch. |
 | 10 | Career version | Its own short interview later. |
-| 11 | Pending 2025-26 rows | Two separate issues. 73 = exact repeat rows, already counted once by the Salary Finder (no action). 45 = same-team amounts that grew by odd factors (Connaughton, Bufkin, Houstan), waiting on the sheet owner; blocks the career version only. |
+| 11 | Pending 2025-26 rows | The repeated rows were deleted from the sheet (October 2026). The career version now waits only on the 45 same-team amounts that grew by odd factors (Connaughton, Bufkin, Houstan), with the sheet owner. |
 | 12 | One official Daily play per device per day | Approved. |
 | 13 | Timer keeps running when you switch apps or tabs | Approved. |
 | 14 | Reloading or closing mid-pick counts as a timeout | Approved. |
+| 15 | Nate Williams is now "Jeenathan Williams" in the Salary Finder (October 12, 2026) | **Open, needs Jorge's OK:** rename the approved crosswalk entry to "Jeenathan Williams" → 1631466. No effect on the 2026-27 game (no 2026-27 salary); needed for the career version. |

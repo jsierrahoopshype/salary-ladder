@@ -1,0 +1,21 @@
+{
+  "readme": "Salary-data names that must never be matched to anyone (spec 24).",
+  "entries": [
+    {
+      "name": "Marcus D. Williams",
+      "why": "fuzzy match wrongly gave Marvin Williams; he is 200766, no headshot"
+    },
+    {
+      "name": "Marcus E. Williams",
+      "why": "fuzzy match wrongly gave Marvin Williams; no NBA ID found, no headshot"
+    },
+    {
+      "name": "Steven Smith",
+      "why": "2006-07 PHI, La Salle; not Steve Smith (120)"
+    },
+    {
+      "name": "Marcus Thornton II",
+      "why": "2017-18, William & Mary; not Marcus Thornton (201977, LSU)"
+    }
+  ]
+}

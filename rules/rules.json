@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "season": "2026-27",
+  "lives": 5,
+  "band": 0.10,
+  "timer_seconds": 8,
+  "start": {
+    "pct_low": 0.05,
+    "pct_high": 0.25,
+    "neighbor_band": 0.05,
+    "min_neighbors": 15
+  },
+  "recent_no_repeat": 10,
+  "min_pick_ms": 300,
+  "min_avg_ms": 700,
+  "reveal_ms": 1500,
+  "recording": true
+}
