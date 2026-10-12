@@ -44,7 +44,10 @@ function fakeSources(dir, builtDate) {
 
   fs.writeFileSync(path.join(finder, 'data', 'data.json'), JSON.stringify({ meta: { built: `${builtDate}T11:00:00` }, seasons }));
   fs.writeFileSync(path.join(finder, 'data_sources', 'salaries_future.csv'), sheet.join('\n') + '\n');
-  fs.writeFileSync(path.join(finder, 'data_sources', 'bio.csv'), bio.join('\n') + '\n');
+  // One player bio.csv has no row for, covered by the Finder's stand-in bios.
+  const noBio = seasons[20].player;
+  fs.writeFileSync(path.join(finder, 'data_sources', 'bio.csv'), bio.filter((l) => !l.startsWith(`${noBio},`)).join('\n') + '\n');
+  fs.writeFileSync(path.join(finder, 'data', 'bio_overrides.json'), JSON.stringify({ entries: { [noBio]: { BIRTHDAY: '7/9/2003' } } }));
   fs.writeFileSync(path.join(heads, 'players', 'metadata', 'legends.json'), JSON.stringify(legends));
   fs.writeFileSync(path.join(heads, 'players', 'metadata', 'players_all.json'), JSON.stringify({ players: all }));
   const git = (...a) => execFileSync('git', ['-C', heads, ...a], { stdio: 'ignore' });
@@ -83,6 +86,8 @@ test('daily job: off by default, builds tomorrow once, falls back when data is l
   const two = snap.players.find((p) => p.id === 1630100);
   assert.equal(two.team, 'POR');
   assert.equal(two.salary, src.seasons[100].team_salaries.POR); // current team only, not the Milwaukee dead money
+  assert.equal(snap.players.find((p) => p.id === 1630020).born, '2003-07-09'); // from bio_overrides.json
+  assert.ok(snap.players.every((p) => p.born));
   const review = JSON.parse(fs.readFileSync(path.join(root, 'data', 'review.json'), 'utf8'));
   assert.deepEqual(review.waiting, ['Brand New Rookie']);
   assert.ok(fs.existsSync(path.join(root, 'build', 'issue.md')));

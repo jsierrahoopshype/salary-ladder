@@ -43,6 +43,14 @@ export function standinRoster(finderDir, season, seasonRecords) {
   const bySheet = new Map(sheet.filter((r) => r.PLAYER).map((r) => [norm(r.PLAYER), r]));
   const bio = parseCsv(fs.readFileSync(path.join(finderDir, 'data_sources', 'bio.csv'), 'utf8'));
   const born = new Map(bio.map((r) => [norm(r.PLAYER), isoDate(r.BIRTHDAY)]));
+  // Stand-in bios the Salary Finder keeps for players bio.csv has no row for.
+  const overridesFile = path.join(finderDir, 'data', 'bio_overrides.json');
+  if (fs.existsSync(overridesFile)) {
+    for (const [name, o] of Object.entries(readJson(overridesFile).entries ?? {})) {
+      const k = norm(name);
+      if (!born.get(k) && o.BIRTHDAY) born.set(k, isoDate(o.BIRTHDAY));
+    }
+  }
 
   return seasonRecords.map((rec) => {
     // No row on the sheet, or no recognised status: no current contract we

@@ -71,7 +71,7 @@ LAUNCH (gate below)
 
 - **Repo:** salary-season-finder. **Its own session.**
 - **What it does:** adds `data/roster_status.json` to the existing daily build, exactly as spec section 25 describes:
-  - current team, contract type, current salary, dead money, total, birth date;
+  - current team, contract type, current salary, dead money, total, birth date (from `bio.csv` plus `data/bio_overrides.json`);
   - the built-in check that current salary + dead money = the `data.json` salary;
   - tests in that repo.
 
@@ -81,7 +81,7 @@ LAUNCH (gate below)
   - After the next 06:00 UTC run, check that the file exists: https://github.com/jsierrahoopshype/salary-season-finder/blob/main/data/roster_status.json
 - **Blocks:** C2 and launch. Nothing earlier waits for it; A3, B1 and B2 use a stand-in.
 - **Hand-off prompt:**
-  > Work in jsierrahoopshype/salary-season-finder. Add a new file data/roster_status.json written by the same daily build that writes data/data.json, following section 25 of https://github.com/jsierrahoopshype/salary-ladder/blob/main/docs/salary-ladder-spec.md. New file only: do not change data.json or any existing output. Add the current_salary + dead_money = total = data.json check and tests. Open a PR; don't merge.
+  > Work in jsierrahoopshype/salary-season-finder. Add a new file data/roster_status.json written by the same daily build that writes data/data.json, following section 25 of https://github.com/jsierrahoopshype/salary-ladder/blob/main/docs/salary-ladder-spec.md. New file only: do not change data.json or any existing output. birth_date must use bio.csv plus data/bio_overrides.json for players bio.csv has no row for. Add the current_salary + dead_money = total = data.json check and tests. Open a PR; don't merge.
 
 ### A2. Refresh nba-headshots
 
