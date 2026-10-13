@@ -22,7 +22,7 @@ RECORDING = "on"
 [[d1_databases]]
 binding = "DB"
 database_name = "salary-ladder"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "f6afae91-969c-4374-adeb-12e4a6b4944b"
 migrations_dir = "../migrations"
 
 # Every 5 minutes: score counts for the end-screen percentage.
