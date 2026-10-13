@@ -88,7 +88,7 @@ The approved crosswalk entries are listed in section 24.
 **Update, October 12, 2026** (Salary Finder rebuilt with PRs #65–#69: abbreviated names like "G. Antetokounmpo" now match full names, 14 new stand-in bios, repeated 2025-26 rows deleted). Rebuilt with the A3 pipeline on that day's data:
 - **Game pool: 446 players** (447 on October 8). Left: Isaiah Stevens, Miles Kelly, Lester Quinones, Christian Koloko, Dennis Smith Jr. Joined: Kylor Kelley, Johni Broome, Jahmyl Telfort, Alondes Williams. No salary or team changes for anyone who stayed.
 - 2026-27 rows: 639 (638). **0 names need a decision.** 83 new players are waiting for the NBA's player list / nba-headshots refresh (77 on October 8); 2 matched players still have no headshot (Phillip Wheeler, Malik Williams).
-- **Crosswalk:** none of the 30 entries now matches automatically, so all stay. One name changed: the Finder now files Nate Williams under his full name, **Jeenathan Williams** (NBA ID 1631466, same rows plus a 2022-23 Portland row). He has no 2026-27 salary, so the 2026-27 game is unaffected; the career version needs the entry renamed (section 27).
+- **Crosswalk:** none of the 30 entries now matches automatically, so all stay. One name changed: the Finder now files Nate Williams under his full name, **Jeenathan Williams** (NBA ID 1631466, same rows plus a 2022-23 Portland row). He has no 2026-27 salary, so the 2026-27 game is unaffected. The crosswalk entry was renamed to "Jeenathan Williams" with Jorge's OK on October 13, 2026 (section 27, item 15).
 - **Cameron Whitmore** is still a separate name in `data.json` (his 2024-25 row), so the merge stays.
 - Alex Toohey and Thomas Sorber now have birth dates, from the Finder's `bio_overrides.json`.
 
@@ -603,7 +603,7 @@ Pool of 448; start rule as in section 6.2; band ±10%; 50/50 coin flip; ties exc
 | Gerald Henderson | 2009-10 to 2017-18, CHA/PHI/POR, 2009 #12 Duke | 201945 | 76993 (older, no headshot) |
 | Johnny Davis | 2022-23 to 2024-25, WAS, 2022 #10 Wisconsin | 1631098 | 76526 (older, no headshot) |
 | Brandon Williams | 2021-22 to 2026-27, DAL/GSW/POR, undrafted, Arizona | 1630314 | 1585 (late 1990s, no headshot) |
-| Nate Williams | 2023-24 to 2025-26, GSW/HOU, undrafted | 1631466 | 78561 (1970s, no headshot) |
+| Jeenathan Williams (filed as Nate Williams until October 12, 2026) | 2022-23 to 2025-26, POR/GSW/HOU, undrafted | 1631466 | 78561 (1970s, no headshot) |
 | David Johnson | 2021-22, TOR, 2021 #47 Louisville | 1630525 | 77139 (older, no headshot) |
 | George King | 2018-19 to 2021-22, DAL/PHX, 2018 #59 Colorado | 1628994 | 77268 (older, no headshot) |
 
@@ -693,4 +693,5 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 | 12 | One official Daily play per device per day | Approved. |
 | 13 | Timer keeps running when you switch apps or tabs | Approved. |
 | 14 | Reloading or closing mid-pick counts as a timeout | Approved. |
-| 15 | Nate Williams is now "Jeenathan Williams" in the Salary Finder (October 12, 2026) | **Open, needs Jorge's OK:** rename the approved crosswalk entry to "Jeenathan Williams" → 1631466. No effect on the 2026-27 game (no 2026-27 salary); needed for the career version. |
+| 16 | A player with no position in the Salary Finder (Thomas Sorber, October 2026) | Approved October 13, 2026: the card shows no position until the Salary Finder has one. Same for a missing birth date (no age). |
+| 15 | Nate Williams is now "Jeenathan Williams" in the Salary Finder (October 12, 2026) | **Approved October 13, 2026:** the crosswalk entry is renamed to "Jeenathan Williams" → 1631466. No effect on the 2026-27 game (no 2026-27 salary); needed for the career version. |
