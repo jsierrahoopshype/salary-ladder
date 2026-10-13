@@ -10,24 +10,31 @@ import {
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
-// Headshot crops, as the Daily 73-9 uses them: face2 (every head the same size
-// and position), with the regular face crop as fallback, then initials. The
-// data files name each player's face-tight file; the other crops share its
-// file name. Small spots use face2-160, the same framing at 160px.
+// Headshot crops, best first; each one that fails falls back to the next, then
+// to initials. The data files name each player's face-tight file; the other
+// crops share its file name. Play cards use face2, as the Daily 73-9 does
+// (every head the same size and position), then the regular face crop. When
+// the mid-size face2 WebP lands in nba-headshots, it goes first in CARD_CROPS.
+const CARD_CROPS = [['face2', 'png'], ['face', 'png']];
+// Small spots (end screen, contract pick): face2-160, the same framing at 160px.
+const SMALL_CROPS = [['face2-160', 'webp'], ['face', 'png']];
 const crop = (p, dir, ext) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.${ext}`;
-const faceImg = (p, small = false) =>
-  `<img src="${esc(small ? crop(p, 'face2-160', 'webp') : crop(p, 'face2', 'png'))}" data-fallback="${esc(crop(p, 'face', 'png'))}" alt=""` +
-  `${small ? '' : ' decoding="async"'}>`;
+const cropUrls = (p, crops) => crops.map(([dir, ext]) => crop(p, dir, ext));
+function faceImg(p, small = false) {
+  const [src, ...rest] = cropUrls(p, small ? SMALL_CROPS : CARD_CROPS);
+  return `<img src="${esc(src)}" data-fallback="${esc(rest.join(' '))}" alt=""${small ? '' : ' decoding="async"'}>`;
+}
 
-// A headshot that fails moves to its fallback crop; when that fails too, the
-// frame shows initials (play cards) or stays empty. Capturing, because image
-// errors don't bubble.
+// A headshot that fails moves to its next crop; when none is left, the frame
+// shows initials (play cards) or stays empty. Capturing, because image errors
+// don't bubble.
 document.addEventListener('error', (e) => {
   const img = e.target;
   if (!(img instanceof HTMLImageElement) || !img.closest('.face')) return;
-  if (img.dataset.fallback) {
-    img.src = img.dataset.fallback;
-    delete img.dataset.fallback;
+  const rest = (img.dataset.fallback ?? '').split(' ').filter(Boolean);
+  if (rest.length) {
+    img.src = rest.shift();
+    img.dataset.fallback = rest.join(' ');
   } else {
     img.closest('.face').classList.add('noimg');
   }
@@ -54,7 +61,7 @@ const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').match
 
 // Loaded data: today's Daily (or the preview stand-in), the live rules file
 // and the prepared pool.
-const D = { today: null, daily: null, rules: null, pool: null, preview: false };
+const D = { today: null, daily: null, rules: null, pool: null, preview: false, nextSeed: null };
 // The game on screen: {g: saved game, state, last, armed, t0, timer, turn}.
 let G = null;
 
@@ -167,23 +174,47 @@ function showIntro() {
   $('i-foot').textContent = `Salaries as of ${shortDate(D.daily.salaries_as_of)}` +
     (D.preview ? ' · Preview: the real Daily and rankings start at launch' : '');
   showScreen('intro');
+  preloadFirstPairs();
 }
 
 // ---------------------------------------------------------------------------
 // Playing
 
+/** The record for a new game in `mode`. Nothing is saved until it starts. */
+function newRecord(mode) {
+  const d = D.daily;
+  if (mode === 'daily') {
+    return { mode, date: d.date, number: d.number, dataDate: d.salaries_as_of, rules: d.rules, seed: d.seed, startId: d.start };
+  }
+  // Unlimited: a fresh random start every game (spec 11). The seed is rolled
+  // ahead, so the intro can download the first pair's photos; the game that
+  // starts uses it and the next game gets a new one. C2 takes the seed from
+  // the server's start ticket instead.
+  D.nextSeed ??= randomHex();
+  return { mode, date: d.date, number: null, dataDate: d.salaries_as_of, rules: D.rules, seed: D.nextSeed,
+    startId: pickStart(D.pool, D.rules, D.nextSeed) };
+}
+
+/**
+ * Downloads the first pair of photos of each game the player can start or
+ * continue from this screen, so the first clock doesn't wait on them either.
+ * Call after settle() has run for both modes.
+ */
+function preloadFirstPairs() {
+  for (const mode of ['daily', 'unlimited']) {
+    if (mode === 'daily' && dailyResult()) continue;
+    const saved = store.get(liveKey(mode));
+    const { state } = rebuild(resumable(saved) ? saved : { ...newRecord(mode), picks: [] });
+    if (!isDone(state)) for (const id of [state.incumbent, state.challenger]) preload(D.pool.byId.get(id));
+  }
+}
+
 function startGame(mode) {
   if (mode === 'daily' && dailyResult()) return showEnd(dailyResult());
   let g = settle(mode);
   if (!g) {
-    const d = D.daily;
-    g = mode === 'daily'
-      ? { mode, date: d.date, number: d.number, dataDate: d.salaries_as_of, rules: d.rules, seed: d.seed, startId: d.start }
-      : { mode, date: d.date, number: null, dataDate: d.salaries_as_of, rules: D.rules, seed: randomHex(), startId: null };
-    // Unlimited: a fresh random start every game (spec 11). C2 takes the
-    // seed from the server's start ticket instead.
-    if (mode === 'unlimited') g.startId = pickStart(D.pool, g.rules, g.seed);
-    Object.assign(g, { picks: [], pending: false, ticket: null });
+    g = { ...newRecord(mode), picks: [], pending: false, ticket: null };
+    if (mode === 'unlimited') D.nextSeed = null;
     store.set(liveKey(mode), g);
   }
   const { state, last } = rebuild(g);
@@ -244,14 +275,33 @@ function imageReady(el) {
   ]);
 }
 
-/** Warms the cache with both possible next challengers. */
+// Photos downloaded ahead of time, by player ID. Each Image is kept until the
+// game ends, so the browser can't drop a download halfway.
+const preloaded = new Map();
+
+/** Downloads a player's card photo, following the same crops as the card. */
+function preload(p) {
+  if (preloaded.has(p.id)) return;
+  const urls = cropUrls(p, CARD_CROPS);
+  const img = new Image();
+  img.onerror = () => { if (urls.length) img.src = urls.shift(); };
+  img.src = urls.shift();
+  preloaded.set(p.id, img);
+}
+
+/**
+ * Downloads both possible next challengers while the player decides. The
+ * next one is fixed by the seed, the pick number and who holds the rung
+ * after this pick: the incumbent (a right "stay", a wrong pick or a
+ * timeout) or the challenger (a right climb). So by the time the next pair
+ * shows, its photos are already here and the clock doesn't wait on them.
+ */
 function preloadNext() {
   const { state, g } = G;
   const recent = [...state.recent, state.challenger].slice(-g.rules.recent_no_repeat);
   for (const inc of new Set([state.incumbent, state.challenger])) {
-    if (D.pool.byId.get(inc).salary >= D.pool.top) continue;
-    const id = nextChallenger(D.pool, g.rules, g.seed, state.pickIndex + 1, inc, recent);
-    new Image().src = crop(D.pool.byId.get(id), 'face2', 'png');
+    if (D.pool.byId.get(inc).salary >= D.pool.top) continue; // climbing to the top ends the game
+    preload(D.pool.byId.get(nextChallenger(D.pool, g.rules, g.seed, state.pickIndex + 1, inc, recent)));
   }
 }
 
@@ -288,7 +338,6 @@ async function showPick(climbed) {
   $('p-result').className = 'result';
   renderStatus();
   setTimer(maxMs, maxMs, true);
-  preloadNext();
   // The clock starts once the challenger card is fully on screen (spec 7).
   await Promise.all([wait(reducedMotion() ? 0 : ENTER_MS), imageReady(ch), imageReady(inc)]);
   if (!G || turn !== G.turn) return;
@@ -298,6 +347,8 @@ async function showPick(climbed) {
 function arm(maxMs) {
   G.armed = true;
   G.t0 = performance.now();
+  // Only now, so the next pair's photos never slow down the pair on screen.
+  preloadNext();
   G.g.pending = true;
   store.set(liveKey(G.g.mode), G.g);
   G.timer = setTimeout(() => choose(CHOICE.TIMEOUT), maxMs);
@@ -377,6 +428,7 @@ document.addEventListener('keydown', (e) => {
 function finish() {
   const { g, state, last } = G;
   G = null;
+  preloaded.clear();
   const summary = {
     mode: g.mode, date: g.date, number: g.number, dataDate: g.dataDate,
     score: score(D.pool, state), endId: state.incumbent, rung: state.rung,
@@ -453,6 +505,7 @@ function showEnd(summary) {
     ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
   $('e-foot').textContent = `${which} · Salaries as of ${shortDate(summary.dataDate)}` + (D.preview ? ' · Preview data' : '');
   showScreen('end');
+  preloadFirstPairs(); // for Play again / Play Unlimited
 }
 
 function showContract(summary) {
