@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { buildPage, ROOT } from '../tools/build-page.mjs';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, gapText, clock, pickTiming, pairKey,
-  streakAfter, liveStreak, streakAtStake, shareText, cleanName, cleanHandle,
+  streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
 } from '../page/lib.js';
 import { preparePool, newGame, applyPick, isDone, replay, CHOICE } from '../shared/game.js';
 
@@ -42,9 +42,17 @@ test('page: canonical, og:url, no outside resources beyond the approved ones', (
     'https://jsierrahoopshype.github.io/nba-headshots/',
     'https://hoopsmatic.com/salary-ladder/',
   ];
+  // The share modal's platform buttons: links opened only when tapped, so
+  // nothing loads from these.
+  const shareButtons = [
+    'https://twitter.com/intent/tweet?', 'https://bsky.app/intent/compose?', 'https://www.facebook.com/sharer/sharer.php?',
+    'https://wa.me/?', 'https://www.reddit.com/submit?', 'https://t.me/share/url?',
+  ];
   for (const [url] of html.matchAll(/https?:\/\/[^\s"'`)<>]+/g)) {
-    assert.ok(allowed.some((a) => url.startsWith(a)), `unexpected outside resource: ${url}`);
+    assert.ok([...allowed, ...shareButtons].some((a) => url.startsWith(a)), `unexpected outside resource: ${url}`);
   }
+  // Only the two fonts the Salary Finder loads: no Oswald (73-9's heading font) until approved.
+  assert.doesNotMatch(html, /family=Oswald|['"]Oswald['"]/);
   assert.doesNotMatch(html, /<script[^>]+src=/, 'no outside scripts');
   assert.doesNotMatch(html, /<iframe/i);
 });
@@ -150,6 +158,17 @@ test('share card: no player names, full link', () => {
     'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12\nhttps://hoopsmatic.com/salary-ladder/');
   assert.match(shareText({ ...base, mode: 'unlimited', number: null }), /^Salary Ladder · Unlimited\n/);
   assert.match(shareText({ ...base, mode: 'daily', number: null }), /^Salary Ladder · Oct 9\n/);
+});
+
+test('share buttons carry the share card text and the link', () => {
+  const text = shareText({ mode: 'daily', number: 12, date: '2026-10-09', score: 31_400_000, rung: 34, livesLeft: 3, lives: 5, totalMs: 192_000 });
+  const links = shareLinks(text);
+  assert.deepEqual(Object.keys(links), ['x', 'bsky', 'fb', 'wa', 'reddit', 'telegram']);
+  const x = new URL(links.x);
+  assert.equal(x.searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/');
+  assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12');
+  assert.equal(new URL(links.bsky).searchParams.get('text'), text);
+  assert.equal(new URL(links.reddit).searchParams.get('title'), 'Salary Ladder #12 · Oct 9 · I reached $31.4M (rung 34) · ❤️❤️❤️🖤🖤 · 3:12');
 });
 
 test('names and handles, vote pair keys', () => {

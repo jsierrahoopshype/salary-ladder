@@ -6,7 +6,7 @@
 import { CHOICE, preparePool, pickStart, newGame, applyPick, isDone, score, nextChallenger } from '../shared/game.js';
 import {
   dailyDate, shortDate, ageOn, money, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
-  shareText, store, randomHex, cleanName, cleanHandle,
+  shareText, shareLinks, SITE_URL, store, randomHex, cleanName, cleanHandle,
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
@@ -118,6 +118,7 @@ function dailyResult() {
 function showScreen(id) {
   for (const s of ['loading', 'intro', 'play', 'end']) $(s).hidden = s !== id;
   document.body.classList.toggle('playing', id === 'play');
+  document.body.dataset.screen = id;
   window.scrollTo(0, 0);
 }
 
@@ -386,21 +387,28 @@ function finish() {
   showEnd(summary);
 }
 
+const face = (p) => `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt=""></span>`;
+
 function playerRow(p) {
-  return `<img src="${HEADSHOTS}${esc(p.img)}" alt=""><div><div class="pname">${esc(p.name)}</div>` +
-    `<div class="pmeta">${esc(metaLine(p))}</div></div>`;
+  return `${face(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(metaLine(p))}</div></div>`;
 }
 
 function showEnd(summary) {
   const end = D.pool.byId.get(summary.endId);
-  $('e-score').textContent = summary.finished ? `You reached the top: ${money(summary.score)}` : `You reached ${money(summary.score)}`;
+  // The 73-9 record: the big number, then badges, then one line of detail.
+  // "You reached" is read out with the number but not shown above it (no eyebrows).
+  $('e-score').innerHTML = `<span class="sr">You reached </span>${money(summary.score)}`;
+  const grades = [
+    summary.finished && '<span class="grade top">Top of the ladder</span>',
+    summary.newBest && '<span class="grade best">New personal best!</span>',
+  ].filter(Boolean);
+  $('e-grade').innerHTML = grades.join(' ');
+  $('e-grade').hidden = grades.length === 0;
+  const lives = `${summary.livesLeft}/${summary.lives}`;
+  $('e-sub').innerHTML = `You reached rung <b>${summary.rung}</b> · <b>${lives}</b> lives left · <b>${clock(summary.totalMs)}</b>`;
   $('e-player').innerHTML = end ? playerRow(end) : '';
-  $('e-rung').textContent = summary.rung;
-  $('e-lives').textContent = `${summary.livesLeft}/${summary.lives}`;
-  $('e-time').textContent = clock(summary.totalMs);
   const modeName = summary.mode === 'daily' ? 'Daily' : 'Unlimited';
-  $('e-best').textContent = summary.newBest ? 'New personal best!' : `Personal best (${modeName}): ${money(summary.best)}`;
-  $('e-best').className = `best${summary.newBest ? ' new' : ''}`;
+  $('e-best').innerHTML = `Personal best (${modeName}): <b>${money(summary.best)}</b>`;
   // "Higher than X% of today's players" and the boards need the server (C2).
   $('e-rank').textContent = serverOn(D.rules) ? '' : 'Rankings are resting. Score not recorded.';
 
@@ -413,12 +421,9 @@ function showEnd(summary) {
 
   showContract(summary);
 
-  const text = shareText(summary);
-  $('e-share-text').textContent = text;
-  $('e-share-msg').textContent = '';
-  $('e-share').onclick = () => share(text);
   $('e-next').textContent = summary.mode === 'daily' ? 'Play Unlimited' : 'Play again';
   $('e-next').onclick = () => startGame('unlimited');
+  $('e-share').onclick = () => openShare(summary);
   // Which game this was goes in the footer, not in a label above the score.
   const which = summary.mode === 'daily'
     ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
@@ -434,7 +439,7 @@ function showContract(summary) {
   $('e-contract-msg').textContent = '';
   $('e-contract-opts').innerHTML = pair.map((p) =>
     `<button class="opt" type="button" data-id="${p.id}" aria-pressed="${summary.contract === p.id}"${summary.contract ? ' disabled' : ''}>` +
-    `<img src="${HEADSHOTS}${esc(p.img)}" alt=""><span class="pname">${esc(p.name)}</span><span class="sal">${money(p.salary)}</span></button>`).join('');
+    `${face(p)}<span class="pname">${esc(p.name)}</span><span class="sal">${money(p.salary)}</span></button>`).join('');
   for (const b of box.querySelectorAll('.opt')) {
     b.onclick = () => {
       // One optional tap. Saved with the game; C2 adds it to the game record (spec 14).
@@ -462,17 +467,193 @@ $('e-name').addEventListener('submit', (e) => {
   msg.textContent = serverOn(D.rules) ? '' : 'Saved on this device. Rankings are resting, so it is not on a board yet.';
 });
 
-async function share(text) {
-  const msg = $('e-share-msg');
-  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
-    try { await navigator.share({ text }); return; } catch (e) { if (e.name === 'AbortError') return; }
+// ---------------------------------------------------------------------------
+// Share (copied from the 73-9 share modal): a drawn picture of the share card,
+// the link with Copy, the platform buttons, then Download / Copy / Play again.
+// The picture carries exactly what the text card says (spec 9): no player
+// names, and no outside images, so the canvas never taints.
+
+function roundRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function fitFont(ctx, text, maxW, weight, px, family, minPx) {
+  ctx.font = `${weight} ${px}px ${family}`;
+  while (px > minPx && ctx.measureText(text).width > maxW) ctx.font = `${weight} ${px -= 2}px ${family}`;
+}
+
+const spacing = (ctx, v) => { try { ctx.letterSpacing = v; } catch { /* older browsers: no tracking */ } };
+
+function heart(ctx, cx, cy, size) {
+  const s = size / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + s * 0.9);
+  ctx.bezierCurveTo(cx - s * 1.35, cy + s * 0.05, cx - s * 0.95, cy - s * 1.05, cx, cy - s * 0.4);
+  ctx.bezierCurveTo(cx + s * 0.95, cy - s * 1.05, cx + s * 1.35, cy + s * 0.05, cx, cy + s * 0.9);
+  ctx.closePath();
+}
+
+const DISPLAY = '"DM Sans", sans-serif';
+const MONO = '"JetBrains Mono", monospace';
+
+function drawCard(sm) {
+  const W = 1080, H = 1350, SS = 2;
+  const cv = document.createElement('canvas');
+  cv.width = W * SS; cv.height = H * SS;
+  const ctx = cv.getContext('2d');
+  ctx.scale(SS, SS);
+  // Background, top glow and frame: the 73-9 card.
+  const bg = ctx.createLinearGradient(0, 0, W * 0.4, H);
+  bg.addColorStop(0, '#1a1a3e'); bg.addColorStop(0.55, '#0a0a1a'); bg.addColorStop(1, '#050510');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(W / 2, -120, 40, W / 2, -120, 720);
+  glow.addColorStop(0, 'rgba(255,107,53,0.20)'); glow.addColorStop(1, 'rgba(255,107,53,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, W, 460);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 2;
+  roundRect(ctx, 28, 28, W - 56, H - 56, 30); ctx.stroke();
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+
+  // Title, and which game (the share text's first line).
+  const grd = ctx.createLinearGradient(W / 2 - 400, 0, W / 2 + 400, 0);
+  grd.addColorStop(0, '#ff6b35'); grd.addColorStop(0.5, '#ffd700'); grd.addColorStop(1, '#ff6b35');
+  spacing(ctx, '4px'); ctx.fillStyle = grd; fitFont(ctx, 'SALARY LADDER', W - 160, 700, 112, DISPLAY, 70);
+  ctx.fillText('SALARY LADDER', W / 2, 190);
+  const which = sm.mode === 'daily'
+    ? `DAILY${sm.number ? ` #${sm.number}` : ''}  ·  ${shortDate(sm.date).toUpperCase()}` : 'UNLIMITED';
+  spacing(ctx, '4px'); ctx.fillStyle = '#ffd84d'; ctx.font = `700 30px ${DISPLAY}`;
+  ctx.fillText(which, W / 2, 262);
+
+  // The score, and the rung under it.
+  spacing(ctx, '0px'); ctx.fillStyle = '#fff'; fitFont(ctx, money(sm.score), W - 200, 700, 190, DISPLAY, 100);
+  ctx.fillText(money(sm.score), W / 2, 470);
+  spacing(ctx, '3px'); ctx.fillStyle = '#dcdcf7'; ctx.font = `700 28px ${DISPLAY}`;
+  ctx.fillText(sm.finished ? `TOP OF THE LADDER  ·  RUNG ${sm.rung}` : `RUNG ${sm.rung}`, W / 2, 528);
+
+  // The climb: one bar per rung, rising to the last one.
+  const n = Math.min(Math.max(sm.rung, 1), 40);
+  const x0 = 96, x1 = W - 96, base = 870, top = 590, gap = n > 24 ? 6 : 10;
+  const bw = (x1 - x0 - gap * (n - 1)) / n;
+  for (let i = 0; i < n; i++) {
+    const h = sm.rung === 0 ? 24 : 24 + (base - top - 24) * (n === 1 ? 1 : i / (n - 1));
+    const x = x0 + i * (bw + gap);
+    const fill = ctx.createLinearGradient(0, base - h, 0, base);
+    const last = i === n - 1 && sm.rung > 0;
+    fill.addColorStop(0, last ? '#ffd700' : 'rgba(255,184,64,0.75)');
+    fill.addColorStop(1, last ? '#ff6b35' : 'rgba(255,107,53,0.35)');
+    ctx.fillStyle = sm.rung === 0 ? '#2a2a52' : fill;
+    roundRect(ctx, x, base - h, bw, h, Math.min(8, bw / 2)); ctx.fill();
   }
+
+  // Lives and time, in two tiles.
+  const ty = 920, th = 210, tw = (W - 96 * 2 - 24) / 2;
+  for (const [i, label] of ['LIVES', 'TIME'].entries()) {
+    const tx = 96 + i * (tw + 24);
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'; roundRect(ctx, tx, ty, tw, th, 18); ctx.fill();
+    spacing(ctx, '3px'); ctx.fillStyle = '#9a9ac8'; ctx.font = `700 24px ${DISPLAY}`;
+    ctx.fillText(label, tx + tw / 2, ty + th - 34);
+  }
+  const hs = 52, hg = 14, hx = 96 + tw / 2 - ((sm.lives - 1) * (hs + hg)) / 2;
+  for (let i = 0; i < sm.lives; i++) {
+    heart(ctx, hx + i * (hs + hg), ty + 92, hs);
+    ctx.fillStyle = i < sm.livesLeft ? '#ff6666' : '#2a2a52'; ctx.fill();
+  }
+  spacing(ctx, '0px'); ctx.fillStyle = '#ffd700'; ctx.font = `600 76px ${MONO}`;
+  ctx.fillText(clock(sm.totalMs), 96 + tw + 24 + tw / 2, ty + 120);
+
+  // Footer.
+  spacing(ctx, '2px'); ctx.fillStyle = '#aeaed4'; fitFont(ctx, 'CLIMB YOUR OWN LADDER AT HOOPSMATIC.COM/SALARY-LADDER', W - 140, 700, 26, DISPLAY, 18);
+  ctx.fillText('CLIMB YOUR OWN LADDER AT HOOPSMATIC.COM/SALARY-LADDER', W / 2, H - 76);
+  spacing(ctx, '0px');
+  return cv;
+}
+
+const SOCIAL = [['x', 'X'], ['bsky', 'Bluesky'], ['fb', 'Facebook'], ['wa', 'WhatsApp'], ['reddit', 'Reddit'], ['telegram', 'Telegram']];
+// The 73-9 icons, drawn inline (no outside images).
+const SOCIAL_ICON = {
+  x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zM17.61 20.64h2.04L6.49 3.24H4.3z"/></svg>',
+  bsky: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 10.8C10.91 8.69 7.95 4.75 5.2 2.81 2.57.94 1.56 1.27.9 1.57.14 1.91 0 3.08 0 3.77c0 .69.38 5.65.62 6.48.82 2.74 3.71 3.66 6.38 3.36-3.91.58-7.39 2.01-2.83 7.08 5.01 5.19 6.87-1.11 7.82-4.31.95 3.2 2.05 9.27 7.73 4.31 4.27-4.31 1.17-6.5-2.74-7.08 2.67.3 5.57-.63 6.38-3.36C23.62 9.42 24 4.46 24 3.77c0-.69-.14-1.86-.9-2.2-.66-.3-1.66-.62-4.3 1.24C16.05 4.75 13.09 8.69 12 10.8z"/></svg>',
+  fb: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.13 11.93v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8v8.44C19.61 23.08 24 18.09 24 12.07z"/></svg>',
+  wa: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.16c-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.14-.18.19-.3.29-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.88-9.88 9.88M20.46 3.49A11.81 11.81 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.42"/></svg>',
+  reddit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.74c.69 0 1.25.56 1.25 1.25a1.25 1.25 0 0 1-2.5.06l-2.6-.55-.8 3.75c1.83.07 3.48.63 4.68 1.49.31-.31.73-.49 1.21-.49.97 0 1.75.79 1.75 1.75 0 .72-.44 1.33-1.01 1.61.03.17.04.34.04.52 0 2.7-3.13 4.87-7 4.87-3.88 0-7-2.17-7-4.87 0-.18.01-.37.04-.53A1.75 1.75 0 0 1 4.03 12c0-.97.79-1.75 1.75-1.75.46 0 .9.2 1.21.49 1.21-.88 2.88-1.43 4.74-1.49l.89-4.18a.34.34 0 0 1 .14-.2.35.35 0 0 1 .24-.04l2.91.62a1.21 1.21 0 0 1 1.11-.7zM9.25 12c-.69 0-1.25.56-1.25 1.25 0 .69.56 1.25 1.25 1.25.69 0 1.25-.56 1.25-1.25 0-.69-.56-1.25-1.25-1.25zm5.5 0c-.69 0-1.25.56-1.25 1.25 0 .69.56 1.25 1.25 1.25.69 0 1.25-.56 1.25-1.25 0-.69-.56-1.25-1.25-1.25zm-5.47 3.99a.33.33 0 0 0-.23.09.33.33 0 0 0 0 .47c.84.84 2.48.91 2.96.91.48 0 2.11-.06 2.96-.91a.36.36 0 0 0 .03-.47.33.33 0 0 0-.46 0c-.55.53-1.69.73-2.51.73-.83 0-1.98-.2-2.51-.73a.33.33 0 0 0-.24-.09z"/></svg>',
+  telegram: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.94 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.06 0zm4.96 7.22c.1 0 .32.02.47.14a.51.51 0 0 1 .17.33c.02.09.04.31.02.47-.18 1.9-.96 6.5-1.36 8.63-.17.9-.5 1.2-.82 1.23-.7.06-1.23-.46-1.9-.9-1.06-.7-1.65-1.12-2.68-1.8-1.19-.78-.42-1.21.26-1.91.18-.18 3.25-2.98 3.31-3.23 0-.03.01-.15-.06-.21-.07-.06-.17-.04-.25-.02-.1.02-1.79 1.14-5.06 3.34-.48.33-.91.49-1.3.48-.43 0-1.25-.24-1.86-.44-.75-.24-1.35-.37-1.3-.79.03-.21.33-.43.89-.66 3.5-1.52 5.83-2.53 7-3.01 3.33-1.39 4.02-1.63 4.48-1.63z"/></svg>',
+};
+
+async function openShare(summary) {
+  const text = shareText(summary);
+  const links = shareLinks(text);
+  // The card uses the page fonts; make sure they're in before drawing.
+  await Promise.all([document.fonts.load(`700 100px ${DISPLAY}`), document.fonts.load(`600 70px ${MONO}`)]).catch(() => {});
+  let url, blob;
   try {
-    await navigator.clipboard.writeText(text);
-    msg.textContent = 'Copied. Paste it anywhere.';
-  } catch {
-    msg.textContent = 'Copy the text below.';
-    getSelection().selectAllChildren($('e-share-text'));
+    const cv = drawCard(summary);
+    url = cv.toDataURL('image/png');
+    blob = await (await fetch(url)).blob();
+  } catch (e) {
+    console.warn('share card failed', e);
+  }
+
+  $('share-modal')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'share-modal';
+  ov.className = 'share-modal';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-modal', 'true');
+  ov.setAttribute('aria-label', 'Share your result');
+  const canCopyImage = Boolean(blob && navigator.clipboard && window.ClipboardItem);
+  ov.innerHTML = '<div class="share-box">' +
+    '<button class="share-x" type="button" aria-label="Close">×</button>' +
+    (url ? `<img class="share-img" alt="${esc(text.split('\n').slice(0, 3).join('. '))}" src="${url}">` : '') +
+    `<div class="share-link"><input class="share-url" readonly value="${esc(SITE_URL)}" aria-label="Link"><button class="share-copybtn" type="button" data-act="copylink">Copy</button></div>` +
+    '<div class="share-social">' + SOCIAL.map(([k, name]) =>
+      `<button class="soc soc-${k}" type="button" data-soc="${k}" aria-label="Share on ${name}">${SOCIAL_ICON[k]}<span>${name}</span></button>`).join('') + '</div>' +
+    '<div class="share-btns">' +
+      (blob ? '<button class="btn" type="button" data-act="download">Download</button>' : '') +
+      (canCopyImage ? '<button class="btn ghost" type="button" data-act="copy">Copy</button>' : '') +
+      `<button class="btn ghost" type="button" data-act="again">${esc($('e-next').textContent)}</button>` +
+    '</div>' +
+    '<p class="share-msg" aria-live="polite"></p></div>';
+  document.body.appendChild(ov);
+
+  const msg = ov.querySelector('.share-msg');
+  const opener = document.activeElement;
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  const close = () => { ov.remove(); document.removeEventListener('keydown', onKey); opener?.focus?.(); };
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  ov.querySelector('.share-x').onclick = close;
+  ov.querySelector('.share-x').focus();
+  const field = ov.querySelector('.share-url');
+  field.onclick = () => field.select();
+  for (const b of ov.querySelectorAll('[data-soc]')) {
+    b.onclick = () => window.open(links[b.dataset.soc], '_blank', 'noopener,noreferrer');
+  }
+  for (const b of ov.querySelectorAll('[data-act]')) {
+    b.onclick = async () => {
+      const act = b.dataset.act;
+      if (act === 'again') { close(); startGame('unlimited'); return; }
+      if (act === 'download') {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'salary-ladder.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+        msg.textContent = 'Saved to your downloads.';
+      } else if (act === 'copy') {
+        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = 'Image copied. Paste it anywhere.'; }
+        catch { msg.textContent = 'Copy blocked here. Use Download.'; }
+      } else if (act === 'copylink') {
+        // The whole text card (spec 9), the link on its last line.
+        try { await navigator.clipboard.writeText(text); msg.textContent = 'Text + link copied.'; }
+        catch { field.value = text; field.select(); msg.textContent = 'Copy blocked here. The text is selected.'; }
+      }
+    };
   }
 }
 
