@@ -118,6 +118,25 @@ export function shareText({ mode, number, date, score, rung, livesLeft, lives, t
   return [head, `I reached ${money(score)} (rung ${rung})`, `${hearts} · ${clock(totalMs)}`, SITE_URL].join('\n');
 }
 
+/**
+ * The share modal's platform buttons (copied from the 73-9 modal). Each opens
+ * the platform's own compose page with the share card text; nothing loads
+ * until the player taps one.
+ */
+export function shareLinks(text) {
+  const lines = text.split('\n').filter((l) => l !== SITE_URL);
+  const body = lines.join('\n');
+  const e = encodeURIComponent, u = e(SITE_URL), t = e(body), all = e(`${body}\n${SITE_URL}`);
+  return {
+    x: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
+    bsky: `https://bsky.app/intent/compose?text=${all}`,
+    fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
+    wa: `https://wa.me/?text=${all}`,
+    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(lines.join(' · '))}`,
+    telegram: `https://t.me/share/url?url=${u}&text=${t}`,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Device storage (spec 16). Every read and write is wrapped, so the game
 // still plays when the browser blocks storage; things just aren't remembered.
