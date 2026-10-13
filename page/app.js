@@ -393,8 +393,6 @@ function playerRow(p) {
 
 function showEnd(summary) {
   const end = D.pool.byId.get(summary.endId);
-  $('e-mode').textContent = summary.mode === 'daily'
-    ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
   $('e-score').textContent = summary.finished ? `You reached the top: ${money(summary.score)}` : `You reached ${money(summary.score)}`;
   $('e-player').innerHTML = end ? playerRow(end) : '';
   $('e-rung').textContent = summary.rung;
@@ -421,7 +419,10 @@ function showEnd(summary) {
   $('e-share').onclick = () => share(text);
   $('e-next').textContent = summary.mode === 'daily' ? 'Play Unlimited' : 'Play again';
   $('e-next').onclick = () => startGame('unlimited');
-  $('e-foot').textContent = `Salaries as of ${shortDate(summary.dataDate)}` + (D.preview ? ' · Preview data' : '');
+  // Which game this was goes in the footer, not in a label above the score.
+  const which = summary.mode === 'daily'
+    ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
+  $('e-foot').textContent = `${which} · Salaries as of ${shortDate(summary.dataDate)}` + (D.preview ? ' · Preview data' : '');
   showScreen('end');
 }
 
