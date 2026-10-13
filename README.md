@@ -11,4 +11,5 @@ What's here so far:
 - `tools/simulate.mjs`: the ladder simulator (spec 23).
 - `test/`: run with `node --test`. No dependencies.
 - `index.html`: the game page GitHub Pages serves (spec 2, 7 to 10, 16, 20). Built by `tools/build-page.mjs` from `page/` (template, styles, page code) and `shared/game.js`, so it is one file that runs the same game code as the server. Edit `page/` and rebuild; a test fails if `index.html` is out of date.
+- `workers/`: the two server Workers (game check, leaderboard) and the database tables (spec 12 to 14, 18). Deployed by `.github/workflows/deploy-workers.yml` on merge. API and admin links: `workers/README.md`.
 - `preview/snapshot.json`: real salaries (stand-in roster) for the page until the daily job is switched on in C2, which deletes it. Rebuild with `tools/build-preview.mjs --finder DIR --headshots DIR`.

@@ -1,0 +1,34 @@
+# salary-ladder-game: the game-check Worker (spec 13, 14). Deployed only by
+# .github/workflows/deploy-workers.yml on merge to main, never by hand.
+# Secrets (VERIFY_SECRET, ADMIN_KEY) live in the Cloudflare dashboard, not here.
+name = "salary-ladder-game"
+main = "index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+preview_urls = false
+
+# Everything under /salary-ladder/api/ except /salary-ladder/api/board*,
+# which the more specific route of salary-ladder-board takes.
+routes = [
+  { pattern = "hoopsmatic.com/salary-ladder/api/*", zone_name = "hoopsmatic.com" },
+]
+
+[vars]
+# Where the daily puzzles and rules are published (this repo's GitHub Pages).
+DATA_BASE = "https://jsierrahoopshype.github.io/salary-ladder/"
+# "off" stops all recording (as does "recording": false in rules/rules.json).
+RECORDING = "on"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "salary-ladder"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "../migrations"
+
+# Every 5 minutes: score counts for the end-screen percentage.
+# Hourly at :23: the daily totals job (it waits for 9 AM ET by itself) and clean-up.
+[triggers]
+crons = ["*/5 * * * *", "23 * * * *"]
+
+[observability]
+enabled = true

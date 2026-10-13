@@ -1,0 +1,53 @@
+name: Deploy Workers
+
+# Merging is the deploy (build plan ground rules): on every merge to main
+# that changes the Workers or the shared game logic, apply database changes
+# and deploy both Workers. Uses the two GitHub secrets CLOUDFLARE_API_TOKEN
+# and CLOUDFLARE_ACCOUNT_ID. Never touches the secrets stored in the
+# Cloudflare dashboard (VERIFY_SECRET, ADMIN_KEY).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/**'
+      - 'shared/game.js'
+      - '.github/workflows/deploy-workers.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-workers
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run the tests first
+        run: node --test
+      - name: Check the setup is complete
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the repo's Settings > Secrets and variables > Actions (build plan, 'Before merging B2')."
+            exit 1
+          fi
+          if grep -q 'REPLACE_WITH' workers/game/wrangler.toml; then
+            echo "::error::The D1 database ID is not in workers/game/wrangler.toml yet."
+            exit 1
+          fi
+      - name: Create or update the database tables
+        run: npx --yes wrangler@4 d1 migrations apply salary-ladder --remote --config workers/game/wrangler.toml
+      - name: Deploy the leaderboard Worker
+        run: npx --yes wrangler@4 deploy --config workers/board/wrangler.toml
+      - name: Deploy the game-check Worker
+        run: npx --yes wrangler@4 deploy --config workers/game/wrangler.toml
