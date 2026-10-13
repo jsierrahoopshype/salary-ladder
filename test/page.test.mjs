@@ -34,11 +34,12 @@ test('page: canonical, og:url, no outside resources beyond the approved ones', (
   assert.match(html, /<link rel="canonical" href="https:\/\/hoopsmatic\.com\/salary-ladder\/">/);
   assert.match(html, /<meta property="og:url" content="https:\/\/hoopsmatic\.com\/salary-ladder\/">/);
   assert.doesNotMatch(html, /github\.io\/salary-ladder/);
-  // Fonts: the same request hoopsmatic.com's Salary Finder makes. Images:
-  // Jorge's nba-headshots site. Nothing else.
+  // Fonts: the Salary Finder's Google Fonts request plus Oswald (73-9's
+  // heading font, approved Oct 13), in one request. Images: Jorge's
+  // nba-headshots site. Nothing else.
   const allowed = [
     'https://fonts.googleapis.com', 'https://fonts.gstatic.com',
-    'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap',
+    'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Oswald:wght@600;700&display=swap',
     'https://jsierrahoopshype.github.io/nba-headshots/',
     'https://hoopsmatic.com/salary-ladder/',
   ];
@@ -51,8 +52,7 @@ test('page: canonical, og:url, no outside resources beyond the approved ones', (
   for (const [url] of html.matchAll(/https?:\/\/[^\s"'`)<>]+/g)) {
     assert.ok([...allowed, ...shareButtons].some((a) => url.startsWith(a)), `unexpected outside resource: ${url}`);
   }
-  // Only the two fonts the Salary Finder loads: no Oswald (73-9's heading font) until approved.
-  assert.doesNotMatch(html, /family=Oswald|['"]Oswald['"]/);
+  assert.equal(html.match(/<link href="https:\/\/fonts\.googleapis\.com\/css2/g).length, 1, 'one font request');
   assert.doesNotMatch(html, /<script[^>]+src=/, 'no outside scripts');
   assert.doesNotMatch(html, /<iframe/i);
 });
@@ -166,8 +166,12 @@ test('share buttons carry the share card text and the link', () => {
   assert.deepEqual(Object.keys(links), ['x', 'bsky', 'fb', 'wa', 'reddit', 'telegram']);
   const x = new URL(links.x);
   assert.equal(x.searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/');
-  assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12');
-  assert.equal(new URL(links.bsky).searchParams.get('text'), text);
+  assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12\n@hoopshype');
+  assert.equal(new URL(links.bsky).searchParams.get('text'),
+    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12\n@hoopshypeofficial.bsky.social\nhttps://hoopsmatic.com/salary-ladder/');
+  // Only X and Bluesky tag HoopsHype, as in 73-9; the copied text card has no handle.
+  for (const k of ['fb', 'wa', 'reddit', 'telegram']) assert.doesNotMatch(decodeURIComponent(links[k]), /@hoopshype/);
+  assert.doesNotMatch(text, /@/);
   assert.equal(new URL(links.reddit).searchParams.get('title'), 'Salary Ladder #12 · Oct 9 · I reached $31.4M (rung 34) · ❤️❤️❤️🖤🖤 · 3:12');
 });
 

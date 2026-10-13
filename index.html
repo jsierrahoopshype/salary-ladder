@@ -14,25 +14,24 @@
 <meta property="og:url" content="https://hoopsmatic.com/salary-ladder/">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#0a0a1a">
-<!-- Same font request the HoopsMatic Salary Finder already makes (no new outside resources). -->
+<!-- The Salary Finder's font request (DM Sans, JetBrains Mono) plus Oswald, 73-9's heading font: one request, same provider. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
 <style>
 /* Salary Ladder. Colours, type, panels, cards, buttons, share modal and end
    screen copied from the 73-9 game (BoxScoreLab box_score_lab_roulette.html,
    live at hoopsmatic.com/73-9-game), the look the Daily 73-9 also uses.
 
-   Fonts: 73-9 sets its headings in Oswald, which the Salary Finder doesn't
-   load, so it is not added here until Jorge approves it. Headings use
-   --display (DM Sans, already loaded) in the same uppercase, spaced style.
-   Switching to Oswald is the font request in page/index.html plus --display. */
+   Fonts: headings in Oswald, as in 73-9 (approved October 13, 2026), body in
+   JetBrains Mono. Both come in the one Google Fonts request in page/index.html
+   that also loads DM Sans, the Salary Finder's font, kept as the fallback. */
 
 :root{
   --gold:#ffd700;--orange:#ff6b35;--green:#34d97a;--amber:#ffd24a;--red:#ff6666;
   --ink:#c8c8e0;--dim:#8888aa;--panel:#12122a;--panel2:#0c0c1e;--line:#2a2a52;
   --white:#eaeaff;
-  --display:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --display:'Oswald','DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -135,7 +134,7 @@ body.playing .hdr{display:none}
 .pcard .face img{width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
   font-family:var(--display);font-size:1.6rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
-.pcard .face.noimg img{display:none}
+.face.noimg img{visibility:hidden}
 .pcard .face.noimg .initials{display:flex}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
@@ -750,15 +749,17 @@ function shareText({ mode, number, date, score, rung, livesLeft, lives, totalMs 
 /**
  * The share modal's platform buttons (copied from the 73-9 modal). Each opens
  * the platform's own compose page with the share card text; nothing loads
- * until the player taps one.
+ * until the player taps one. As in 73-9, X and Bluesky also tag HoopsHype.
  */
+const HANDLES = { x: '@hoopshype', bsky: '@hoopshypeofficial.bsky.social' };
+
 function shareLinks(text) {
   const lines = text.split('\n').filter((l) => l !== SITE_URL);
   const body = lines.join('\n');
   const e = encodeURIComponent, u = e(SITE_URL), t = e(body), all = e(`${body}\n${SITE_URL}`);
   return {
-    x: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
-    bsky: `https://bsky.app/intent/compose?text=${all}`,
+    x: `https://twitter.com/intent/tweet?text=${e(`${body}\n${HANDLES.x}`)}&url=${u}`,
+    bsky: `https://bsky.app/intent/compose?text=${e(`${body}\n${HANDLES.bsky}\n${SITE_URL}`)}`,
     fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
     wa: `https://wa.me/?text=${all}`,
     reddit: `https://www.reddit.com/submit?url=${u}&title=${e(lines.join(' · '))}`,
@@ -816,6 +817,28 @@ function cleanHandle(handle) {
 
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
+// Headshot crops, as the Daily 73-9 uses them: face2 (every head the same size
+// and position), with the regular face crop as fallback, then initials. The
+// data files name each player's face-tight file; the other crops share its
+// file name. Small spots use face2-160, the same framing at 160px.
+const crop = (p, dir, ext) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.${ext}`;
+const faceImg = (p, small = false) =>
+  `<img src="${esc(small ? crop(p, 'face2-160', 'webp') : crop(p, 'face2', 'png'))}" data-fallback="${esc(crop(p, 'face', 'png'))}" alt=""` +
+  `${small ? '' : ' decoding="async"'}>`;
+
+// A headshot that fails moves to its fallback crop; when that fails too, the
+// frame shows initials (play cards) or stays empty. Capturing, because image
+// errors don't bubble.
+document.addEventListener('error', (e) => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.closest('.face')) return;
+  if (img.dataset.fallback) {
+    img.src = img.dataset.fallback;
+    delete img.dataset.fallback;
+  } else {
+    img.closest('.face').classList.add('noimg');
+  }
+}, true);
 const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
 // Build plan C2 points this at https://hoopsmatic.com/salary-ladder/api/.
 // Until then the page plays without a server and says rankings are resting.
@@ -1006,13 +1029,11 @@ function fillCard(el, p, role) {
   el.innerHTML =
     `<span class="role">${label}</span>` +
     `<span class="mark" aria-hidden="true"></span>` +
-    `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt="" decoding="async"><span class="initials">${esc(initials(p.name))}</span></span>` +
+    `<span class="face">${faceImg(p)}<span class="initials">${esc(initials(p.name))}</span></span>` +
     `<span class="pname">${esc(p.name)}</span>` +
     `<span class="pmeta team"><img class="logo" src="${LOGOS}${esc(p.team.toLowerCase())}.svg" alt=""><span>${esc(teamName(p))}</span></span>` +
     `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
     `<span class="sal"></span><span class="gap"></span><span class="more">Paid more</span>`;
-  const img = el.querySelector('.face img');
-  img.addEventListener('error', () => img.parentElement.classList.add('noimg'), { once: true });
   el.querySelector('.logo').addEventListener('error', (e) => e.target.remove(), { once: true });
 }
 
@@ -1021,7 +1042,11 @@ function imageReady(el) {
   const img = el.querySelector('.face img');
   if (!img || img.complete) return Promise.resolve();
   return Promise.race([
-    new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); }),
+    new Promise((r) => {
+      img.addEventListener('load', r, { once: true });
+      // An error that only switches to the fallback crop isn't the end.
+      img.addEventListener('error', () => { if (img.closest('.face').classList.contains('noimg')) r(); });
+    }),
     wait(IMAGE_WAIT_MS),
   ]);
 }
@@ -1033,7 +1058,7 @@ function preloadNext() {
   for (const inc of new Set([state.incumbent, state.challenger])) {
     if (D.pool.byId.get(inc).salary >= D.pool.top) continue;
     const id = nextChallenger(D.pool, g.rules, g.seed, state.pickIndex + 1, inc, recent);
-    new Image().src = HEADSHOTS + D.pool.byId.get(id).img;
+    new Image().src = crop(D.pool.byId.get(id), 'face2', 'png');
   }
 }
 
@@ -1193,7 +1218,7 @@ function finish() {
   showEnd(summary);
 }
 
-const face = (p) => `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt=""></span>`;
+const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
 
 function playerRow(p) {
   return `${face(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(metaLine(p))}</div></div>`;
@@ -1306,7 +1331,7 @@ function heart(ctx, cx, cy, size) {
   ctx.closePath();
 }
 
-const DISPLAY = '"DM Sans", sans-serif';
+const DISPLAY = 'Oswald, "DM Sans", sans-serif';
 const MONO = '"JetBrains Mono", monospace';
 
 function drawCard(sm) {

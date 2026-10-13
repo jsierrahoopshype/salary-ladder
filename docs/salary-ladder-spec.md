@@ -20,7 +20,7 @@ Two NBA players are on screen: the **incumbent** (your current rung) and a **cha
 - **Address:** https://hoopsmatic.com/salary-ladder/
 - **Canonical tag and og:url:** `https://hoopsmatic.com/salary-ladder/`. Never `jsierrahoopshype.github.io`.
 - **Sitemap:** the page is listed in a sitemap with an accurate `<lastmod>`. The date changes only when the page itself changes (its HTML, title, description or how-to-play text). Daily puzzle data changing does **not** change `<lastmod>`. The build follows whatever pattern the other HoopsMatic games use: either an entry in the existing sitemap or a small `https://hoopsmatic.com/salary-ladder/sitemap.xml`. Either way, the sitemap must be listed in https://hoopsmatic.com/robots.txt and submitted in Google Search Console (https://search.google.com/search-console).
-- **No new third-party scripts, fonts or embeds.** Headshots and logos load from Jorge's own nba-headshots GitHub Pages site (already used by other HoopsMatic tools). Any other outside resource must be flagged to Jorge first.
+- **No new third-party scripts, fonts or embeds.** (One approved addition, October 13, 2026: the Oswald font, in the same Google Fonts request as the Salary Finder's fonts; section 20.) Headshots and logos load from Jorge's own nba-headshots GitHub Pages site (already used by other HoopsMatic tools). Any other outside resource must be flagged to Jorge first.
 
 ---
 
@@ -43,7 +43,7 @@ Daily and Unlimited follow the same ladder rules (section 6), lives, timer and s
 
 - **Salaries:** https://github.com/jsierrahoopshype/salary-season-finder, file `data/data.json`. It's rebuilt daily at 06:00 UTC by that repo's GitHub Action. Read from `https://raw.githubusercontent.com/jsierrahoopshype/salary-season-finder/main/data/data.json`.
 - **Roster status (new file, launch blocker):** `data/roster_status.json` in the same repo, added in a separate Salary Finder session with Jorge's OK. It gives each player's current team, contract type and birth date. Spec in section 25.
-- **Headshots:** https://github.com/jsierrahoopshype/nba-headshots. It provides the player index (`players/metadata/players_all.json`) and the tight face crops in `players/headshots/face-tight/` (file name `{nba_id}-{slug}.webp`). Images are served from `https://jsierrahoopshype.github.io/nba-headshots/players/headshots/face-tight/{nba_id}-{slug}.webp`.
+- **Headshots:** https://github.com/jsierrahoopshype/nba-headshots. It provides the player index (`players/metadata/players_all.json`) and the tight face crops in `players/headshots/face-tight/` (file name `{nba_id}-{slug}.webp`). The pool uses the face-tight file list. The page shows the same file name from the `face2` crop (fallback `face`), as the Daily 73-9 does (section 20): `https://jsierrahoopshype.github.io/nba-headshots/players/headshots/face2/{nba_id}-{slug}.png`. Every face-tight file has a face2 twin (checked October 13, 2026).
 
 ### 4.2 Matching players (by NBA ID, never by name alone)
 
@@ -168,7 +168,7 @@ How each kind of player is handled:
 ## 8. What the cards show, and the reveal
 
 **Each card shows:**
-- the headshot (face-tight crop),
+- the headshot (face2 crop, section 20),
 - the player's name,
 - his current team,
 - his position,
@@ -209,6 +209,7 @@ How each kind of player is handled:
   ```
 
   `#12` is the Daily number (#1 = launch day). For Unlimited the first line reads "Salary Ladder · Unlimited".
+- **Share buttons** (the 73-9 share modal, section 20): Copy copies the card above exactly. The X and Bluesky buttons add HoopsHype's handle on its own line after the card text, as 73-9 does: **@hoopshype** on X, **@hoopshypeofficial.bsky.social** on Bluesky. Facebook, WhatsApp, Reddit and Telegram get the card with no handle.
 
 ---
 
@@ -473,9 +474,10 @@ Also state:
 
 ## 20. Design
 
-- **Match the look of the 73-9 game** (changed October 13, 2026; it was the NBA Polymarket tracker). Reference: the original 73-9, https://raw.githubusercontent.com/aderoa/BoxScoreLab/main/box_score_lab_roulette.html (live at https://hoopsmatic.com/73-9-game), and the Daily 73-9 at https://hoopsmatic.com/73-9-game/daily, which uses the same look. Copied from it: colours (dark navy gradient, orange-to-gold accents), type (uppercase spaced headings, JetBrains Mono body), panel and card style, buttons, headshot framing (the dark reel-window well), the share modal and the end-screen layout. Our game rules and the no-scroll phone layout stay as written.
+- **Match the look of the 73-9 game** (changed October 13, 2026; it was the NBA Polymarket tracker). Reference: the original 73-9, https://raw.githubusercontent.com/aderoa/BoxScoreLab/main/box_score_lab_roulette.html (live at https://hoopsmatic.com/73-9-game), and the Daily 73-9 at https://hoopsmatic.com/73-9-game/daily, which uses the same look. Copied from it: colours (dark navy gradient, orange-to-gold accents), type (uppercase spaced Oswald headings, JetBrains Mono body), panel and card style, buttons, headshot framing (the dark reel-window well), the share modal and the end-screen layout. Our game rules and the no-scroll phone layout stay as written.
   - **Outside resources:** headshots and team logos only from nba-headshots. The 73-9 page's ESPN logos, its `hoopsmatic-games.js` and its other scripts are not copied. The share modal's platform buttons (X, Bluesky, Facebook, WhatsApp, Reddit, Telegram) are plain links that open each site's own share page when tapped; nothing loads from them.
-  - **Fonts:** only the two the Salary Finder already loads (DM Sans, JetBrains Mono 400 to 600). 73-9 sets its headings in **Oswald**, which the Salary Finder doesn't load, so headings use DM Sans in the same uppercase, spaced style until Jorge approves Oswald. Switching is the font request in `page/index.html` plus one line in `page/style.css`.
+  - **Fonts:** headings in **Oswald**, as in 73-9 (approved October 13, 2026), body in JetBrains Mono. Oswald is added to the same Google Fonts request that loads the Salary Finder's DM Sans and JetBrains Mono: one request, no new provider. DM Sans stays as the fallback.
+  - **Headshots:** the crops the Daily 73-9 uses: `face2` (every head the same size and position), falling back to the regular `face` crop, then initials. Small spots (end screen, contract pick) use `face2-160`, the same framing at 160px. The data files keep naming the `face-tight` file; the page takes the file name from it. Checked October 13, 2026: all 446 players in the preview pool have face2, face2-160 and face.
   - **No eyebrows:** no small label above a heading or the score. Functional labels (Rung, Score, Your rung, Challenger) stay.
   - **Share modal:** a picture of the share card (section 9's text: no player names, no outside images), the link with Copy (copies the full text card), the platform buttons, then Download, Copy image and Play again.
 - **Mobile first. No scrolling during play:** both cards, the timer bar, hearts, rung and current score all fit on one phone screen.
@@ -661,7 +663,7 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 10. `rules/rules.json` at version 1: 5 lives, ±10% band, 8 s timer, start window 5th–25th percentile with at least 15 neighbours, recording on.
 11. `data/crosswalk.json` and `data/exclude.json` filled from section 24.
 12. Canonical and og:url set to https://hoopsmatic.com/salary-ladder/
-12a. Look copied from the 73-9 game (section 20). Oswald approved or left out.
+12a. Look copied from the 73-9 game (section 20), with Oswald and face2 headshots.
 13. Sitemap entry with an accurate `<lastmod>`; sitemap listed in https://hoopsmatic.com/robots.txt; submitted in Google Search Console: https://search.google.com/search-console
 14. **Tests:**
     - The page and the server replay agree on 1,000 recorded games.
