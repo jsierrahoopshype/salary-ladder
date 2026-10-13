@@ -125,7 +125,9 @@ test('real data: pool size and the known traps', { skip: !process.env.REAL_FINDE
     finderDir: process.env.REAL_FINDER, headshotsDir: process.env.REAL_HEADSHOTS,
     config: read('pipeline/config.json'), crosswalk: read('data/crosswalk.json'), exclude: read('data/exclude.json'),
   });
-  assert.ok(players.length > 380 && players.length < 520, `pool ${players.length}`);
+  // Upper limit: every player with a 2026-27 salary (638 on October 8). The
+  // nba-headshots refresh of October 13 took the pool from ~448 to 521.
+  assert.ok(players.length > 380 && players.length <= 640, `pool ${players.length}`);
   const ids = new Set(players.map((p) => p.id));
   assert.ok(ids.has(1631095), 'Jabari Smith Jr.');
   assert.ok(!ids.has(2074), 'never Jabari Smith Sr.');

@@ -1,0 +1,25 @@
+# salary-ladder-board: the leaderboard Worker (spec 12). Deployed only by
+# .github/workflows/deploy-workers.yml on merge to main, never by hand.
+# Secrets (VERIFY_SECRET, the same value as salary-ladder-game's, and
+# ADMIN_KEY) live in the Cloudflare dashboard, not here.
+name = "salary-ladder-board"
+main = "index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+preview_urls = false
+
+routes = [
+  { pattern = "hoopsmatic.com/salary-ladder/api/board*", zone_name = "hoopsmatic.com" },
+]
+
+# One Durable Object holds every board row, so updates can't collide.
+[[durable_objects.bindings]]
+name = "BOARD"
+class_name = "BoardDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["BoardDO"]
+
+[observability]
+enabled = true

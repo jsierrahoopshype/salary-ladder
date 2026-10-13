@@ -270,6 +270,7 @@ How each kind of player is handled:
   - reversed spellings are checked;
   - acrostic attacks (offensive words spelled by the first letters of names stacked down the board) are hidden when the board is served;
   - elongated spellings are caught with pattern rules, not exact lists.
+  - *Built (B2, October 13, 2026):* the Daily 73-9 filter rule for rule, plus the 73-9 leaderboard's English and Spanish swear words as standalone words (that Worker blocked them anywhere, which refused names like Hancock). "dick" and "cock" are left out because Dick is a name. Accents are removed before checking.
 - **One board row per name.** The same @handle means the same person. Names that differ only by trailing digits (lemontree1, lemontree2) collapse into one row. The row keeps that person's best score.
 - **Admin "scrub" endpoint** (needs the admin key): hides a name everywhere, survives redeploys, and can be undone.
 - **Admin endpoint to remove entries.**
@@ -310,6 +311,7 @@ Salary Ladder gets **its own signing secret and its own admin key**, never 73-9'
    - **High scores without a valid token are rejected outright.**
    - If the token has expired while the player types a name, the page quietly re-verifies (step 2 again with the saved game) before submitting, so slow typers aren't punished.
    - If verification fails, the player sees: "Score not verified, retry".
+   - *Built (B2):* every board score needs a token, not only high ones (73-9 still let low tokenless scores through). Tokens last 15 minutes and work once. The same game can be re-sent for 30 hours; a game must first be sent within 24 hours of its ticket.
 
 ### 13.2 What this can't stop (accepted)
 
@@ -346,6 +348,7 @@ A scheduled job runs once a day after the 9 AM ET reset. It adds the day's recor
 - **Contract preference totals** (the end-screen question): pair + which contract was preferred.
 - **Accuracy by gap size** (0–2%, 2–4%, 4–6%, 6–8%, 8–10%): right / wrong / timeout counts. Used to calibrate lives (section 15).
 - **Accuracy per game:** how many games ended at each accuracy level (5-point buckets, games with 20+ picks). This shows how good the best players are, which is what decides the finish rate.
+- *Built (B2):* the job runs hourly at :23 and counts each day once, two days after it (a game started just before 9 AM ET may arrive up to 24 hours later). Each step writes its totals and its place together, so a stop never counts a game twice. The end-screen percentage reads score counts that a 5-minute job rebuilds from the records, so each game end reads one small row.
 
 Raw game records are kept 7 days (for re-verification and abuse checks), then deleted. Totals are kept.
 
@@ -417,6 +420,7 @@ Every read and write is wrapped so the game still works if the browser blocks st
 - **The game page** is served by this repo on GitHub Pages, at https://hoopsmatic.com/salary-ladder/ through the shared hoopsmatic.com Worker.
 - **Shared Worker change:** adding the `/salary-ladder/` route touches the shared Worker (https://github.com/jsierrahoopshype/hoopsmatic-worker), which Jorge shares with Alberto. **The build prompt for that step must start by checking exactly where the Worker stands:** main's latest commit, recent merges, open PRs, unmerged branches, and deploy status. **Never deploy anything that isn't pushed first.**
 - **The game's own server code runs in its own Workers** (game-check and leaderboard), on the route `hoopsmatic.com/salary-ladder/api/*`, deployed separately from the shared Worker. A crash in game code can't break the rest of the site.
+  - *Built (B2):* the leaderboard Worker takes the more specific route `hoopsmatic.com/salary-ladder/api/board*`; the game-check Worker takes the rest. Details in `workers/README.md`.
 - **Deploys happen only through GitHub Actions, never from anyone's computer.**
   - The shared Worker already deploys through its own Action when a change is merged to its `main`.
   - The game's two Workers deploy through an Action in this repo whenever `workers/` or the shared game logic changes on `main`.
@@ -477,7 +481,7 @@ Also state:
 - **Match the look of the 73-9 game** (changed October 13, 2026; it was the NBA Polymarket tracker). Reference: the original 73-9, https://raw.githubusercontent.com/aderoa/BoxScoreLab/main/box_score_lab_roulette.html (live at https://hoopsmatic.com/73-9-game), and the Daily 73-9 at https://hoopsmatic.com/73-9-game/daily, which uses the same look. Copied from it: colours (dark navy gradient, orange-to-gold accents), type (uppercase spaced Oswald headings, JetBrains Mono body), panel and card style, buttons, headshot framing (the dark reel-window well), the share modal and the end-screen layout. Our game rules and the no-scroll phone layout stay as written.
   - **Outside resources:** headshots and team logos only from nba-headshots. The 73-9 page's ESPN logos, its `hoopsmatic-games.js` and its other scripts are not copied. The share modal's platform buttons (X, Bluesky, Facebook, WhatsApp, Reddit, Telegram) are plain links that open each site's own share page when tapped; nothing loads from them.
   - **Fonts:** headings in **Oswald**, as in 73-9 (approved October 13, 2026), body in JetBrains Mono. Oswald is added to the same Google Fonts request that loads the Salary Finder's DM Sans and JetBrains Mono: one request, no new provider. DM Sans stays as the fallback.
-  - **Headshots:** the crops the Daily 73-9 uses: `face2` (every head the same size and position), falling back to the regular `face` crop, then initials. Small spots (end screen, contract pick) use `face2-160`, the same framing at 160px. The data files keep naming the `face-tight` file; the page takes the file name from it. Checked October 13, 2026: all 446 players in the preview pool have face2, face2-160 and face.
+  - **Headshots:** the crops the Daily 73-9 uses: `face2` (every head the same size and position), falling back to the regular `face` crop, then the team logo from nba-headshots shown whole (as the Daily 73-9 does; approved October 13, 2026), then initials only if the logo fails too. Small spots (end screen, contract pick) use `face2-160`, the same framing at 160px. The data files keep naming the `face-tight` file; the page takes the file name from it. Checked October 13, 2026: all 446 players in the preview pool have face2, face2-160 and face.
   - **Photos load ahead, so the clock never waits on one.** While the player decides, the page downloads the photos of both possible next challengers: the seed fixes the next one for each way the pick can go (the incumbent keeps the rung, or the challenger takes it). On the intro and end screens it downloads the first pair of each game that can be started or continued. Unlimited rolls its seed ahead for this; the game that starts uses it.
   - **No eyebrows:** no small label above a heading or the score. Functional labels (Rung, Score, Your rung, Challenger) stay.
   - **Share modal:** a picture of the share card (section 9's text: no player names, no outside images), the link with Copy (copies the full text card), the platform buttons, then Download, Copy image and Play again.
