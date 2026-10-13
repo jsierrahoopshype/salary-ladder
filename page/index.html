@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--__BUILT__-->
+<title>Salary Ladder: Who gets paid more? | HoopsMatic</title>
+<meta name="description" content="Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. New Daily every day.">
+<link rel="canonical" href="https://hoopsmatic.com/salary-ladder/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HoopsMatic">
+<meta property="og:title" content="Salary Ladder: Who gets paid more?">
+<meta property="og:description" content="Two NBA players, one question: who makes more in 2026-27? Climb to the top of the salary ladder.">
+<meta property="og:url" content="https://hoopsmatic.com/salary-ladder/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f5f5f7">
+<!-- Same font request the HoopsMatic Salary Finder already makes (no new outside resources). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*__STYLE__*/
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hdr">
+    <h1>Salary Ladder</h1>
+    <span class="brand">HoopsMatic</span>
+  </header>
+
+  <p id="loading" class="loading">Loading salaries…</p>
+
+  <section id="intro" class="screen intro" hidden>
+    <p class="tagline">Who gets paid more in <span id="i-season">2026-27</span>?</p>
+    <p id="i-streak" class="streak" hidden></p>
+    <ol id="i-howto" class="howto"></ol>
+    <div class="actions">
+      <button id="i-daily" class="btn btn-accent" type="button"></button>
+      <button id="i-unlimited" class="btn" type="button"></button>
+    </div>
+    <p id="i-foot" class="foot"></p>
+  </section>
+
+  <section id="play" class="screen play" hidden>
+    <div class="status">
+      <span id="p-mode" class="mode"></span>
+      <span id="p-hearts" class="hearts" role="img"></span>
+      <span class="stat"><span class="lbl">Rung</span> <b id="p-rung">0</b></span>
+      <span class="stat"><span class="lbl">Score</span> <b id="p-score"></b></span>
+    </div>
+    <p class="question">Who gets paid more?</p>
+    <div class="duel">
+      <button id="card-inc" class="pcard" type="button"></button>
+      <button id="card-ch" class="pcard" type="button"></button>
+    </div>
+    <div id="timer" class="timer" aria-hidden="true">
+      <div class="bar"><i id="t-bar"></i></div>
+      <span id="t-secs" class="secs"></span>
+    </div>
+    <p id="p-result" class="result" aria-live="polite"></p>
+    <p class="keys">Arrow keys: ← your rung · challenger →</p>
+  </section>
+
+  <section id="end" class="screen end" hidden>
+    <p id="e-mode" class="end-mode"></p>
+    <h2 id="e-score" class="end-score"></h2>
+    <div id="e-player" class="reached"></div>
+    <div class="stats">
+      <div><span class="lbl">Rung</span><b id="e-rung"></b></div>
+      <div><span class="lbl">Lives left</span><b id="e-lives"></b></div>
+      <div><span class="lbl">Time</span><b id="e-time"></b></div>
+    </div>
+    <p id="e-best" class="best"></p>
+    <p id="e-rank" class="resting"></p>
+
+    <form id="e-name" class="box namebox" autocomplete="off">
+      <label for="e-name-input">Your name for the boards</label>
+      <div class="row">
+        <input id="e-name-input" name="name" maxlength="24" placeholder="Display name" required>
+        <input id="e-handle-input" name="handle" maxlength="31" placeholder="@handle (optional)">
+      </div>
+      <button class="btn btn-sm" type="submit">Save name</button>
+      <p id="e-name-msg" class="msg" aria-live="polite"></p>
+    </form>
+
+    <div id="e-contract" class="box contract">
+      <p class="box-title">Which contract would you rather have?</p>
+      <div id="e-contract-opts" class="opts"></div>
+      <p id="e-contract-msg" class="msg" aria-live="polite"></p>
+    </div>
+
+    <div class="actions">
+      <button id="e-share" class="btn btn-accent" type="button">Share result</button>
+      <button id="e-next" class="btn" type="button"></button>
+      <button id="e-home" class="btn btn-ghost" type="button">Home</button>
+    </div>
+    <p id="e-share-msg" class="msg center" aria-live="polite"></p>
+    <pre id="e-share-text" class="share-text"></pre>
+    <p id="e-foot" class="foot"></p>
+  </section>
+</div>
+<noscript><p class="loading">Salary Ladder needs JavaScript.</p></noscript>
+<script type="module">
+/*__SCRIPT__*/
+</script>
+</body>
+</html>

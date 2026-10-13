@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Built by tools/build-page.mjs from page/ and shared/game.js. Edit those, not this file. -->
+<title>Salary Ladder: Who gets paid more? | HoopsMatic</title>
+<meta name="description" content="Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. New Daily every day.">
+<link rel="canonical" href="https://hoopsmatic.com/salary-ladder/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="HoopsMatic">
+<meta property="og:title" content="Salary Ladder: Who gets paid more?">
+<meta property="og:description" content="Two NBA players, one question: who makes more in 2026-27? Climb to the top of the salary ladder.">
+<meta property="og:url" content="https://hoopsmatic.com/salary-ladder/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f5f5f7">
+<!-- Same font request the HoopsMatic Salary Finder already makes (no new outside resources). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Salary Ladder. Tokens, fonts and card style copied from the NBA Polymarket
+   tracker (nba-polymarket/docs/styles.css), the shared HoopsMatic look. */
+
+:root{
+  --bg:#f5f5f7;--surface:#fff;--surface-hover:#f0f0f2;--border:#d1d1d6;
+  --text:#1d1d1f;--text-secondary:#6e6e73;--accent:#3b82f6;--accent-dim:rgba(59,130,246,.15);
+  --green:#1d8a40;--green-dim:rgba(52,199,89,.16);--green-bar:#34c759;
+  --red:#d12c2c;--red-dim:rgba(239,68,68,.13);--red-bar:#ef4444;
+  --orange:#b26b00;--orange-dim:rgba(245,158,11,.16);
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);
+  color:var(--text);min-height:100vh;line-height:1.45;-webkit-font-smoothing:antialiased}
+body.playing{overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+
+.app{max-width:34rem;margin:0 auto;padding:.6rem max(.75rem,env(safe-area-inset-right)) 1.5rem max(.75rem,env(safe-area-inset-left))}
+body.playing .app{height:100vh;height:100dvh;display:flex;flex-direction:column;padding-bottom:max(.6rem,env(safe-area-inset-bottom))}
+
+.hdr{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:.5rem}
+.hdr h1{font-size:1.25rem;font-weight:700;letter-spacing:-.03em}
+.brand{font-family:var(--mono);font-size:.66rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em}
+.loading{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-family:var(--mono);font-size:.8rem}
+.foot{text-align:center;font-size:.72rem;color:var(--text-secondary);margin-top:1.2rem;font-family:var(--mono)}
+.lbl{font-family:var(--mono);font-size:.6rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em}
+.msg{font-size:.78rem;color:var(--text-secondary);min-height:1.1em;margin-top:.35rem}
+.msg.err{color:var(--red)}
+.center{text-align:center}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;font-weight:600;font-size:.95rem;
+  padding:.75rem 1rem;border:1px solid var(--border);border-radius:12px;background:var(--surface);cursor:pointer;
+  transition:.12s;touch-action:manipulation}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{color:#fff;filter:brightness(1.07)}
+.btn-ghost{background:none;border-color:transparent;color:var(--text-secondary)}
+.btn-sm{font-size:.8rem;padding:.45rem .8rem;border-radius:8px}
+.actions{display:flex;flex-direction:column;gap:.5rem;margin-top:1rem}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* intro */
+.tagline{font-size:1.15rem;font-weight:600;letter-spacing:-.01em;margin:.4rem 0 .6rem}
+.streak{display:inline-block;font-weight:600;font-size:.9rem;padding:.3rem .65rem;border-radius:8px;
+  background:var(--orange-dim);color:var(--orange);margin-bottom:.7rem}
+.howto{list-style:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.4rem .9rem}
+.howto li{padding:.5rem 0;font-size:.9rem;border-bottom:1px solid var(--border)}
+.howto li:last-child{border-bottom:none}
+.howto b{font-family:var(--mono);font-weight:600}
+
+/* play */
+.play{flex:1;min-height:0;display:flex;flex-direction:column}
+.status{display:flex;align-items:center;gap:.8rem;padding:.4rem .7rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;font-size:.85rem}
+.status .mode{font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--accent);background:var(--accent-dim);padding:.12rem .4rem;border-radius:4px;white-space:nowrap}
+.status .stat{margin-left:auto;white-space:nowrap}
+.status .stat+.stat{margin-left:0}
+.status b{font-family:var(--mono);font-weight:600}
+.hearts{font-size:1rem;letter-spacing:.06em;white-space:nowrap}
+.hearts .full{color:var(--red)}
+.hearts .empty{color:var(--border)}
+.question{text-align:center;font-weight:700;font-size:1.05rem;margin:.55rem 0 .45rem;letter-spacing:-.01em}
+
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;min-height:0}
+.pcard{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.15rem;
+  background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:.5rem .45rem .6rem;
+  cursor:pointer;transition:border-color .12s,background .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0}
+@media(hover:hover){.pcard:hover{border-color:var(--accent)}}
+.pcard .role{font-family:var(--mono);font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)}
+.pcard .face{position:relative;display:block;width:min(100%,clamp(84px,27dvh,190px));aspect-ratio:1;margin:.15rem 0;
+  border-radius:10px;background:var(--surface-hover);overflow:hidden}
+.pcard .face img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--text-secondary)}
+.pcard .face.noimg img{display:none}
+.pcard .face.noimg .initials{display:flex}
+.pcard .pname{font-weight:700;font-size:.98rem;line-height:1.2;letter-spacing:-.01em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
+.pcard .pmeta{display:block;font-size:.74rem;line-height:1.3;color:var(--text-secondary);
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .team{display:flex;align-items:center;justify-content:center;gap:.3rem}
+.pcard .team span{overflow:hidden;text-overflow:ellipsis}
+.pcard .logo{width:16px;height:16px;flex:none}
+.pcard .sal{font-family:var(--mono);font-weight:700;font-size:1.15rem;min-height:1.5rem;line-height:1.5rem;opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s}
+.pcard .gap{font-family:var(--mono);font-size:.7rem;color:var(--text-secondary);min-height:1rem;opacity:0;transition:opacity .18s}
+.pcard .more{visibility:hidden;font-family:var(--mono);font-size:.6rem;font-weight:700;margin-top:.15rem;
+  text-transform:uppercase;letter-spacing:.04em;padding:.08rem .4rem;border-radius:4px;background:var(--green-dim);color:var(--green)}
+.pcard .mark{display:none;position:absolute;top:.35rem;right:.35rem;width:1.7rem;height:1.7rem;border-radius:50%;
+  align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff}
+.pcard.revealed{cursor:default}
+.pcard.revealed .sal{opacity:1;transform:none}
+.pcard.revealed .gap{opacity:1}
+.pcard.richer .more{visibility:visible}
+.pcard.right{border-color:var(--green);background:linear-gradient(var(--green-dim),var(--green-dim)) var(--surface)}
+.pcard.right .mark{display:flex;background:var(--green)}
+.pcard.wrong{border-color:var(--red);background:linear-gradient(var(--red-dim),var(--red-dim)) var(--surface)}
+.pcard.wrong .mark{display:flex;background:var(--red)}
+
+.pcard.enter{animation:enter .24s ease-out both}
+.pcard.climb{animation:climb .24s ease-out both}
+@keyframes enter{from{opacity:0;transform:translateX(14px)}}
+@keyframes climb{from{transform:translateX(calc(100% + .6rem))}}
+@media(prefers-reduced-motion:reduce){.pcard.enter,.pcard.climb{animation:none}.pcard .sal{transition:none}}
+
+.timer{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.timer .bar{flex:1;height:10px;border-radius:5px;background:var(--surface-hover);border:1px solid var(--border);overflow:hidden}
+.timer .bar i{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(1)}
+.timer .secs{font-family:var(--mono);font-weight:600;font-size:.95rem;min-width:2.2rem;text-align:right}
+.timer.warn .bar i{background:var(--orange)}
+.timer.warn .secs{color:var(--orange)}
+.timer.idle .bar i{background:var(--border)}
+.timer.idle .secs{color:var(--text-secondary)}
+.result{text-align:center;font-weight:600;font-size:.95rem;min-height:1.5rem;margin-top:.45rem}
+.result.ok{color:var(--green)}
+.result.bad{color:var(--red)}
+.keys{display:none;text-align:center;font-family:var(--mono);font-size:.66rem;color:var(--text-secondary);margin-top:auto;padding-top:.4rem}
+@media(hover:hover) and (pointer:fine){.keys{display:block}}
+
+/* end */
+.end-mode{font-family:var(--mono);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-top:.4rem}
+.end-score{font-size:1.6rem;font-weight:700;letter-spacing:-.02em;margin:.15rem 0 .5rem}
+.reached{display:flex;align-items:center;gap:.7rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.55rem .7rem}
+.reached img{width:56px;height:56px;border-radius:8px;background:var(--surface-hover);object-fit:cover;flex:none}
+.reached .pname{font-weight:700}
+.reached .pmeta{font-size:.78rem;color:var(--text-secondary)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.6rem}
+.stats div{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.5rem .6rem;display:flex;flex-direction:column}
+.stats b{font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.best{margin-top:.7rem;font-weight:600}
+.best.new{color:var(--green)}
+.resting{margin-top:.3rem;font-size:.85rem;color:var(--text-secondary)}
+.box{margin-top:.8rem;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.7rem .8rem}
+.box-title,.namebox label{display:block;font-weight:600;font-size:.88rem;margin-bottom:.45rem}
+.namebox .row{display:flex;gap:.4rem;margin-bottom:.5rem}
+.namebox input{flex:1;min-width:0;font:inherit;font-size:16px;padding:.5rem .6rem;border:1px solid var(--border);border-radius:8px;background:var(--bg)}
+.contract .opts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.contract .opt{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.5rem;border:1px solid var(--border);
+  border-radius:10px;background:var(--bg);cursor:pointer;text-align:center}
+.contract .opt img{width:48px;height:48px;border-radius:8px;object-fit:cover;background:var(--surface-hover)}
+.contract .opt .pname{font-weight:600;font-size:.82rem;line-height:1.2}
+.contract .opt .sal{font-family:var(--mono);font-size:.78rem;color:var(--text-secondary)}
+.contract .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-dim)}
+.contract .opt:disabled{cursor:default}
+.share-text{margin-top:.5rem;font-family:var(--mono);font-size:.74rem;white-space:pre-wrap;background:var(--surface);
+  border:1px dashed var(--border);border-radius:10px;padding:.6rem .7rem;color:var(--text-secondary);user-select:all}
+
+@media(min-width:560px){
+  .actions{flex-direction:row;flex-wrap:wrap}
+  .actions .btn{flex:1}
+}
+@media(max-height:560px){
+  .question{margin:.3rem 0}
+  .pcard .face{width:min(100%,clamp(64px,22dvh,190px))}
+  .hdr{margin-bottom:.3rem}
+}
+@media(max-width:360px){
+  .status{gap:.5rem;padding:.4rem .55rem}
+  .status .stat:last-child .lbl{display:none}
+  .hearts{font-size:.9rem;letter-spacing:0}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hdr">
+    <h1>Salary Ladder</h1>
+    <span class="brand">HoopsMatic</span>
+  </header>
+
+  <p id="loading" class="loading">Loading salaries…</p>
+
+  <section id="intro" class="screen intro" hidden>
+    <p class="tagline">Who gets paid more in <span id="i-season">2026-27</span>?</p>
+    <p id="i-streak" class="streak" hidden></p>
+    <ol id="i-howto" class="howto"></ol>
+    <div class="actions">
+      <button id="i-daily" class="btn btn-accent" type="button"></button>
+      <button id="i-unlimited" class="btn" type="button"></button>
+    </div>
+    <p id="i-foot" class="foot"></p>
+  </section>
+
+  <section id="play" class="screen play" hidden>
+    <div class="status">
+      <span id="p-mode" class="mode"></span>
+      <span id="p-hearts" class="hearts" role="img"></span>
+      <span class="stat"><span class="lbl">Rung</span> <b id="p-rung">0</b></span>
+      <span class="stat"><span class="lbl">Score</span> <b id="p-score"></b></span>
+    </div>
+    <p class="question">Who gets paid more?</p>
+    <div class="duel">
+      <button id="card-inc" class="pcard" type="button"></button>
+      <button id="card-ch" class="pcard" type="button"></button>
+    </div>
+    <div id="timer" class="timer" aria-hidden="true">
+      <div class="bar"><i id="t-bar"></i></div>
+      <span id="t-secs" class="secs"></span>
+    </div>
+    <p id="p-result" class="result" aria-live="polite"></p>
+    <p class="keys">Arrow keys: ← your rung · challenger →</p>
+  </section>
+
+  <section id="end" class="screen end" hidden>
+    <p id="e-mode" class="end-mode"></p>
+    <h2 id="e-score" class="end-score"></h2>
+    <div id="e-player" class="reached"></div>
+    <div class="stats">
+      <div><span class="lbl">Rung</span><b id="e-rung"></b></div>
+      <div><span class="lbl">Lives left</span><b id="e-lives"></b></div>
+      <div><span class="lbl">Time</span><b id="e-time"></b></div>
+    </div>
+    <p id="e-best" class="best"></p>
+    <p id="e-rank" class="resting"></p>
+
+    <form id="e-name" class="box namebox" autocomplete="off">
+      <label for="e-name-input">Your name for the boards</label>
+      <div class="row">
+        <input id="e-name-input" name="name" maxlength="24" placeholder="Display name" required>
+        <input id="e-handle-input" name="handle" maxlength="31" placeholder="@handle (optional)">
+      </div>
+      <button class="btn btn-sm" type="submit">Save name</button>
+      <p id="e-name-msg" class="msg" aria-live="polite"></p>
+    </form>
+
+    <div id="e-contract" class="box contract">
+      <p class="box-title">Which contract would you rather have?</p>
+      <div id="e-contract-opts" class="opts"></div>
+      <p id="e-contract-msg" class="msg" aria-live="polite"></p>
+    </div>
+
+    <div class="actions">
+      <button id="e-share" class="btn btn-accent" type="button">Share result</button>
+      <button id="e-next" class="btn" type="button"></button>
+      <button id="e-home" class="btn btn-ghost" type="button">Home</button>
+    </div>
+    <p id="e-share-msg" class="msg center" aria-live="polite"></p>
+    <pre id="e-share-text" class="share-text"></pre>
+    <p id="e-foot" class="foot"></p>
+  </section>
+</div>
+<noscript><p class="loading">Salary Ladder needs JavaScript.</p></noscript>
+<script type="module">
+// ---- shared/game.js ----
+// Salary Ladder game logic, shared by the page, the server Workers, the
+// daily builders and the simulator. One copy, so the browser and the server
+// can never disagree about what a game was. No dependencies, no Date.now(),
+// no Math.random(): everything random comes from the seed.
+//
+// Pool entries look like {id, name, team, pos, born, salary, img}.
+
+const LOGIC_VERSION = 1;
+
+const CHOICE = Object.freeze({ INCUMBENT: 0, CHALLENGER: 1, TIMEOUT: 2 });
+
+// ---------------------------------------------------------------------------
+// Seeded randomness. cyrb128 turns any string into four 32-bit words and
+// sfc32 turns those into a stream of floats in [0, 1). Both are plain
+// integer arithmetic, so Node, browsers and Workers produce identical numbers.
+
+function cyrb128(str) {
+  let h1 = 1779033703, h2 = 3144134277, h3 = 1013904242, h4 = 2773480762;
+  for (let i = 0; i < str.length; i++) {
+    const k = str.charCodeAt(i);
+    h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+    h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+    h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+    h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+  }
+  h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+  h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+  h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+  h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+  h1 ^= h2 ^ h3 ^ h4; h2 ^= h1; h3 ^= h1; h4 ^= h1;
+  return [h1 >>> 0, h2 >>> 0, h3 >>> 0, h4 >>> 0];
+}
+
+function sfc32(a, b, c, d) {
+  return function () {
+    a |= 0; b |= 0; c |= 0; d |= 0;
+    const t = (((a + b) | 0) + d) | 0;
+    d = (d + 1) | 0;
+    a = b ^ (b >>> 9);
+    b = (c + (c << 3)) | 0;
+    c = (c << 21) | (c >>> 11);
+    c = (c + t) | 0;
+    return (t >>> 0) / 4294967296;
+  };
+}
+
+function makeRng(...parts) {
+  const [a, b, c, d] = cyrb128(parts.join(':'));
+  const rng = sfc32(a, b, c, d);
+  for (let i = 0; i < 12; i++) rng(); // let the state mix before use
+  return rng;
+}
+
+function pickOne(rng, list) {
+  return list[Math.floor(rng() * list.length)];
+}
+
+// ---------------------------------------------------------------------------
+// Pool
+
+/** Sorts the pool by salary (then NBA ID) and indexes it by ID. */
+function preparePool(players) {
+  const sorted = [...players].sort((a, b) => a.salary - b.salary || a.id - b.id);
+  const byId = new Map(sorted.map((p) => [p.id, p]));
+  if (byId.size !== sorted.length) throw new Error('duplicate NBA ID in pool');
+  const top = sorted[sorted.length - 1].salary;
+  return { sorted, byId, top };
+}
+
+// First index whose salary is >= value.
+function lowerBound(sorted, value) {
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid].salary < value) lo = mid + 1; else hi = mid;
+  }
+  return lo;
+}
+
+// First index whose salary is > value.
+function upperBound(sorted, value) {
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (sorted[mid].salary <= value) lo = mid + 1; else hi = mid;
+  }
+  return lo;
+}
+
+/** Players with a different salary within ±pct of `salary`. */
+function nonTiedNeighbours(pool, salary, pct) {
+  const { sorted } = pool;
+  const from = lowerBound(sorted, salary * (1 - pct));
+  const to = upperBound(sorted, salary * (1 + pct));
+  let n = 0;
+  for (let i = from; i < to; i++) if (sorted[i].salary !== salary) n++;
+  return n;
+}
+
+/**
+ * Start window (spec 6.2): players between the pct_low and pct_high
+ * percentiles of salary with at least min_neighbors non-tied players within
+ * ±neighbor_band. If the data ever leaves nobody, the neighbour minimum is
+ * lowered one at a time until somebody qualifies, so a game can always start.
+ */
+function startCandidates(pool, rules) {
+  const { sorted } = pool;
+  const s = rules.start;
+  const n = sorted.length;
+  const lo = sorted[Math.floor(s.pct_low * n)].salary;
+  const hi = sorted[Math.floor(s.pct_high * n)].salary;
+  const inWindow = sorted.filter((p) => p.salary >= lo && p.salary <= hi && p.salary < pool.top);
+  for (let need = s.min_neighbors; need >= 0; need--) {
+    const ok = inWindow.filter((p) => nonTiedNeighbours(pool, p.salary, s.neighbor_band) >= need);
+    if (ok.length) return ok;
+  }
+  return [sorted[0]];
+}
+
+function pickStart(pool, rules, seed) {
+  return pickOne(makeRng(seed, 'start'), startCandidates(pool, rules)).id;
+}
+
+/**
+ * The challenger for a pick (spec 6.1). Depends only on the seed, the pick
+ * number, the incumbent and the recently shown players, so anyone making the
+ * same choices on the same puzzle sees the same players.
+ */
+function nextChallenger(pool, rules, seed, pickIndex, incumbentId, recentIds) {
+  const { sorted, byId } = pool;
+  const inc = byId.get(incumbentId);
+  const rng = makeRng(seed, 'pick', pickIndex, incumbentId);
+  const wantRicher = rng() < 0.5;
+
+  const from = lowerBound(sorted, inc.salary * (1 - rules.band));
+  const to = upperBound(sorted, inc.salary * (1 + rules.band));
+  const poorer = [], richer = [];
+  for (let i = from; i < to; i++) {
+    const p = sorted[i];
+    if (p.salary < inc.salary) poorer.push(p);
+    else if (p.salary > inc.salary) richer.push(p); // exact ties never paired
+  }
+
+  let side = wantRicher ? richer : poorer;
+  if (!side.length) {
+    // Widen just enough to reach the nearest salary on that side.
+    if (wantRicher) {
+      const j = upperBound(sorted, inc.salary);
+      if (j < sorted.length) side = sorted.filter((p) => p.salary === sorted[j].salary);
+    } else {
+      const j = lowerBound(sorted, inc.salary) - 1;
+      if (j >= 0) side = sorted.filter((p) => p.salary === sorted[j].salary);
+    }
+  }
+  if (!side.length) {
+    // Nobody poorer at all: the challenger is richer. (Nobody richer means
+    // the incumbent is the top, and the game is already over.)
+    side = richer.length ? richer : sorted.filter((p) => p.salary === sorted[upperBound(sorted, inc.salary)]?.salary);
+  }
+  const recent = new Set(recentIds);
+  const fresh = side.filter((p) => !recent.has(p.id));
+  return pickOne(rng, fresh.length ? fresh : side).id;
+}
+
+// ---------------------------------------------------------------------------
+// A game
+
+function newGame({ pool, rules, seed, startId }) {
+  const state = {
+    seed,
+    lives: rules.lives,
+    rung: 0,
+    incumbent: startId,
+    challenger: null,
+    pickIndex: 0,
+    recent: [],
+    picks: [],
+    totalMs: 0,
+    finished: pool.byId.get(startId).salary >= pool.top,
+    over: false,
+  };
+  if (!state.finished) state.challenger = nextChallenger(pool, rules, seed, 0, startId, []);
+  return state;
+}
+
+function isDone(state) {
+  return state.finished || state.over;
+}
+
+/** Applies one pick. choice is a CHOICE value; ms the time the pick took. */
+function applyPick(pool, rules, state, choice, ms) {
+  if (isDone(state)) throw new Error('game already ended');
+  const inc = pool.byId.get(state.incumbent);
+  const ch = pool.byId.get(state.challenger);
+  const richerIsChallenger = ch.salary > inc.salary;
+  const correct =
+    choice === CHOICE.CHALLENGER ? richerIsChallenger :
+    choice === CHOICE.INCUMBENT ? !richerIsChallenger :
+    false; // a timeout is never right
+
+  state.picks.push({ c: choice, ms });
+  state.totalMs += ms;
+  state.recent.push(ch.id);
+  if (state.recent.length > rules.recent_no_repeat) state.recent.shift();
+
+  const result = {
+    incumbent: inc.id, challenger: ch.id, choice, correct, ms,
+    incumbentSalary: inc.salary, challengerSalary: ch.salary, climbed: false,
+  };
+  if (correct && choice === CHOICE.CHALLENGER) {
+    state.incumbent = ch.id;
+    state.rung += 1;
+    result.climbed = true;
+    if (ch.salary >= pool.top) state.finished = true;
+  } else if (!correct) {
+    state.lives -= 1;
+    if (state.lives <= 0) state.over = true;
+  }
+  state.pickIndex += 1;
+  state.challenger = isDone(state)
+    ? null
+    : nextChallenger(pool, rules, state.seed, state.pickIndex, state.incumbent, state.recent);
+  return result;
+}
+
+function score(pool, state) {
+  return pool.byId.get(state.incumbent).salary;
+}
+
+// ---------------------------------------------------------------------------
+// Replay: what the server runs on every finished game (spec 13.1). It checks
+// the per-pick time rules here; the "no longer than real server time" rule
+// needs the server clock, so the Worker checks that one itself.
+
+function replay({ pool, rules, seed, startId, picks }) {
+  const fail = (reason, at) => ({ ok: false, reason, at });
+  if (!Array.isArray(picks) || picks.length === 0) return fail('no picks');
+  if (!pool.byId.has(startId)) return fail('unknown start player');
+  const maxMs = rules.timer_seconds * 1000;
+
+  const state = newGame({ pool, rules, seed, startId });
+  const log = [];
+  for (let i = 0; i < picks.length; i++) {
+    if (isDone(state)) return fail('picks after the game ended', i);
+    const p = picks[i];
+    if (!p || ![CHOICE.INCUMBENT, CHOICE.CHALLENGER, CHOICE.TIMEOUT].includes(p.c)) return fail('bad choice', i);
+    if (!Number.isInteger(p.ms)) return fail('bad time', i);
+    if (p.c === CHOICE.TIMEOUT) {
+      if (p.ms !== maxMs) return fail('timeout not recorded as the full timer', i);
+    } else {
+      if (p.ms > maxMs) return fail('pick over the timer without a timeout', i);
+      if (p.ms < rules.min_pick_ms) return fail('pick faster than the minimum', i);
+    }
+    log.push(applyPick(pool, rules, state, p.c, p.ms));
+  }
+  if (!isDone(state)) return fail('game not finished');
+  if (state.totalMs / picks.length < rules.min_avg_ms) return fail('average pick faster than the minimum');
+
+  return {
+    ok: true,
+    score: score(pool, state),
+    rung: state.rung,
+    livesLeft: state.lives,
+    totalMs: state.totalMs,
+    finished: state.finished,
+    picks: picks.length,
+    endId: state.incumbent,
+    log,
+  };
+}
+
+// ---- page/lib.js ----
+// Page helpers with no DOM: formatting, the 9 AM ET day, streaks, the share
+// card, pick timing and device storage. Tested in Node (test/page.test.mjs);
+// tools/build-page.mjs inlines this file into index.html.
+
+// ---------------------------------------------------------------------------
+// Dates. Dates are 'YYYY-MM-DD' strings throughout.
+
+function addDaysIso(date, n) {
+  const d = new Date(`${date}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * The Daily that is live at `now` (spec 10): days turn over at 9:00 AM US
+ * Eastern, following daylight saving. Before 9 AM ET it's still yesterday's.
+ */
+function dailyDate(now = new Date()) {
+  const p = {};
+  for (const part of new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23',
+  }).formatToParts(now)) p[part.type] = part.value;
+  const date = `${p.year}-${p.month}-${p.day}`;
+  return Number(p.hour) < 9 ? addDaysIso(date, -1) : date;
+}
+
+/** 'Oct 9' */
+function shortDate(date) {
+  return new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+
+/** Whole years old on `onDate` (spec 8), or null without a birth date. */
+function ageOn(born, onDate) {
+  if (!born) return null;
+  const [by, bm, bd] = born.split('-').map(Number);
+  const [y, m, d] = onDate.split('-').map(Number);
+  return y - by - (m < bm || (m === bm && d < bd) ? 1 : 0);
+}
+
+// ---------------------------------------------------------------------------
+// Money and time
+
+/** Three significant figures (spec 8): $2.45M, $31.4M, $62.6M, $679K. */
+function money(n) {
+  const a = Math.abs(n);
+  if (a >= 999500) return `$${(a / 1e6).toPrecision(3)}M`;
+  if (a >= 1000) return `$${(a / 1e3).toPrecision(3)}K`;
+  return `$${Math.round(a)}`;
+}
+
+/** The challenger's salary against the incumbent's: '+$1.23M (+4.1%)'. */
+function gapText(incumbentSalary, challengerSalary) {
+  const diff = challengerSalary - incumbentSalary;
+  const sign = diff < 0 ? '−' : '+';
+  const pct = Math.abs(diff / incumbentSalary * 100).toFixed(1);
+  return `${sign}${money(diff)} (${sign}${pct}%)`;
+}
+
+/** Total time as m:ss. */
+function clock(ms) {
+  const s = Math.round(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+// ---------------------------------------------------------------------------
+// Picks
+
+/**
+ * Turns the time since the timer started into what gets recorded (spec 13.1
+ * rules, so an honest game always verifies). Returns null for a tap faster
+ * than the minimum, which is ignored; anything at or past the timer is a
+ * timeout recorded as exactly the full timer.
+ */
+function pickTiming(elapsedMs, rules) {
+  const max = rules.timer_seconds * 1000;
+  if (elapsedMs >= max) return { timeout: true, ms: max };
+  const ms = Math.round(elapsedMs);
+  if (ms < rules.min_pick_ms) return null;
+  return { timeout: false, ms };
+}
+
+/** One vote per pair per device (spec 14.1): both NBA IDs and both salaries. */
+function pairKey(idA, salaryA, idB, salaryB) {
+  return idA < idB ? `${idA}:${salaryA}|${idB}:${salaryB}` : `${idB}:${salaryB}|${idA}:${salaryA}`;
+}
+
+// ---------------------------------------------------------------------------
+// Streak (spec 10): Daily days in a row, kept only on the device.
+
+/** The streak after the Daily for `date` ends. */
+function streakAfter(streak, date) {
+  if (streak && streak.last === date) return streak;
+  const count = streak && streak.last === addDaysIso(date, -1) ? streak.count + 1 : 1;
+  return { count, last: date };
+}
+
+/** Streak still alive on `today`: played today or yesterday. */
+function liveStreak(streak, today) {
+  if (!streak) return 0;
+  return streak.last === today || streak.last === addDaysIso(today, -1) ? streak.count : 0;
+}
+
+/** True when an active streak is lost unless today's Daily is played. */
+function streakAtStake(streak, today) {
+  return Boolean(streak && streak.count > 0 && streak.last === addDaysIso(today, -1));
+}
+
+// ---------------------------------------------------------------------------
+// Share card (spec 9). No player names, so it never spoils the day.
+
+const SITE_URL = 'https://hoopsmatic.com/salary-ladder/';
+
+function shareText({ mode, number, date, score, rung, livesLeft, lives, totalMs }) {
+  const head = mode === 'daily'
+    ? `Salary Ladder${number ? ` #${number}` : ''} · ${shortDate(date)}`
+    : 'Salary Ladder · Unlimited';
+  const hearts = '❤️'.repeat(Math.max(livesLeft, 0)) + '🖤'.repeat(Math.max(lives - livesLeft, 0));
+  return [head, `I reached ${money(score)} (rung ${rung})`, `${hearts} · ${clock(totalMs)}`, SITE_URL].join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// Device storage (spec 16). Every read and write is wrapped, so the game
+// still plays when the browser blocks storage; things just aren't remembered.
+
+const PREFIX = 'salary-ladder:';
+
+const store = {
+  get(key, fallback = null) {
+    try {
+      const raw = globalThis.localStorage.getItem(PREFIX + key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch { return fallback; }
+  },
+  set(key, value) {
+    try { globalThis.localStorage.setItem(PREFIX + key, JSON.stringify(value)); return true; } catch { return false; }
+  },
+  remove(key) {
+    try { globalThis.localStorage.removeItem(PREFIX + key); } catch { /* storage blocked */ }
+  },
+};
+
+/** Random hex string from the browser's crypto. */
+function randomHex(bytes = 16) {
+  const a = new Uint8Array(bytes);
+  globalThis.crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ---------------------------------------------------------------------------
+// Names (spec 12.2). The full name filter runs on the server (B2); the page
+// only trims and checks the length, and cleans the @handle.
+
+function cleanName(name) {
+  const n = String(name ?? '').replace(/\s+/g, ' ').trim();
+  return n.length >= 2 && n.length <= 24 ? n : null;
+}
+
+function cleanHandle(handle) {
+  const h = String(handle ?? '').trim().replace(/^@+/, '').replace(/[^A-Za-z0-9_.]/g, '').slice(0, 30);
+  return h ? `@${h}` : '';
+}
+
+// ---- page/app.js ----
+// The Salary Ladder page (build plan B1). Plays the whole game in the
+// browser with the shared game logic; the server only verifies and ranks.
+// tools/build-page.mjs inlines this file, page/lib.js and shared/game.js
+// into index.html, so the page is one file.
+
+
+const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
+const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
+// Build plan C2 points this at https://hoopsmatic.com/salary-ladder/api/.
+// Until then the page plays without a server and says rankings are resting.
+const API_BASE = null;
+const ENTER_MS = 240;       // card entrance animation (style.css)
+const IMAGE_WAIT_MS = 2000; // longest wait for a headshot before the clock starts anyway
+
+const TEAMS = {
+  ATL: 'Hawks', BKN: 'Nets', BOS: 'Celtics', CHA: 'Hornets', CHI: 'Bulls', CLE: 'Cavaliers', DAL: 'Mavericks',
+  DEN: 'Nuggets', DET: 'Pistons', GSW: 'Warriors', HOU: 'Rockets', IND: 'Pacers', LAC: 'Clippers', LAL: 'Lakers',
+  MEM: 'Grizzlies', MIA: 'Heat', MIL: 'Bucks', MIN: 'Timberwolves', NOP: 'Pelicans', NYK: 'Knicks', OKC: 'Thunder',
+  ORL: 'Magic', PHI: '76ers', PHX: 'Suns', POR: 'Trail Blazers', SAC: 'Kings', SAS: 'Spurs', TOR: 'Raptors',
+  UTA: 'Jazz', WAS: 'Wizards',
+};
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Loaded data: today's Daily (or the preview stand-in), the live rules file
+// and the prepared pool.
+const D = { today: null, daily: null, rules: null, pool: null, preview: false };
+// The game on screen: {g: saved game, state, last, armed, t0, timer, turn}.
+let G = null;
+
+// ---------------------------------------------------------------------------
+// Server (build plan B2/C2). Off until API_BASE is set; `recording: false` in
+// the rules file also switches it off. Every failure means "Rankings are
+// resting" and play carries on (spec 18.2).
+
+const serverOn = (rules) => Boolean(API_BASE) && rules.recording !== false;
+
+// ---------------------------------------------------------------------------
+// Loading
+
+async function getJson(url) {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return r.json();
+}
+
+async function load() {
+  D.today = dailyDate();
+  const [rules, daily] = await Promise.all([
+    getJson('rules/rules.json'),
+    getJson(`daily/${D.today}.json`).catch(() => null),
+  ]);
+  D.rules = rules;
+  if (daily) {
+    D.daily = daily;
+  } else {
+    // No Daily files until the daily job is switched on (build plan C2):
+    // a preview Daily from the preview pool, the same for everyone that day.
+    const snap = await getJson('preview/snapshot.json');
+    const seed = `preview:${D.today}`;
+    D.daily = {
+      date: D.today, number: null, season: snap.season, salaries_as_of: snap.date, rules, seed,
+      start: pickStart(preparePool(snap.players), rules, seed), players: snap.players,
+    };
+    D.preview = true;
+  }
+  D.pool = preparePool(D.daily.players);
+}
+
+// ---------------------------------------------------------------------------
+// Saved games. A game in progress is saved after every pick, and marked
+// `pending` while a pick's clock runs, so a reload mid-pick counts that pick
+// as a timeout (spec 7) and the game resumes from there.
+
+const liveKey = (mode) => `live-${mode}`;
+
+function resumable(g) {
+  if (!g) return false;
+  // A Daily belongs to its day; an Unlimited game to the salaries it started with.
+  return g.mode === 'daily' ? g.date === D.daily.date : g.dataDate === D.daily.salaries_as_of;
+}
+
+function rebuild(g) {
+  const state = newGame({ pool: D.pool, rules: g.rules, seed: g.seed, startId: g.startId });
+  let last = null;
+  for (const p of g.picks) last = applyPick(D.pool, g.rules, state, p.c, p.ms);
+  return { state, last };
+}
+
+/** Applies the reload rule to a saved game. Returns the game, or null. */
+function settle(mode) {
+  const g = store.get(liveKey(mode));
+  if (!resumable(g)) { store.remove(liveKey(mode)); return null; }
+  if (g.pending) {
+    g.picks.push({ c: CHOICE.TIMEOUT, ms: g.rules.timer_seconds * 1000 });
+    g.pending = false;
+    store.set(liveKey(mode), g);
+  }
+  return g;
+}
+
+function dailyResult() {
+  const d = store.get('daily');
+  return d && d.date === D.daily.date ? d.summary : null;
+}
+
+// ---------------------------------------------------------------------------
+// Intro
+
+function showScreen(id) {
+  for (const s of ['loading', 'intro', 'play', 'end']) $(s).hidden = s !== id;
+  document.body.classList.toggle('playing', id === 'play');
+  window.scrollTo(0, 0);
+}
+
+function showIntro() {
+  const r = D.rules;
+  $('i-season').textContent = D.daily.season;
+  $('i-howto').innerHTML = [
+    'Two players. Tap the one who makes more this season.',
+    'Pick the challenger right and you climb to his rung. Pick your own player right and you stay.',
+    `<b>${r.lives}</b> lives, <b>${r.timer_seconds}</b> seconds a pick. Salaries are within <b>${Math.round(r.band * 100)}%</b> of each other.`,
+    'Climb from near the bottom to the highest-paid player in the NBA.',
+  ].map((t) => `<li>${t}</li>`).join('');
+
+  const streak = store.get('streak');
+  const n = liveStreak(streak, D.daily.date);
+  const s = $('i-streak');
+  s.hidden = n === 0;
+  s.textContent = streakAtStake(streak, D.daily.date) ? `🔥 ${n}-day streak at stake` : `🔥 ${n}-day streak`;
+
+  const num = D.daily.number ? ` #${D.daily.number}` : '';
+  $('i-daily').textContent = dailyResult() ? "See today's Daily result"
+    : settle('daily') ? "Continue today's Daily" : `Play the Daily${num}`;
+  $('i-unlimited').textContent = settle('unlimited') ? 'Continue Unlimited' : 'Play Unlimited';
+  $('i-foot').textContent = `Salaries as of ${shortDate(D.daily.salaries_as_of)}` +
+    (D.preview ? ' · Preview: the real Daily and rankings start at launch' : '');
+  showScreen('intro');
+}
+
+// ---------------------------------------------------------------------------
+// Playing
+
+function startGame(mode) {
+  if (mode === 'daily' && dailyResult()) return showEnd(dailyResult());
+  let g = settle(mode);
+  if (!g) {
+    const d = D.daily;
+    g = mode === 'daily'
+      ? { mode, date: d.date, number: d.number, dataDate: d.salaries_as_of, rules: d.rules, seed: d.seed, startId: d.start }
+      : { mode, date: d.date, number: null, dataDate: d.salaries_as_of, rules: D.rules, seed: randomHex(), startId: null };
+    // Unlimited: a fresh random start every game (spec 11). C2 takes the
+    // seed from the server's start ticket instead.
+    if (mode === 'unlimited') g.startId = pickStart(D.pool, g.rules, g.seed);
+    Object.assign(g, { picks: [], pending: false, ticket: null });
+    store.set(liveKey(mode), g);
+  }
+  const { state, last } = rebuild(g);
+  G = { g, state, last, armed: false, t0: 0, timer: 0, turn: 0 };
+  if (isDone(state)) return finish();
+  showScreen('play');
+  showPick(false);
+}
+
+function initials(name) {
+  return name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+}
+
+const teamName = (p) => TEAMS[p.team] ?? p.team;
+
+/** Position and age. Either is simply left out when the data has none
+ * (e.g. a player the Salary Finder has no position for yet). */
+function posAge(p) {
+  const age = ageOn(p.born, D.daily.date);
+  return [p.pos, age === null ? null : `Age ${age}`].filter(Boolean).join(' · ');
+}
+
+const metaLine = (p) => [teamName(p), posAge(p)].filter(Boolean).join(' · ');
+
+function fillCard(el, p, role) {
+  el.classList.remove('revealed', 'richer', 'right', 'wrong', 'enter', 'climb');
+  const label = role === 'inc' ? 'Your rung' : 'Challenger';
+  el.setAttribute('aria-label', `${label}: ${p.name}, ${metaLine(p)}`);
+  if (el.dataset.id === String(p.id)) {
+    el.querySelector('.sal').textContent = '';
+    el.querySelector('.gap').textContent = '';
+    el.querySelector('.role').textContent = label;
+    return;
+  }
+  el.dataset.id = p.id;
+  el.innerHTML =
+    `<span class="role">${label}</span>` +
+    `<span class="mark" aria-hidden="true"></span>` +
+    `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt="" decoding="async"><span class="initials">${esc(initials(p.name))}</span></span>` +
+    `<span class="pname">${esc(p.name)}</span>` +
+    `<span class="pmeta team"><img class="logo" src="${LOGOS}${esc(p.team.toLowerCase())}.svg" alt=""><span>${esc(teamName(p))}</span></span>` +
+    `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
+    `<span class="sal"></span><span class="gap"></span><span class="more">Paid more</span>`;
+  const img = el.querySelector('.face img');
+  img.addEventListener('error', () => img.parentElement.classList.add('noimg'), { once: true });
+  el.querySelector('.logo').addEventListener('error', (e) => e.target.remove(), { once: true });
+}
+
+/** Resolves once the card's headshot is ready (or failed, or took too long). */
+function imageReady(el) {
+  const img = el.querySelector('.face img');
+  if (!img || img.complete) return Promise.resolve();
+  return Promise.race([
+    new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); }),
+    wait(IMAGE_WAIT_MS),
+  ]);
+}
+
+/** Warms the cache with both possible next challengers. */
+function preloadNext() {
+  const { state, g } = G;
+  const recent = [...state.recent, state.challenger].slice(-g.rules.recent_no_repeat);
+  for (const inc of new Set([state.incumbent, state.challenger])) {
+    if (D.pool.byId.get(inc).salary >= D.pool.top) continue;
+    const id = nextChallenger(D.pool, g.rules, g.seed, state.pickIndex + 1, inc, recent);
+    new Image().src = HEADSHOTS + D.pool.byId.get(id).img;
+  }
+}
+
+function renderStatus() {
+  const { state, g } = G;
+  $('p-mode').textContent = g.mode === 'daily' ? `Daily${g.number ? ` #${g.number}` : ''}` : 'Unlimited';
+  const h = $('p-hearts');
+  h.innerHTML = Array.from({ length: g.rules.lives }, (_, i) =>
+    `<span class="${i < state.lives ? 'full' : 'empty'}">♥</span>`).join('');
+  h.setAttribute('aria-label', `${state.lives} of ${g.rules.lives} lives left`);
+  $('p-rung').textContent = state.rung;
+  $('p-score').textContent = money(score(D.pool, state));
+}
+
+function setTimer(leftMs, maxMs, idle = false) {
+  $('t-bar').style.transform = `scaleX(${Math.max(leftMs, 0) / maxMs})`;
+  $('t-secs').textContent = `${Math.ceil(Math.max(leftMs, 0) / 1000)}s`;
+  $('timer').classList.toggle('warn', !idle && leftMs <= 3000);
+  $('timer').classList.toggle('idle', idle);
+}
+
+async function showPick(climbed) {
+  const { state, g } = G;
+  const turn = ++G.turn;
+  const maxMs = g.rules.timer_seconds * 1000;
+  const inc = $('card-inc'), ch = $('card-ch');
+  fillCard(inc, D.pool.byId.get(state.incumbent), 'inc');
+  fillCard(ch, D.pool.byId.get(state.challenger), 'ch');
+  // Force a reflow so the entrance animation restarts on the same element.
+  void ch.offsetWidth;
+  ch.classList.add('enter');
+  if (climbed) inc.classList.add('climb');
+  $('p-result').textContent = '';
+  $('p-result').className = 'result';
+  renderStatus();
+  setTimer(maxMs, maxMs, true);
+  preloadNext();
+  // The clock starts once the challenger card is fully on screen (spec 7).
+  await Promise.all([wait(reducedMotion() ? 0 : ENTER_MS), imageReady(ch), imageReady(inc)]);
+  if (!G || turn !== G.turn) return;
+  arm(maxMs);
+}
+
+function arm(maxMs) {
+  G.armed = true;
+  G.t0 = performance.now();
+  G.g.pending = true;
+  store.set(liveKey(G.g.mode), G.g);
+  G.timer = setTimeout(() => choose(CHOICE.TIMEOUT), maxMs);
+  const tick = () => {
+    if (!G || !G.armed) return;
+    setTimer(maxMs - (performance.now() - G.t0), maxMs);
+    requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+function choose(choice) {
+  if (!G || !G.armed) return;
+  const { g, state } = G;
+  const maxMs = g.rules.timer_seconds * 1000;
+  let c = choice, ms = maxMs;
+  if (choice !== CHOICE.TIMEOUT) {
+    const t = pickTiming(performance.now() - G.t0, g.rules);
+    if (!t) return; // faster than the minimum: ignored
+    if (t.timeout) c = CHOICE.TIMEOUT; else ms = t.ms;
+  }
+  G.armed = false;
+  clearTimeout(G.timer);
+  const r = applyPick(D.pool, g.rules, state, c, ms);
+  g.picks.push({ c, ms });
+  g.pending = false;
+  store.set(liveKey(g.mode), g);
+  G.last = r;
+  reveal(r);
+  const turn = G.turn;
+  setTimeout(() => {
+    if (!G || turn !== G.turn) return;
+    if (isDone(G.state)) finish(); else showPick(r.climbed);
+  }, g.rules.reveal_ms);
+}
+
+function reveal(r) {
+  const inc = $('card-inc'), ch = $('card-ch');
+  inc.querySelector('.sal').textContent = money(r.incumbentSalary);
+  ch.querySelector('.sal').textContent = money(r.challengerSalary);
+  ch.querySelector('.gap').textContent = gapText(r.incumbentSalary, r.challengerSalary);
+  inc.classList.add('revealed');
+  ch.classList.add('revealed');
+  (r.challengerSalary > r.incumbentSalary ? ch : inc).classList.add('richer');
+  if (r.choice !== CHOICE.TIMEOUT) {
+    const picked = r.choice === CHOICE.CHALLENGER ? ch : inc;
+    picked.classList.add(r.correct ? 'right' : 'wrong');
+    picked.querySelector('.mark').textContent = r.correct ? '✓' : '✗';
+  }
+  const { state } = G;
+  const lives = `${state.lives} ${state.lives === 1 ? 'life' : 'lives'} left`;
+  const text =
+    r.correct && r.climbed ? (state.finished ? '✓ Right. You reached the top!' : `✓ Right. Up to rung ${state.rung}`) :
+    r.correct ? '✓ Right. You hold your rung' :
+    `${r.choice === CHOICE.TIMEOUT ? "✗ Time's up" : '✗ Wrong'}. ${state.over ? 'Game over' : lives}`;
+  $('p-result').textContent = text;
+  $('p-result').className = `result ${r.correct ? 'ok' : 'bad'}`;
+  setTimer(0, 1, true);
+  renderStatus();
+}
+
+// The timer keeps running while the tab is hidden (spec 7); catch up on return.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && G && G.armed &&
+      performance.now() - G.t0 >= G.g.rules.timer_seconds * 1000) choose(CHOICE.TIMEOUT);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!G || $('play').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); choose(CHOICE.INCUMBENT); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); choose(CHOICE.CHALLENGER); }
+});
+
+// ---------------------------------------------------------------------------
+// Game end
+
+function finish() {
+  const { g, state, last } = G;
+  G = null;
+  const summary = {
+    mode: g.mode, date: g.date, number: g.number, dataDate: g.dataDate,
+    score: score(D.pool, state), endId: state.incumbent, rung: state.rung,
+    livesLeft: state.lives, lives: g.rules.lives, totalMs: state.totalMs, finished: state.finished,
+    picks: g.picks.length, pair: last ? [last.incumbent, last.challenger] : null, contract: null,
+  };
+
+  // Personal best, one per mode (spec 9).
+  const best = store.get('best', {});
+  summary.best = Math.max(best[g.mode] ?? 0, summary.score);
+  summary.newBest = summary.score > (best[g.mode] ?? 0);
+  if (summary.newBest) store.set('best', { ...best, [g.mode]: summary.score });
+
+  if (g.mode === 'daily') {
+    store.set('streak', streakAfter(store.get('streak'), g.date));
+    store.set('daily', { date: g.date, summary });
+  }
+
+  // Today's best game per mode, kept so a name claimed later can back-credit
+  // it (spec 12.2). C2 sends it with its start ticket for verification.
+  const today = store.get('today', {});
+  const prev = today[g.mode];
+  if (!prev || prev.date !== D.today || summary.score > prev.score ||
+      (summary.score === prev.score && summary.totalMs < prev.totalMs)) {
+    today[g.mode] = {
+      date: D.today, score: summary.score, totalMs: summary.totalMs, dataDate: g.dataDate,
+      rulesVersion: g.rules.version, seed: g.seed, startId: g.startId, picks: g.picks, ticket: g.ticket,
+    };
+    store.set('today', today);
+  }
+  store.remove(liveKey(g.mode));
+  showEnd(summary);
+}
+
+function playerRow(p) {
+  return `<img src="${HEADSHOTS}${esc(p.img)}" alt=""><div><div class="pname">${esc(p.name)}</div>` +
+    `<div class="pmeta">${esc(metaLine(p))}</div></div>`;
+}
+
+function showEnd(summary) {
+  const end = D.pool.byId.get(summary.endId);
+  $('e-mode').textContent = summary.mode === 'daily'
+    ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
+  $('e-score').textContent = summary.finished ? `You reached the top: ${money(summary.score)}` : `You reached ${money(summary.score)}`;
+  $('e-player').innerHTML = end ? playerRow(end) : '';
+  $('e-rung').textContent = summary.rung;
+  $('e-lives').textContent = `${summary.livesLeft}/${summary.lives}`;
+  $('e-time').textContent = clock(summary.totalMs);
+  const modeName = summary.mode === 'daily' ? 'Daily' : 'Unlimited';
+  $('e-best').textContent = summary.newBest ? 'New personal best!' : `Personal best (${modeName}): ${money(summary.best)}`;
+  $('e-best').className = `best${summary.newBest ? ' new' : ''}`;
+  // "Higher than X% of today's players" and the boards need the server (C2).
+  $('e-rank').textContent = serverOn(D.rules) ? '' : 'Rankings are resting. Score not recorded.';
+
+  // Name entry: one name per device (spec 12.2).
+  const saved = store.get('name');
+  $('e-name-input').value = saved?.name ?? '';
+  $('e-handle-input').value = saved?.handle ?? '';
+  $('e-name-msg').textContent = '';
+  $('e-name-msg').className = 'msg';
+
+  showContract(summary);
+
+  const text = shareText(summary);
+  $('e-share-text').textContent = text;
+  $('e-share-msg').textContent = '';
+  $('e-share').onclick = () => share(text);
+  $('e-next').textContent = summary.mode === 'daily' ? 'Play Unlimited' : 'Play again';
+  $('e-next').onclick = () => startGame('unlimited');
+  $('e-foot').textContent = `Salaries as of ${shortDate(summary.dataDate)}` + (D.preview ? ' · Preview data' : '');
+  showScreen('end');
+}
+
+function showContract(summary) {
+  const box = $('e-contract');
+  const pair = summary.pair?.map((id) => D.pool.byId.get(id));
+  box.hidden = !pair || pair.some((p) => !p);
+  if (box.hidden) return;
+  $('e-contract-msg').textContent = '';
+  $('e-contract-opts').innerHTML = pair.map((p) =>
+    `<button class="opt" type="button" data-id="${p.id}" aria-pressed="${summary.contract === p.id}"${summary.contract ? ' disabled' : ''}>` +
+    `<img src="${HEADSHOTS}${esc(p.img)}" alt=""><span class="pname">${esc(p.name)}</span><span class="sal">${money(p.salary)}</span></button>`).join('');
+  for (const b of box.querySelectorAll('.opt')) {
+    b.onclick = () => {
+      // One optional tap. Saved with the game; C2 adds it to the game record (spec 14).
+      summary.contract = Number(b.dataset.id);
+      if (summary.mode === 'daily') store.set('daily', { date: summary.date, summary });
+      showContract(summary);
+      $('e-contract-msg').textContent = 'Thanks, noted.';
+    };
+  }
+}
+
+$('e-name').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = cleanName($('e-name-input').value);
+  const msg = $('e-name-msg');
+  if (!name) {
+    msg.textContent = 'Names are 2 to 24 characters.';
+    msg.className = 'msg err';
+    return;
+  }
+  const handle = cleanHandle($('e-handle-input').value);
+  $('e-handle-input').value = handle;
+  store.set('name', { name, handle });
+  msg.className = 'msg';
+  msg.textContent = serverOn(D.rules) ? '' : 'Saved on this device. Rankings are resting, so it is not on a board yet.';
+});
+
+async function share(text) {
+  const msg = $('e-share-msg');
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share({ text }); return; } catch (e) { if (e.name === 'AbortError') return; }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    msg.textContent = 'Copied. Paste it anywhere.';
+  } catch {
+    msg.textContent = 'Copy the text below.';
+    getSelection().selectAllChildren($('e-share-text'));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Start
+
+$('card-inc').addEventListener('click', () => choose(CHOICE.INCUMBENT));
+$('card-ch').addEventListener('click', () => choose(CHOICE.CHALLENGER));
+$('i-daily').addEventListener('click', () => startGame('daily'));
+$('i-unlimited').addEventListener('click', () => startGame('unlimited'));
+$('e-home').addEventListener('click', showIntro);
+
+load().then(() => {
+  // Reload rule first, so a pick that was on the clock is counted even if
+  // the player never comes back to that game. A Daily that the timeout
+  // ends is finished on the spot.
+  for (const mode of ['daily', 'unlimited']) {
+    const g = settle(mode);
+    if (g && isDone(rebuild(g).state)) {
+      const { state, last } = rebuild(g);
+      G = { g, state, last };
+      finish();
+      return;
+    }
+  }
+  showIntro();
+}).catch((err) => {
+  console.error(err);
+  $('loading').textContent = "Couldn't load the salaries. Check your connection and reload.";
+});
+</script>
+</body>
+</html>
