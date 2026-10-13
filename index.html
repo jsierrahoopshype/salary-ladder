@@ -135,6 +135,8 @@ body.playing .hdr{display:none}
 .pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
   font-family:var(--display);font-size:1.6rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
 .face.noimg img{visibility:hidden}
+/* the team logo when no photo loads: whole, centred, as the Daily 73-9 shows it */
+.face.is-logo img{object-fit:contain;padding:16%}
 .pcard .face.noimg .initials{display:flex}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
@@ -817,8 +819,9 @@ function cleanHandle(handle) {
 
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
-// Headshot crops, best first; each one that fails falls back to the next, then
-// to initials. The data files name each player's face-tight file; the other
+// Headshot crops, best first; each one that fails falls back to the next,
+// then to the team logo (as the Daily 73-9 does), then to initials. The data
+// files name each player's face-tight file; the other
 // crops share its file name. Play cards use face2, as the Daily 73-9 does
 // (every head the same size and position), then the regular face crop. When
 // the mid-size face2 WebP lands in nba-headshots, it goes first in CARD_CROPS.
@@ -826,15 +829,18 @@ const CARD_CROPS = [['face2', 'png'], ['face', 'png']];
 // Small spots (end screen, contract pick): face2-160, the same framing at 160px.
 const SMALL_CROPS = [['face2-160', 'webp'], ['face', 'png']];
 const crop = (p, dir, ext) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.${ext}`;
-const cropUrls = (p, crops) => crops.map(([dir, ext]) => crop(p, dir, ext));
+const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
+const logoUrl = (p) => `${LOGOS}${p.team.toLowerCase()}.svg`;
+/** Every picture to try for a player, in order: the crops, then the team logo. */
+const photoUrls = (p, crops = CARD_CROPS) => [...crops.map(([dir, ext]) => crop(p, dir, ext)), logoUrl(p)];
 function faceImg(p, small = false) {
-  const [src, ...rest] = cropUrls(p, small ? SMALL_CROPS : CARD_CROPS);
+  const [src, ...rest] = photoUrls(p, small ? SMALL_CROPS : CARD_CROPS);
   return `<img src="${esc(src)}" data-fallback="${esc(rest.join(' '))}" alt=""${small ? '' : ' decoding="async"'}>`;
 }
 
-// A headshot that fails moves to its next crop; when none is left, the frame
-// shows initials (play cards) or stays empty. Capturing, because image errors
-// don't bubble.
+// A headshot that fails moves to its next picture; the team logo is shown
+// whole rather than cropped. When nothing is left, the frame shows initials
+// (play cards) or stays empty. Capturing, because image errors don't bubble.
 document.addEventListener('error', (e) => {
   const img = e.target;
   if (!(img instanceof HTMLImageElement) || !img.closest('.face')) return;
@@ -842,11 +848,11 @@ document.addEventListener('error', (e) => {
   if (rest.length) {
     img.src = rest.shift();
     img.dataset.fallback = rest.join(' ');
+    img.closest('.face').classList.toggle('is-logo', img.src.startsWith(LOGOS));
   } else {
     img.closest('.face').classList.add('noimg');
   }
 }, true);
-const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
 // Build plan C2 points this at https://hoopsmatic.com/salary-ladder/api/.
 // Until then the page plays without a server and says rankings are resting.
 const API_BASE = null;
@@ -1062,7 +1068,7 @@ function fillCard(el, p, role) {
     `<span class="mark" aria-hidden="true"></span>` +
     `<span class="face">${faceImg(p)}<span class="initials">${esc(initials(p.name))}</span></span>` +
     `<span class="pname">${esc(p.name)}</span>` +
-    `<span class="pmeta team"><img class="logo" src="${LOGOS}${esc(p.team.toLowerCase())}.svg" alt=""><span>${esc(teamName(p))}</span></span>` +
+    `<span class="pmeta team"><img class="logo" src="${esc(logoUrl(p))}" alt=""><span>${esc(teamName(p))}</span></span>` +
     `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
     `<span class="sal"></span><span class="gap"></span><span class="more">Paid more</span>`;
   el.querySelector('.logo').addEventListener('error', (e) => e.target.remove(), { once: true });
@@ -1089,7 +1095,7 @@ const preloaded = new Map();
 /** Downloads a player's card photo, following the same crops as the card. */
 function preload(p) {
   if (preloaded.has(p.id)) return;
-  const urls = cropUrls(p, CARD_CROPS);
+  const urls = photoUrls(p);
   const img = new Image();
   img.onerror = () => { if (urls.length) img.src = urls.shift(); };
   img.src = urls.shift();

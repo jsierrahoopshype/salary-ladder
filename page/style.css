@@ -114,6 +114,8 @@ body.playing .hdr{display:none}
 .pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
   font-family:var(--display);font-size:1.6rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
 .face.noimg img{visibility:hidden}
+/* the team logo when no photo loads: whole, centred, as the Daily 73-9 shows it */
+.face.is-logo img{object-fit:contain;padding:16%}
 .pcard .face.noimg .initials{display:flex}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
