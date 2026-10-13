@@ -2,16 +2,15 @@
    screen copied from the 73-9 game (BoxScoreLab box_score_lab_roulette.html,
    live at hoopsmatic.com/73-9-game), the look the Daily 73-9 also uses.
 
-   Fonts: 73-9 sets its headings in Oswald, which the Salary Finder doesn't
-   load, so it is not added here until Jorge approves it. Headings use
-   --display (DM Sans, already loaded) in the same uppercase, spaced style.
-   Switching to Oswald is the font request in page/index.html plus --display. */
+   Fonts: headings in Oswald, as in 73-9 (approved October 13, 2026), body in
+   JetBrains Mono. Both come in the one Google Fonts request in page/index.html
+   that also loads DM Sans, the Salary Finder's font, kept as the fallback. */
 
 :root{
   --gold:#ffd700;--orange:#ff6b35;--green:#34d97a;--amber:#ffd24a;--red:#ff6666;
   --ink:#c8c8e0;--dim:#8888aa;--panel:#12122a;--panel2:#0c0c1e;--line:#2a2a52;
   --white:#eaeaff;
-  --display:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --display:'Oswald','DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -114,7 +113,7 @@ body.playing .hdr{display:none}
 .pcard .face img{width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
   font-family:var(--display);font-size:1.6rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
-.pcard .face.noimg img{display:none}
+.face.noimg img{visibility:hidden}
 .pcard .face.noimg .initials{display:flex}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}

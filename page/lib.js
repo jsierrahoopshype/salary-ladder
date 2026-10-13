@@ -121,15 +121,17 @@ export function shareText({ mode, number, date, score, rung, livesLeft, lives, t
 /**
  * The share modal's platform buttons (copied from the 73-9 modal). Each opens
  * the platform's own compose page with the share card text; nothing loads
- * until the player taps one.
+ * until the player taps one. As in 73-9, X and Bluesky also tag HoopsHype.
  */
+export const HANDLES = { x: '@hoopshype', bsky: '@hoopshypeofficial.bsky.social' };
+
 export function shareLinks(text) {
   const lines = text.split('\n').filter((l) => l !== SITE_URL);
   const body = lines.join('\n');
   const e = encodeURIComponent, u = e(SITE_URL), t = e(body), all = e(`${body}\n${SITE_URL}`);
   return {
-    x: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
-    bsky: `https://bsky.app/intent/compose?text=${all}`,
+    x: `https://twitter.com/intent/tweet?text=${e(`${body}\n${HANDLES.x}`)}&url=${u}`,
+    bsky: `https://bsky.app/intent/compose?text=${e(`${body}\n${HANDLES.bsky}\n${SITE_URL}`)}`,
     fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
     wa: `https://wa.me/?text=${all}`,
     reddit: `https://www.reddit.com/submit?url=${u}&title=${e(lines.join(' · '))}`,

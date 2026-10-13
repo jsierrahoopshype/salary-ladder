@@ -10,6 +10,28 @@ import {
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
+// Headshot crops, as the Daily 73-9 uses them: face2 (every head the same size
+// and position), with the regular face crop as fallback, then initials. The
+// data files name each player's face-tight file; the other crops share its
+// file name. Small spots use face2-160, the same framing at 160px.
+const crop = (p, dir, ext) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.${ext}`;
+const faceImg = (p, small = false) =>
+  `<img src="${esc(small ? crop(p, 'face2-160', 'webp') : crop(p, 'face2', 'png'))}" data-fallback="${esc(crop(p, 'face', 'png'))}" alt=""` +
+  `${small ? '' : ' decoding="async"'}>`;
+
+// A headshot that fails moves to its fallback crop; when that fails too, the
+// frame shows initials (play cards) or stays empty. Capturing, because image
+// errors don't bubble.
+document.addEventListener('error', (e) => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.closest('.face')) return;
+  if (img.dataset.fallback) {
+    img.src = img.dataset.fallback;
+    delete img.dataset.fallback;
+  } else {
+    img.closest('.face').classList.add('noimg');
+  }
+}, true);
 const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
 // Build plan C2 points this at https://hoopsmatic.com/salary-ladder/api/.
 // Until then the page plays without a server and says rankings are resting.
@@ -200,13 +222,11 @@ function fillCard(el, p, role) {
   el.innerHTML =
     `<span class="role">${label}</span>` +
     `<span class="mark" aria-hidden="true"></span>` +
-    `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt="" decoding="async"><span class="initials">${esc(initials(p.name))}</span></span>` +
+    `<span class="face">${faceImg(p)}<span class="initials">${esc(initials(p.name))}</span></span>` +
     `<span class="pname">${esc(p.name)}</span>` +
     `<span class="pmeta team"><img class="logo" src="${LOGOS}${esc(p.team.toLowerCase())}.svg" alt=""><span>${esc(teamName(p))}</span></span>` +
     `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
     `<span class="sal"></span><span class="gap"></span><span class="more">Paid more</span>`;
-  const img = el.querySelector('.face img');
-  img.addEventListener('error', () => img.parentElement.classList.add('noimg'), { once: true });
   el.querySelector('.logo').addEventListener('error', (e) => e.target.remove(), { once: true });
 }
 
@@ -215,7 +235,11 @@ function imageReady(el) {
   const img = el.querySelector('.face img');
   if (!img || img.complete) return Promise.resolve();
   return Promise.race([
-    new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); }),
+    new Promise((r) => {
+      img.addEventListener('load', r, { once: true });
+      // An error that only switches to the fallback crop isn't the end.
+      img.addEventListener('error', () => { if (img.closest('.face').classList.contains('noimg')) r(); });
+    }),
     wait(IMAGE_WAIT_MS),
   ]);
 }
@@ -227,7 +251,7 @@ function preloadNext() {
   for (const inc of new Set([state.incumbent, state.challenger])) {
     if (D.pool.byId.get(inc).salary >= D.pool.top) continue;
     const id = nextChallenger(D.pool, g.rules, g.seed, state.pickIndex + 1, inc, recent);
-    new Image().src = HEADSHOTS + D.pool.byId.get(id).img;
+    new Image().src = crop(D.pool.byId.get(id), 'face2', 'png');
   }
 }
 
@@ -387,7 +411,7 @@ function finish() {
   showEnd(summary);
 }
 
-const face = (p) => `<span class="face"><img src="${HEADSHOTS}${esc(p.img)}" alt=""></span>`;
+const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
 
 function playerRow(p) {
   return `${face(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(metaLine(p))}</div></div>`;
@@ -500,7 +524,7 @@ function heart(ctx, cx, cy, size) {
   ctx.closePath();
 }
 
-const DISPLAY = '"DM Sans", sans-serif';
+const DISPLAY = 'Oswald, "DM Sans", sans-serif';
 const MONO = '"JetBrains Mono", monospace';
 
 function drawCard(sm) {
