@@ -19,7 +19,7 @@ Fixed text in the page. The season is written in, so it changes by hand each sea
 | Text | Shows | Key |
 |---|---|---|
 | Salary Ladder: Who gets paid more? \| HoopsMatic | Browser tab and Google result title | `meta.title` |
-| Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. New Daily every day. | Google result text | `meta.description` |
+| Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. A new Daily every morning. | Google result text | `meta.description` |
 | Salary Ladder: Who gets paid more? | Title on link previews (X, Bluesky, WhatsApp…) | `meta.ogTitle` |
 | Two NBA players, one question: who makes more in 2026-27? Climb to the top of the salary ladder. | Text on link previews | `meta.ogDescription` |
 
@@ -44,7 +44,7 @@ How to play is a numbered list. Its numbers come from `rules/rules.json` and are
 |---|---|---|
 | Who gets paid more in {season}? | Under the heading (shown in capitals) | `intro.tagline` |
 | Two players, paid within {band}% of each other. Tap the one who makes more in {season}. | How to play, 1 | `intro.howto.1` |
-| Right on the challenger: he takes your rung and you climb. Right on your own player: you stay put. | How to play, 2 | `intro.howto.2` |
+| Pick the challenger and you're right: he becomes your player and you climb a rung. Pick your player and you're right: you stay where you are. | How to play, 2 | `intro.howto.2` |
 | A wrong pick or a timeout costs a life. {lives} lives, {seconds} seconds a pick. | How to play, 3 | `intro.howto.3` |
 | Your score is the salary of the last player you reach. The top of the ladder is the highest-paid player in the NBA. | How to play, 4 | `intro.howto.4` |
 | 🔥 {n}-day streak at stake | Streak line (spec 10): you have a streak and haven't played today's Daily | `intro.streakAtStake` |
@@ -69,8 +69,8 @@ Nothing here may push the screen into scrolling on a small phone, so keep these 
 | Score | Label on the current score | `play.score` |
 | {lives} of {max} lives left | Read aloud by screen readers for the hearts | `play.livesLabel` |
 | {n}s | Seconds left, next to the timer bar | `play.seconds` |
-| Arrow keys: ← your rung · challenger → | Under the cards, computers only | `play.keys` |
-| Your rung | Top of your current player's card | `card.incumbent` |
+| Arrow keys: ← your player · challenger → | Under the cards, computers only | `play.keys` |
+| Your player | Top of your current player's card | `card.incumbent` |
 | Challenger | Top of the challenger's card | `card.challenger` |
 | Age {age} | On each card, after the position | `card.age` |
 | Paid more | Tag on the richer card during the reveal | `card.paidMore` |
@@ -103,7 +103,7 @@ The big number is the score (like $31.4M). Screen readers hear "You reached" bef
 | Personal best ({mode}): {score} | Personal best, one per mode. {mode} is Daily or Unlimited | `end.best` |
 | Higher than {pct}% of today's players | From C2: share of today's players in this mode you beat | `end.rank` |
 | Higher than {pct}% of today's players (early numbers) | From C2: the same, while fewer than 50 games have been played today | `end.rankEarly` |
-| Rankings are resting. Score not recorded. | Instead of the percentage, whenever rankings are off | `end.resting` |
+| Rankings are down right now. Score not recorded. | Instead of the percentage, whenever rankings are off | `end.resting` |
 | Share result | Button | `end.share` |
 | Play Unlimited | Button after a Daily; also in the share window | `end.playUnlimited` |
 | Play again | Button after an Unlimited game; also in the share window | `end.playAgain` |
@@ -132,7 +132,7 @@ The two name refusals also come from the leaderboard Worker word for word; a tes
 | Save name | Button | `name.save` |
 | Names are 2 to 24 characters. | Name too short or too long | `name.length` |
 | That name can't go on the boards. Pick another. | The name filter refuses it (from C2) | `name.refused` |
-| Saved on this device. Rankings are resting, so it is not on a board yet. | Saved while rankings are off | `name.savedResting` |
+| Saved on this device. Rankings are down right now, so it is not on a board yet. | Saved while rankings are off | `name.savedResting` |
 | Checking your score… | From C2: while the score is re-checked before posting | `name.checking` |
 | Score not verified, retry | From C2: the re-check failed (spec 13.1, word for word) | `name.notVerified` |
 | Retry | From C2: button next to that message | `name.retry` |
@@ -157,7 +157,7 @@ Daily games have one board, titled with the Daily's name (like "Daily #12"). Unl
 | Time | Column | `board.colTime` |
 | Your rank: #{rank} | Under the top 50, when your name is further down | `board.you` |
 | No names on this board yet. | A board with nobody on it yet | `board.empty` |
-| Rankings are resting. | When the boards can't be loaded | `board.resting` |
+| Rankings are down right now. | When the boards can't be loaded | `board.resting` |
 
 ## Share window
 
@@ -168,7 +168,7 @@ The X, Bluesky, Facebook, WhatsApp, Reddit and Telegram buttons show the platfor
 | Share your result | Read aloud when the window opens | `share.dialog` |
 | Close | Read aloud for the × button | `share.close` |
 | Link | Read aloud for the link field | `share.link` |
-| Copy | Button next to the link: copies the share text below | `share.copyLink` |
+| Copy text | Button next to the link: copies the share text below | `share.copyLink` |
 | Share on {platform} | Read aloud for each platform button | `share.on` |
 | Download | Button: saves the picture | `share.download` |
 | Copy image | Button: copies the picture | `share.copyImage` |

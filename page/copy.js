@@ -10,7 +10,7 @@
 export const COPY = {
   // Search results, browser tab and link previews
   'meta.title': 'Salary Ladder: Who gets paid more? | HoopsMatic',
-  'meta.description': 'Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. New Daily every day.',
+  'meta.description': 'Two NBA players, one question: who makes more in 2026-27? Climb from the bottom of the salary ladder to the highest-paid player. A new Daily every morning.',
   'meta.ogTitle': 'Salary Ladder: Who gets paid more?',
   'meta.ogDescription': 'Two NBA players, one question: who makes more in 2026-27? Climb to the top of the salary ladder.',
 
@@ -27,7 +27,7 @@ export const COPY = {
   // Intro
   'intro.tagline': 'Who gets paid more in {season}?',
   'intro.howto.1': 'Two players, paid within {band}% of each other. Tap the one who makes more in {season}.',
-  'intro.howto.2': 'Right on the challenger: he takes your rung and you climb. Right on your own player: you stay put.',
+  'intro.howto.2': "Pick the challenger and you're right: he becomes your player and you climb a rung. Pick your player and you're right: you stay where you are.",
   'intro.howto.3': 'A wrong pick or a timeout costs a life. {lives} lives, {seconds} seconds a pick.',
   'intro.howto.4': 'Your score is the salary of the last player you reach. The top of the ladder is the highest-paid player in the NBA.',
   'intro.streakAtStake': '🔥 {n}-day streak at stake',
@@ -47,8 +47,8 @@ export const COPY = {
   'play.score': 'Score',
   'play.livesLabel': '{lives} of {max} lives left',
   'play.seconds': '{n}s',
-  'play.keys': 'Arrow keys: ← your rung · challenger →',
-  'card.incumbent': 'Your rung',
+  'play.keys': 'Arrow keys: ← your player · challenger →',
+  'card.incumbent': 'Your player',
   'card.challenger': 'Challenger',
   'card.age': 'Age {age}',
   'card.paidMore': 'Paid more',
@@ -71,7 +71,7 @@ export const COPY = {
   'end.best': 'Personal best ({mode}): {score}',
   'end.rank': "Higher than {pct}% of today's players",
   'end.rankEarly': "Higher than {pct}% of today's players (early numbers)",
-  'end.resting': 'Rankings are resting. Score not recorded.',
+  'end.resting': 'Rankings are down right now. Score not recorded.',
   'end.share': 'Share result',
   'end.playUnlimited': 'Play Unlimited',
   'end.playAgain': 'Play again',
@@ -90,7 +90,7 @@ export const COPY = {
   'name.save': 'Save name',
   'name.length': 'Names are 2 to 24 characters.',
   'name.refused': "That name can't go on the boards. Pick another.",
-  'name.savedResting': 'Saved on this device. Rankings are resting, so it is not on a board yet.',
+  'name.savedResting': 'Saved on this device. Rankings are down right now, so it is not on a board yet.',
   'name.checking': 'Checking your score…',
   'name.notVerified': 'Score not verified, retry',
   'name.retry': 'Retry',
@@ -110,13 +110,13 @@ export const COPY = {
   'board.colTime': 'Time',
   'board.you': 'Your rank: #{rank}',
   'board.empty': 'No names on this board yet.',
-  'board.resting': 'Rankings are resting.',
+  'board.resting': 'Rankings are down right now.',
 
   // Share window
   'share.dialog': 'Share your result',
   'share.close': 'Close',
   'share.link': 'Link',
-  'share.copyLink': 'Copy',
+  'share.copyLink': 'Copy text',
   'share.on': 'Share on {platform}',
   'share.download': 'Download',
   'share.copyImage': 'Copy image',
