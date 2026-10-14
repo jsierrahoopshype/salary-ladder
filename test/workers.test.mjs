@@ -327,9 +327,9 @@ test('switched off: not configured, recording off, no Daily, and the page keeps 
   r = await G(genv, 'POST', '/finish', { ticket: start.ticket, picks: [{ c: 0, ms: 900 }] }, NOON + H);
   assert.equal(r.status, 503); assert.equal(r.data.error, 'resting');
 
-  // The page still plays without a server until C2 connects it.
+  // The page talks to these Workers, and still plays when they're away.
   const app = fs.readFileSync(new URL('../page/app.js', import.meta.url), 'utf8');
-  assert.match(app, /^const API_BASE = null;/m);
+  assert.match(app, /^const API_BASE = 'https:\/\/hoopsmatic\.com\/salary-ladder\/api\/';/m);
   assert.match(app, /T\('end\.resting'\)/);
   assert.match(fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8'), /Rankings are down right now/);
 });

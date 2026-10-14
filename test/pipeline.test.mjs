@@ -43,6 +43,15 @@ function fakeSources(dir, builtDate) {
   sheet.push('Brand New Rookie,Boston,"$3,000,000",GUARANTEED');
 
   fs.writeFileSync(path.join(finder, 'data', 'data.json'), JSON.stringify({ meta: { built: `${builtDate}T11:00:00` }, seasons }));
+  // roster_status.json (spec 25), saying the same as the sheet above.
+  const players = seasons.map((r, i) => ({
+    player: r.player, team: i === 11 ? null : i === 100 ? 'POR' : 'BOS',
+    contract: i === 11 ? 'dead_money_only' : i === 5 ? 'two_way' : 'guaranteed',
+    current_salary: i === 11 ? 0 : i === 100 ? r.team_salaries.POR : r.salary,
+    dead_money: i === 11 ? [{ team: 'BOS', amount: r.salary }] : i === 100 ? [{ team: 'MIL', amount: r.team_salaries.MIL }] : [],
+    total: r.salary, birth_date: i === 20 ? '2003-07-09' : '2000-01-02',
+  }));
+  fs.writeFileSync(path.join(finder, 'data', 'roster_status.json'), JSON.stringify({ built: `${builtDate}T11:00:00`, season: '2026-27', players }));
   fs.writeFileSync(path.join(finder, 'data_sources', 'salaries_future.csv'), sheet.join('\n') + '\n');
   // One player bio.csv has no row for, covered by the Finder's stand-in bios.
   const noBio = seasons[20].player;
@@ -56,30 +65,35 @@ function fakeSources(dir, builtDate) {
   return { finder, heads, seasons };
 }
 
-function fakeRepo(dir) {
+function fakeRepo(dir, config = {}) {
   const root = path.join(dir, 'root');
   for (const d of ['rules', 'pipeline', 'data']) fs.cpSync(path.join(REPO, d), path.join(root, d), { recursive: true });
   fs.rmSync(path.join(root, 'data', 'snapshots'), { recursive: true, force: true });
   fs.rmSync(path.join(root, 'data', 'review.json'), { force: true });
+  const file = path.join(root, 'pipeline', 'config.json');
+  fs.writeFileSync(file, JSON.stringify({ ...JSON.parse(fs.readFileSync(file, 'utf8')), ...config }));
   return root;
 }
 
 const run = (root, src, now, ...extra) =>
   execFileSync('node', [JOB, '--root', root, '--finder', src.finder, '--headshots', src.heads, '--now', now, ...extra], { encoding: 'utf8' });
 
-test('daily job: off by default, builds tomorrow once, falls back when data is late', () => {
+test('daily job: switch, builds tomorrow once, catches up today, falls back when data is late', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ladder-'));
   const src = fakeSources(dir, '2026-10-08');
-  const root = fakeRepo(dir);
+  const root = fakeRepo(dir, { daily_job_enabled: false });
   const daily = (d) => path.join(root, 'daily', `${d}.json`);
 
-  // Switched off until C2.
+  // The switch in pipeline/config.json.
   assert.match(run(root, src, '2026-10-08T12:17:00Z'), /switched off/);
   assert.ok(!fs.existsSync(daily('2026-10-09')));
 
-  // Today's data is in: snapshot for today, Daily for tomorrow.
+  // Today's data is in: snapshot for today, Daily for tomorrow, and today's
+  // Daily too, since there wasn't one (the job's first run).
   const out = run(root, src, '2026-10-08T12:17:00Z', '--force');
   assert.match(out, /Saved daily\/2026-10-09\.json/);
+  assert.match(out, /Today's Daily was missing: saved daily\/2026-10-08\.json/);
+  assert.equal(JSON.parse(fs.readFileSync(daily('2026-10-08'), 'utf8')).salaries_as_of, '2026-10-08');
   const snap = JSON.parse(fs.readFileSync(path.join(root, 'data', 'snapshots', '2026-27', '2026-10-08.json'), 'utf8'));
   assert.equal(snap.players.length, 158); // 161 rows - the two-way - the one off the sheet - the unknown rookie
   assert.ok(!snap.players.some((p) => p.name === 'Brand New Rookie'));
@@ -108,6 +122,37 @@ test('daily job: off by default, builds tomorrow once, falls back when data is l
   assert.match(run(root, src, '2026-10-09T22:17:00Z', '--force'), /Falling back/);
   assert.equal(JSON.parse(fs.readFileSync(daily('2026-10-10'), 'utf8')).salaries_as_of, '2026-10-08');
   assert.match(fs.readFileSync(path.join(root, 'build', 'issue.md'), 'utf8'), /built from 2026-10-08/);
+
+  // A missed day: today's Daily is built at once, before the Finder's data.
+  fs.rmSync(daily('2026-10-10'));
+  const late = run(root, src, '2026-10-10T10:17:00Z', '--force');
+  assert.match(late, /Today's Daily was missing: saved daily\/2026-10-10\.json \(salaries as of 2026-10-08\)/);
+  assert.match(late, /isn't in yet/);
+});
+
+test('daily job: waits until roster_status.json is from the same Finder run as data.json', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ladder-'));
+  const src = fakeSources(dir, '2026-10-08');
+  const root = fakeRepo(dir, { roster_source: 'roster_status' });
+  const file = path.join(src.finder, 'data', 'roster_status.json');
+  const roster = JSON.parse(fs.readFileSync(file, 'utf8'));
+  fs.writeFileSync(file, JSON.stringify({ ...roster, built: '2026-10-07T11:00:00' }));
+  const out = run(root, src, '2026-10-08T12:17:00Z', '--force');
+  assert.match(out, /doesn't match data\.json yet/);
+  assert.match(out, /isn't in yet/);
+  assert.ok(!fs.existsSync(path.join(root, 'data', 'snapshots', '2026-27', '2026-10-08.json')));
+});
+
+test('the stand-in roster (before roster_status.json) gives the same pool', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ladder-'));
+  const src = fakeSources(dir, '2026-10-08');
+  const read = (p) => JSON.parse(fs.readFileSync(path.join(REPO, p), 'utf8'));
+  const pool = (roster_source) => buildPool({
+    finderDir: src.finder, headshotsDir: src.heads, config: { ...read('pipeline/config.json'), roster_source },
+    crosswalk: read('data/crosswalk.json'), exclude: read('data/exclude.json'),
+  }).players;
+  assert.deepEqual(pool('standin'), pool('roster_status'));
+  assert.equal(pool('roster_status').length, 158);
 });
 
 test('published files are never overwritten', () => {

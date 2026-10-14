@@ -58,6 +58,11 @@ export function gapText(incumbentSalary, challengerSalary) {
   return `${sign}${money(diff)} (${sign}${pct}%)`;
 }
 
+/** Board money (spec 12.1): two decimals, like $31.42M. */
+export function boardMoney(n) {
+  return `$${(n / 1e6).toFixed(2)}M`;
+}
+
 /** Total time as m:ss. */
 export function clock(ms) {
   const s = Math.round(ms / 1000);
@@ -85,6 +90,41 @@ export function pickTiming(elapsedMs, rules) {
 export function pairKey(idA, salaryA, idB, salaryB) {
   return idA < idB ? `${idA}:${salaryA}|${idB}:${salaryB}` : `${idB}:${salaryB}|${idA}:${salaryA}`;
 }
+
+/**
+ * Which picks of a game show a pair this device has already voted on (spec
+ * 14.1). Their indexes go to the server as `novote`, so repeats stay out of
+ * the vote totals; a pair shown twice in one game counts once. `log` is the
+ * game's picks as applyPick returns them, `voted` the keys already counted.
+ * Returns {novote, fresh}: fresh are the keys this game adds.
+ */
+export function voteSplit(log, voted) {
+  const seen = new Set(voted), novote = [], fresh = [];
+  log.forEach((p, i) => {
+    const k = pairKey(p.incumbent, p.incumbentSalary, p.challenger, p.challengerSalary);
+    if (seen.has(k)) novote.push(i);
+    else { seen.add(k); fresh.push(k); }
+  });
+  return { novote, fresh };
+}
+
+/**
+ * The voted-pairs list after a recorded game, newest last. Capped, because
+ * every HoopsMatic game shares the browser's storage for hoopsmatic.com;
+ * the oldest pairs simply count again.
+ */
+export const MAX_VOTED = 5000;
+export function addVotes(voted, fresh, max = MAX_VOTED) {
+  return [...new Set([...voted, ...fresh])].slice(-max);
+}
+
+/**
+ * A result token works once, for 15 minutes on the server (spec 13.1). The
+ * page uses one for 14, so it never sends one that expires on the way; after
+ * that it quietly re-sends the game for a fresh one.
+ */
+export const TOKEN_USE_MS = 14 * 60_000;
+export const tokenUsable = (t, now) => Boolean(t && !t.used && now - t.at < TOKEN_USE_MS);
 
 // ---------------------------------------------------------------------------
 // Streak (spec 10): Daily days in a row, kept only on the device.

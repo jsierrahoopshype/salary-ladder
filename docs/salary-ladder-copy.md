@@ -10,8 +10,6 @@ Every piece of text the player sees, screen by screen. The page shows exactly th
 
 **House rules used here:** no em dashes, no emojis except the streak flame and the share text's hearts (both from 73-9, spec 9 and 10), ✓ and ✗ always next to the colour (spec 8). Money is written with 3 significant figures ($2.45M, $31.4M), and like $31.42M on the boards (spec 8 and 12).
 
-Lines marked **From C2** are not on the page yet: they come in when the page connects to the server (build plan C2). They're here so the wording is approved before then.
-
 ## Search results, browser tab and link previews
 
 Fixed text in the page. The season is written in, so it changes by hand each season.
@@ -56,7 +54,6 @@ How to play is a numbered list. Its numbers come from `rules/rules.json` and are
 | Play Unlimited | Unlimited button | `intro.playUnlimited` |
 | Continue Unlimited | Unlimited button, game in progress | `intro.continueUnlimited` |
 | Daily: the same ladder for everyone, one play a day, new at 9 AM ET. Unlimited: as many games as you like. | Small print under the buttons | `intro.modes` |
-| Preview: the real Daily and rankings start at launch | Added to the footer until launch; C2 removes it | `intro.preview` |
 
 ## Playing
 
@@ -101,15 +98,14 @@ The big number is the score (like $31.4M). Screen readers hear "You reached" bef
 | New personal best! | Badge when you beat your personal best in this mode | `end.newBest` |
 | You reached rung {rung} · {left}/{lives} lives left · {time} | Line under the score. {time} is like 3:12 | `end.summary` |
 | Personal best ({mode}): {score} | Personal best, one per mode. {mode} is Daily or Unlimited | `end.best` |
-| Higher than {pct}% of today's players | From C2: share of today's players in this mode you beat | `end.rank` |
-| Higher than {pct}% of today's players (early numbers) | From C2: the same, while fewer than 50 games have been played today | `end.rankEarly` |
+| Higher than {pct}% of today's players | Share of today's players in this mode you beat | `end.rank` |
+| Higher than {pct}% of today's players (early numbers) | The same, while fewer than 50 games have been played today | `end.rankEarly` |
 | Rankings are down right now. Score not recorded. | Instead of the percentage, whenever rankings are off | `end.resting` |
 | Share result | Button | `end.share` |
 | Play Unlimited | Button after a Daily; also in the share window | `end.playUnlimited` |
 | Play again | Button after an Unlimited game; also in the share window | `end.playAgain` |
 | Home | Button | `end.home` |
 | New Daily at 9 AM ET | Added to the footer after a Daily | `end.nextDaily` |
-| Preview data | Added to the footer until launch; C2 removes it | `end.previewData` |
 
 ## Which contract would you rather have?
 
@@ -131,15 +127,15 @@ The two name refusals also come from the leaderboard Worker word for word; a tes
 | @handle (optional) | Grey hint in the handle field | `name.handlePlaceholder` |
 | Save name | Button | `name.save` |
 | Names are 2 to 24 characters. | Name too short or too long | `name.length` |
-| That name can't go on the boards. Pick another. | The name filter refuses it (from C2) | `name.refused` |
+| That name can't go on the boards. Pick another. | The name filter refuses it | `name.refused` |
 | Saved on this device. Rankings are down right now, so it is not on a board yet. | Saved while rankings are off | `name.savedResting` |
-| Checking your score… | From C2: while the score is re-checked before posting | `name.checking` |
-| Score not verified, retry | From C2: the re-check failed (spec 13.1, word for word) | `name.notVerified` |
-| Retry | From C2: button next to that message | `name.retry` |
-| You're on the boards. | From C2: posted. One rank line per board follows | `name.posted` |
-| {board}: #{rank} | From C2: like "This week: #12". {board} is a board name below | `name.rankLine` |
+| Checking your score… | While the score is re-checked before posting | `name.checking` |
+| Score not verified, retry | The re-check failed (spec 13.1, word for word) | `name.notVerified` |
+| Retry | Button next to that message | `name.retry` |
+| You're on the boards. | Posted. One rank line per board follows | `name.posted` |
+| {board}: #{rank} | Like "This week: #12". {board} is a board name below | `name.rankLine` |
 
-## The boards (from C2)
+## The boards
 
 Daily games have one board, titled with the Daily's name (like "Daily #12"). Unlimited has four. Money on the boards is shown like $31.42M.
 

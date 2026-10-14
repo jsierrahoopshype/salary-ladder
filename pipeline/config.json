@@ -1,7 +1,7 @@
 {
   "season": "2026-27",
-  "roster_source": "standin",
-  "daily_job_enabled": false,
+  "roster_source": "roster_status",
+  "daily_job_enabled": true,
   "daily_number_start": null,
   "finder_repo": "jsierrahoopshype/salary-season-finder",
   "headshots_repo": "jsierrahoopshype/nba-headshots",

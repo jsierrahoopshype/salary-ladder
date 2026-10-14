@@ -8,7 +8,9 @@
 //      build tomorrow's Daily from it.
 //   2. If it still isn't in by the fallback hour, build tomorrow's Daily
 //      from the newest snapshot we have and open an issue.
-//   3. Never overwrite a published snapshot or Daily.
+//   3. If today's Daily is missing (the job was off, or missed a day), build
+//      it at once from the newest snapshot, so a Daily always exists.
+//   4. Never overwrite a published snapshot or Daily.
 //
 // Usage: node scripts/daily-job.mjs --finder DIR --headshots DIR
 //        [--now 2026-10-08T12:00:00Z] [--force]
@@ -61,17 +63,25 @@ if (!config.daily_job_enabled && !args.force) {
 }
 
 const dailyFile = dailyPath(root, tomorrow);
-if (fs.existsSync(dailyFile)) {
+const todayMissing = !fs.existsSync(dailyPath(root, today));
+if (fs.existsSync(dailyFile) && !todayMissing) {
   say(`Daily for ${tomorrow} already built. Nothing to do.`);
   finish();
 }
 
-const finderBuilt = readJson(path.join(args.finder, 'data', 'data.json')).meta.built.slice(0, 10);
+const finderBuiltAt = readJson(path.join(args.finder, 'data', 'data.json')).meta.built;
+const finderBuilt = finderBuiltAt.slice(0, 10);
+// roster_status.json is written by the same Finder run as data.json (spec
+// 25), so today's data is in only when both carry the same build time.
+const rosterFile = path.join(args.finder, 'data', 'roster_status.json');
+const rosterBuilt = config.roster_source === 'roster_status'
+  ? (fs.existsSync(rosterFile) ? readJson(rosterFile).built : 'missing') : finderBuiltAt;
 const fallbackTime = now.getUTCHours() >= config.fallback_after_utc_hour;
 say(`Run at ${now.toISOString()}. Salary Finder data built ${finderBuilt}. Building the Daily for ${tomorrow}.`);
+if (rosterBuilt !== finderBuiltAt) say(`roster_status.json (built ${rosterBuilt}) doesn't match data.json yet.`);
 
 let snapshotDate = null;
-if (finderBuilt === today) {
+if (finderBuilt === today && rosterBuilt === finderBuiltAt) {
   const snapFile = snapshotPath(root, config.season, today);
   if (fs.existsSync(snapFile)) {
     snapshotDate = today;
@@ -118,6 +128,17 @@ if (finderBuilt === today) {
     }
   }
 }
+
+// Catch-up: today's Daily, if it's missing, from the newest snapshot there is.
+if (todayMissing) {
+  const prev = latestSnapshot(root, config.season, today);
+  if (prev) {
+    const daily = makeDaily({ date: today, snapshot: readJson(prev.file), snapshotDate: prev.date, rules, config });
+    writeOnce(dailyPath(root, today), daily);
+    say(`Today's Daily was missing: saved ${path.relative(root, dailyPath(root, today))} (salaries as of ${prev.date}).`);
+  }
+}
+if (fs.existsSync(dailyFile)) finish();
 
 if (!snapshotDate) {
   if (!fallbackTime) {

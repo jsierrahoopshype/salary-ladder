@@ -6,8 +6,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPage, ROOT } from '../tools/build-page.mjs';
 import {
-  dailyDate, addDaysIso, shortDate, ageOn, money, gapText, clock, pickTiming, pairKey,
+  dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
   streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
+  voteSplit, addVotes, tokenUsable, TOKEN_USE_MS,
 } from '../page/lib.js';
 import { preparePool, newGame, applyPick, isDone, replay, CHOICE } from '../shared/game.js';
 
@@ -183,4 +184,34 @@ test('names and handles, vote pair keys', () => {
   assert.equal(cleanHandle('  '), '');
   assert.equal(pairKey(5, 100, 3, 200), pairKey(3, 200, 5, 100));
   assert.notEqual(pairKey(3, 200, 5, 100), pairKey(3, 201, 5, 100), 'a salary change makes a new pair');
+});
+
+test('one vote per pair per device: repeats go to the server as novote', () => {
+  const log = [
+    { incumbent: 1, incumbentSalary: 100, challenger: 2, challengerSalary: 105 },
+    { incumbent: 2, incumbentSalary: 105, challenger: 3, challengerSalary: 110 },
+    { incumbent: 1, incumbentSalary: 100, challenger: 2, challengerSalary: 105 }, // again in this game
+    { incumbent: 3, incumbentSalary: 110, challenger: 4, challengerSalary: 112 },
+  ];
+  const before = [pairKey(3, 110, 4, 112)];
+  const { novote, fresh } = voteSplit(log, before);
+  assert.deepEqual(novote, [2, 3]);
+  assert.deepEqual(fresh, [pairKey(1, 100, 2, 105), pairKey(2, 105, 3, 110)]);
+  // A changed salary is a new pair (spec 14.1).
+  assert.deepEqual(voteSplit([{ incumbent: 3, incumbentSalary: 111, challenger: 4, challengerSalary: 112 }], before).novote, []);
+  // The list keeps the newest, without repeats.
+  assert.deepEqual(addVotes(['a', 'b'], ['b', 'c']), ['a', 'b', 'c']);
+  assert.deepEqual(addVotes(['a', 'b', 'c'], ['d'], 3), ['b', 'c', 'd']);
+});
+
+test('board money and result tokens', () => {
+  assert.equal(boardMoney(31415926), '$31.42M');
+  assert.equal(boardMoney(62587158), '$62.59M');
+  assert.equal(boardMoney(1357763), '$1.36M');
+  const now = 1_000_000_000;
+  assert.ok(tokenUsable({ at: now - TOKEN_USE_MS + 1, used: false }, now));
+  assert.ok(!tokenUsable({ at: now - TOKEN_USE_MS, used: false }, now), 'expired: the page re-sends the game');
+  assert.ok(!tokenUsable({ at: now, used: true }, now), 'tokens work once');
+  assert.ok(!tokenUsable(undefined, now));
+  assert.ok(TOKEN_USE_MS < 15 * 60_000, 'shorter than the server allows');
 });

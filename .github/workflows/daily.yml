@@ -3,8 +3,8 @@ name: Daily data
 # Builds tomorrow's Daily once today's Salary Finder data is in (spec 17).
 # The Finder's "06:00 UTC" build has landed between 09:45 and 18:35 UTC, so
 # this tries every hour from 10:17 to 23:17 UTC; each try exits quickly if
-# there's nothing to do. Off until pipeline/config.json daily_job_enabled is
-# true (build plan C2).
+# there's nothing to do. pipeline/config.json daily_job_enabled switches it
+# off and on (on since build plan C2).
 
 on:
   schedule:
@@ -51,8 +51,11 @@ jobs:
         run: |
           git add data daily
           if git diff --cached --quiet; then echo "Nothing new."; exit 0; fi
-          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -q -m "Daily data $(date -u +%F)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Daily data $(date -u +%F)"
+          # A merge may have landed on main while this ran.
+          git pull -q --rebase
           git push
       - if: always() && steps.gate.outputs.run == 'true' && hashFiles('build/issue.md') != ''
         name: Tell Jorge
