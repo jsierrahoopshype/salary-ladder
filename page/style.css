@@ -42,6 +42,7 @@ body.playing .hdr{display:none}
 
 .loading{text-align:center;padding:3rem 1rem;color:var(--dim);font-size:.8rem}
 .fine{font-size:11px;color:#6a6a8c;letter-spacing:.5px;margin-top:18px;text-align:center}
+.fine + .fine{margin-top:6px}
 .lbl{font-family:var(--display);font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px}
 .msg{font-size:12px;color:var(--green);min-height:16px;margin-top:.4rem;text-align:center}
 .msg.err{color:var(--red)}

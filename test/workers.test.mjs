@@ -330,7 +330,8 @@ test('switched off: not configured, recording off, no Daily, and the page keeps 
   // The page still plays without a server until C2 connects it.
   const app = fs.readFileSync(new URL('../page/app.js', import.meta.url), 'utf8');
   assert.match(app, /^const API_BASE = null;/m);
-  assert.match(app, /Rankings are resting/);
+  assert.match(app, /T\('end\.resting'\)/);
+  assert.match(fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8'), /Rankings are resting/);
 });
 
 test('contract answer, end-screen percentage, totals job, CSV and clean-up', async () => {

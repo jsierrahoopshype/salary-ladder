@@ -2,6 +2,8 @@
 // card, pick timing and device storage. Tested in Node (test/page.test.mjs);
 // tools/build-page.mjs inlines this file into index.html.
 
+import { T } from './copy.js';
+
 // ---------------------------------------------------------------------------
 // Dates. Dates are 'YYYY-MM-DD' strings throughout.
 
@@ -111,11 +113,10 @@ export function streakAtStake(streak, today) {
 export const SITE_URL = 'https://hoopsmatic.com/salary-ladder/';
 
 export function shareText({ mode, number, date, score, rung, livesLeft, lives, totalMs }) {
-  const head = mode === 'daily'
-    ? `Salary Ladder${number ? ` #${number}` : ''} · ${shortDate(date)}`
-    : 'Salary Ladder · Unlimited';
+  const head = mode !== 'daily' ? T('shareText.unlimitedHead')
+    : T(number ? 'shareText.dailyHead' : 'shareText.dailyHeadNoNumber', { number, date: shortDate(date) });
   const hearts = '❤️'.repeat(Math.max(livesLeft, 0)) + '🖤'.repeat(Math.max(lives - livesLeft, 0));
-  return [head, `I reached ${money(score)} (rung ${rung})`, `${hearts} · ${clock(totalMs)}`, SITE_URL].join('\n');
+  return [head, T('shareText.line', { score: money(score), rung }), `${hearts} · ${clock(totalMs)}`, SITE_URL].join('\n');
 }
 
 /**
