@@ -4,6 +4,7 @@
 // into index.html, so the page is one file.
 
 import { CHOICE, preparePool, pickStart, newGame, applyPick, isDone, score, nextChallenger } from '../shared/game.js';
+import { T, TH } from './copy.js';
 import {
   dailyDate, shortDate, ageOn, money, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
   shareText, shareLinks, SITE_URL, store, randomHex, cleanName, cleanHandle,
@@ -157,26 +158,28 @@ function showScreen(id) {
 
 function showIntro() {
   const r = D.rules;
-  $('i-season').textContent = D.daily.season;
+  const season = esc(D.daily.season);
+  $('i-tagline').textContent = T('intro.tagline', { season: D.daily.season });
+  // How to play, with the numbers from the rules file (spec 15).
   $('i-howto').innerHTML = [
-    'Two players. Tap the one who makes more this season.',
-    'Pick the challenger right and you climb to his rung. Pick your own player right and you stay.',
-    `<b>${r.lives}</b> lives, <b>${r.timer_seconds}</b> seconds a pick. Salaries are within <b>${Math.round(r.band * 100)}%</b> of each other.`,
-    'Climb from near the bottom to the highest-paid player in the NBA.',
+    TH('intro.howto.1', { band: `<b>${Math.round(r.band * 100)}</b>`, season }),
+    TH('intro.howto.2'),
+    TH('intro.howto.3', { lives: `<b>${r.lives}</b>`, seconds: `<b>${r.timer_seconds}</b>` }),
+    TH('intro.howto.4'),
   ].map((t) => `<li>${t}</li>`).join('');
 
   const streak = store.get('streak');
   const n = liveStreak(streak, D.daily.date);
   const s = $('i-streak');
   s.hidden = n === 0;
-  s.textContent = streakAtStake(streak, D.daily.date) ? `🔥 ${n}-day streak at stake` : `🔥 ${n}-day streak`;
+  s.textContent = T(streakAtStake(streak, D.daily.date) ? 'intro.streakAtStake' : 'intro.streak', { n });
 
-  const num = D.daily.number ? ` #${D.daily.number}` : '';
-  $('i-daily').textContent = dailyResult() ? "See today's Daily result"
-    : settle('daily') ? "Continue today's Daily" : `Play the Daily${num}`;
-  $('i-unlimited').textContent = settle('unlimited') ? 'Continue Unlimited' : 'Play Unlimited';
-  $('i-foot').textContent = `Salaries as of ${shortDate(D.daily.salaries_as_of)}` +
-    (D.preview ? ' · Preview: the real Daily and rankings start at launch' : '');
+  const number = D.daily.number;
+  $('i-daily').textContent = dailyResult() ? T('intro.dailyDone')
+    : settle('daily') ? T('intro.continueDaily') : T(number ? 'intro.playDailyNumbered' : 'intro.playDaily', { number });
+  $('i-unlimited').textContent = T(settle('unlimited') ? 'intro.continueUnlimited' : 'intro.playUnlimited');
+  $('i-foot').textContent = [T('salariesAsOf', { date: shortDate(D.daily.salaries_as_of) }),
+    D.preview && T('intro.preview')].filter(Boolean).join(' · ');
   showScreen('intro');
   preloadFirstPairs();
 }
@@ -234,18 +237,24 @@ function initials(name) {
 
 const teamName = (p) => TEAMS[p.team] ?? p.team;
 
+/** 'Daily #12', 'Daily' (no number yet) or 'Unlimited'. */
+const modeName = (mode, number) =>
+  mode !== 'daily' ? T('mode.unlimited') : T(number ? 'mode.dailyNumbered' : 'mode.daily', { number });
+
+const livesLeft = (n) => (n === 1 ? T('lives.one') : T('lives.other', { n }));
+
 /** Position and age. Either is simply left out when the data has none
  * (e.g. a player the Salary Finder has no position for yet). */
 function posAge(p) {
   const age = ageOn(p.born, D.daily.date);
-  return [p.pos, age === null ? null : `Age ${age}`].filter(Boolean).join(' · ');
+  return [p.pos, age === null ? null : T('card.age', { age })].filter(Boolean).join(' · ');
 }
 
 const metaLine = (p) => [teamName(p), posAge(p)].filter(Boolean).join(' · ');
 
 function fillCard(el, p, role) {
   el.classList.remove('revealed', 'richer', 'right', 'wrong', 'enter', 'climb');
-  const label = role === 'inc' ? 'Your rung' : 'Challenger';
+  const label = T(role === 'inc' ? 'card.incumbent' : 'card.challenger');
   el.setAttribute('aria-label', `${label}: ${p.name}, ${metaLine(p)}`);
   if (el.dataset.id === String(p.id)) {
     el.querySelector('.sal').textContent = '';
@@ -261,7 +270,7 @@ function fillCard(el, p, role) {
     `<span class="pname">${esc(p.name)}</span>` +
     `<span class="pmeta team"><img class="logo" src="${esc(logoUrl(p))}" alt=""><span>${esc(teamName(p))}</span></span>` +
     `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
-    `<span class="sal"></span><span class="gap"></span><span class="more">Paid more</span>`;
+    `<span class="sal"></span><span class="gap"></span><span class="more">${esc(T('card.paidMore'))}</span>`;
   el.querySelector('.logo').addEventListener('error', (e) => e.target.remove(), { once: true });
 }
 
@@ -311,18 +320,18 @@ function preloadNext() {
 
 function renderStatus() {
   const { state, g } = G;
-  $('p-mode').textContent = g.mode === 'daily' ? `Daily${g.number ? ` #${g.number}` : ''}` : 'Unlimited';
+  $('p-mode').textContent = modeName(g.mode, g.number);
   const h = $('p-hearts');
   h.innerHTML = Array.from({ length: g.rules.lives }, (_, i) =>
     `<span class="${i < state.lives ? 'full' : 'empty'}">♥</span>`).join('');
-  h.setAttribute('aria-label', `${state.lives} of ${g.rules.lives} lives left`);
+  h.setAttribute('aria-label', T('play.livesLabel', { lives: state.lives, max: g.rules.lives }));
   $('p-rung').textContent = state.rung;
   $('p-score').textContent = money(score(D.pool, state));
 }
 
 function setTimer(leftMs, maxMs, idle = false) {
   $('t-bar').style.transform = `scaleX(${Math.max(leftMs, 0) / maxMs})`;
-  $('t-secs').textContent = `${Math.ceil(Math.max(leftMs, 0) / 1000)}s`;
+  $('t-secs').textContent = T('play.seconds', { n: Math.ceil(Math.max(leftMs, 0) / 1000) });
   $('timer').classList.toggle('warn', !idle && leftMs <= 3000);
   $('timer').classList.toggle('idle', idle);
 }
@@ -403,11 +412,11 @@ function reveal(r) {
     picked.querySelector('.mark').textContent = r.correct ? '✓' : '✗';
   }
   const { state } = G;
-  const lives = `${state.lives} ${state.lives === 1 ? 'life' : 'lives'} left`;
+  const left = state.over ? T('lives.gameOver') : livesLeft(state.lives);
   const text =
-    r.correct && r.climbed ? (state.finished ? '✓ Right. You reached the top!' : `✓ Right. Up to rung ${state.rung}`) :
-    r.correct ? '✓ Right. You hold your rung' :
-    `${r.choice === CHOICE.TIMEOUT ? "✗ Time's up" : '✗ Wrong'}. ${state.over ? 'Game over' : lives}`;
+    r.correct && r.climbed ? (state.finished ? T('result.top') : T('result.climb', { rung: state.rung })) :
+    r.correct ? T('result.hold') :
+    T(r.choice === CHOICE.TIMEOUT ? 'result.timeout' : 'result.wrong', { left });
   $('p-result').textContent = text;
   $('p-result').className = `result ${r.correct ? 'ok' : 'bad'}`;
   setTimer(0, 1, true);
@@ -477,20 +486,20 @@ function showEnd(summary) {
   const end = D.pool.byId.get(summary.endId);
   // The 73-9 record: the big number, then badges, then one line of detail.
   // "You reached" is read out with the number but not shown above it (no eyebrows).
-  $('e-score').innerHTML = `<span class="sr">You reached </span>${money(summary.score)}`;
+  $('e-score').innerHTML = `<span class="sr">${TH('end.reached')} </span>${money(summary.score)}`;
   const grades = [
-    summary.finished && '<span class="grade top">Top of the ladder</span>',
-    summary.newBest && '<span class="grade best">New personal best!</span>',
+    summary.finished && `<span class="grade top">${TH('end.top')}</span>`,
+    summary.newBest && `<span class="grade best">${TH('end.newBest')}</span>`,
   ].filter(Boolean);
   $('e-grade').innerHTML = grades.join(' ');
   $('e-grade').hidden = grades.length === 0;
-  const lives = `${summary.livesLeft}/${summary.lives}`;
-  $('e-sub').innerHTML = `You reached rung <b>${summary.rung}</b> · <b>${lives}</b> lives left · <b>${clock(summary.totalMs)}</b>`;
+  $('e-sub').innerHTML = TH('end.summary', {
+    rung: `<b>${summary.rung}</b>`, left: `<b>${summary.livesLeft}</b>`, lives: `<b>${summary.lives}</b>`, time: `<b>${clock(summary.totalMs)}</b>`,
+  });
   $('e-player').innerHTML = end ? playerRow(end) : '';
-  const modeName = summary.mode === 'daily' ? 'Daily' : 'Unlimited';
-  $('e-best').innerHTML = `Personal best (${modeName}): <b>${money(summary.best)}</b>`;
+  $('e-best').innerHTML = TH('end.best', { mode: TH(summary.mode === 'daily' ? 'mode.daily' : 'mode.unlimited'), score: `<b>${money(summary.best)}</b>` });
   // "Higher than X% of today's players" and the boards need the server (C2).
-  $('e-rank').textContent = serverOn(D.rules) ? '' : 'Rankings are resting. Score not recorded.';
+  $('e-rank').textContent = serverOn(D.rules) ? '' : T('end.resting');
 
   // Name entry: one name per device (spec 12.2).
   const saved = store.get('name');
@@ -501,13 +510,15 @@ function showEnd(summary) {
 
   showContract(summary);
 
-  $('e-next').textContent = summary.mode === 'daily' ? 'Play Unlimited' : 'Play again';
+  $('e-next').textContent = T(summary.mode === 'daily' ? 'end.playUnlimited' : 'end.playAgain');
   $('e-next').onclick = () => startGame('unlimited');
   $('e-share').onclick = () => openShare(summary);
   // Which game this was goes in the footer, not in a label above the score.
-  const which = summary.mode === 'daily'
-    ? `Daily${summary.number ? ` #${summary.number}` : ''} · ${shortDate(summary.date)}` : 'Unlimited';
-  $('e-foot').textContent = `${which} · Salaries as of ${shortDate(summary.dataDate)}` + (D.preview ? ' · Preview data' : '');
+  const daily = summary.mode === 'daily';
+  $('e-foot').textContent = [
+    modeName(summary.mode, summary.number), daily && shortDate(summary.date),
+    T('salariesAsOf', { date: shortDate(summary.dataDate) }), D.preview && T('end.previewData'), daily && T('end.nextDaily'),
+  ].filter(Boolean).join(' · ');
   showScreen('end');
   preloadFirstPairs(); // for Play again / Play Unlimited
 }
@@ -527,7 +538,7 @@ function showContract(summary) {
       summary.contract = Number(b.dataset.id);
       if (summary.mode === 'daily') store.set('daily', { date: summary.date, summary });
       showContract(summary);
-      $('e-contract-msg').textContent = 'Thanks, noted.';
+      $('e-contract-msg').textContent = T('contract.thanks');
     };
   }
 }
@@ -537,7 +548,7 @@ $('e-name').addEventListener('submit', (e) => {
   const name = cleanName($('e-name-input').value);
   const msg = $('e-name-msg');
   if (!name) {
-    msg.textContent = 'Names are 2 to 24 characters.';
+    msg.textContent = T('name.length');
     msg.className = 'msg err';
     return;
   }
@@ -545,7 +556,7 @@ $('e-name').addEventListener('submit', (e) => {
   $('e-handle-input').value = handle;
   store.set('name', { name, handle });
   msg.className = 'msg';
-  msg.textContent = serverOn(D.rules) ? '' : 'Saved on this device. Rankings are resting, so it is not on a board yet.';
+  msg.textContent = serverOn(D.rules) ? '' : T('name.savedResting');
 });
 
 // ---------------------------------------------------------------------------
@@ -604,10 +615,11 @@ function drawCard(sm) {
   // Title, and which game (the share text's first line).
   const grd = ctx.createLinearGradient(W / 2 - 400, 0, W / 2 + 400, 0);
   grd.addColorStop(0, '#ff6b35'); grd.addColorStop(0.5, '#ffd700'); grd.addColorStop(1, '#ff6b35');
-  spacing(ctx, '4px'); ctx.fillStyle = grd; fitFont(ctx, 'SALARY LADDER', W - 160, 700, 112, DISPLAY, 70);
-  ctx.fillText('SALARY LADDER', W / 2, 190);
-  const which = sm.mode === 'daily'
-    ? `DAILY${sm.number ? ` #${sm.number}` : ''}  ·  ${shortDate(sm.date).toUpperCase()}` : 'UNLIMITED';
+  const title = T('app.name').toUpperCase();
+  spacing(ctx, '4px'); ctx.fillStyle = grd; fitFont(ctx, title, W - 160, 700, 112, DISPLAY, 70);
+  ctx.fillText(title, W / 2, 190);
+  const which = (sm.mode === 'daily'
+    ? `${modeName('daily', sm.number)}  ·  ${shortDate(sm.date)}` : modeName('unlimited')).toUpperCase();
   spacing(ctx, '4px'); ctx.fillStyle = '#ffd84d'; ctx.font = `700 30px ${DISPLAY}`;
   ctx.fillText(which, W / 2, 262);
 
@@ -615,7 +627,8 @@ function drawCard(sm) {
   spacing(ctx, '0px'); ctx.fillStyle = '#fff'; fitFont(ctx, money(sm.score), W - 200, 700, 190, DISPLAY, 100);
   ctx.fillText(money(sm.score), W / 2, 470);
   spacing(ctx, '3px'); ctx.fillStyle = '#dcdcf7'; ctx.font = `700 28px ${DISPLAY}`;
-  ctx.fillText(sm.finished ? `TOP OF THE LADDER  ·  RUNG ${sm.rung}` : `RUNG ${sm.rung}`, W / 2, 528);
+  const rung = T('image.rung', { rung: sm.rung });
+  ctx.fillText((sm.finished ? `${T('end.top')}  ·  ${rung}` : rung).toUpperCase(), W / 2, 528);
 
   // The climb: one bar per rung, rising to the last one.
   const n = Math.min(Math.max(sm.rung, 1), 40);
@@ -634,7 +647,7 @@ function drawCard(sm) {
 
   // Lives and time, in two tiles.
   const ty = 920, th = 210, tw = (W - 96 * 2 - 24) / 2;
-  for (const [i, label] of ['LIVES', 'TIME'].entries()) {
+  for (const [i, label] of [T('image.lives'), T('image.time')].map((l) => l.toUpperCase()).entries()) {
     const tx = 96 + i * (tw + 24);
     ctx.fillStyle = 'rgba(255,255,255,0.04)'; roundRect(ctx, tx, ty, tw, th, 18); ctx.fill();
     spacing(ctx, '3px'); ctx.fillStyle = '#9a9ac8'; ctx.font = `700 24px ${DISPLAY}`;
@@ -649,8 +662,9 @@ function drawCard(sm) {
   ctx.fillText(clock(sm.totalMs), 96 + tw + 24 + tw / 2, ty + 120);
 
   // Footer.
-  spacing(ctx, '2px'); ctx.fillStyle = '#aeaed4'; fitFont(ctx, 'CLIMB YOUR OWN LADDER AT HOOPSMATIC.COM/SALARY-LADDER', W - 140, 700, 26, DISPLAY, 18);
-  ctx.fillText('CLIMB YOUR OWN LADDER AT HOOPSMATIC.COM/SALARY-LADDER', W / 2, H - 76);
+  const footer = T('image.footer').toUpperCase();
+  spacing(ctx, '2px'); ctx.fillStyle = '#aeaed4'; fitFont(ctx, footer, W - 140, 700, 26, DISPLAY, 18);
+  ctx.fillText(footer, W / 2, H - 76);
   spacing(ctx, '0px');
   return cv;
 }
@@ -686,17 +700,17 @@ async function openShare(summary) {
   ov.className = 'share-modal';
   ov.setAttribute('role', 'dialog');
   ov.setAttribute('aria-modal', 'true');
-  ov.setAttribute('aria-label', 'Share your result');
+  ov.setAttribute('aria-label', T('share.dialog'));
   const canCopyImage = Boolean(blob && navigator.clipboard && window.ClipboardItem);
   ov.innerHTML = '<div class="share-box">' +
-    '<button class="share-x" type="button" aria-label="Close">×</button>' +
+    `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
     (url ? `<img class="share-img" alt="${esc(text.split('\n').slice(0, 3).join('. '))}" src="${url}">` : '') +
-    `<div class="share-link"><input class="share-url" readonly value="${esc(SITE_URL)}" aria-label="Link"><button class="share-copybtn" type="button" data-act="copylink">Copy</button></div>` +
+    `<div class="share-link"><input class="share-url" readonly value="${esc(SITE_URL)}" aria-label="${TH('share.link')}"><button class="share-copybtn" type="button" data-act="copylink">${TH('share.copyLink')}</button></div>` +
     '<div class="share-social">' + SOCIAL.map(([k, name]) =>
-      `<button class="soc soc-${k}" type="button" data-soc="${k}" aria-label="Share on ${name}">${SOCIAL_ICON[k]}<span>${name}</span></button>`).join('') + '</div>' +
+      `<button class="soc soc-${k}" type="button" data-soc="${k}" aria-label="${TH('share.on', { platform: name })}">${SOCIAL_ICON[k]}<span>${name}</span></button>`).join('') + '</div>' +
     '<div class="share-btns">' +
-      (blob ? '<button class="btn" type="button" data-act="download">Download</button>' : '') +
-      (canCopyImage ? '<button class="btn ghost" type="button" data-act="copy">Copy</button>' : '') +
+      (blob ? `<button class="btn" type="button" data-act="download">${TH('share.download')}</button>` : '') +
+      (canCopyImage ? `<button class="btn ghost" type="button" data-act="copy">${TH('share.copyImage')}</button>` : '') +
       `<button class="btn ghost" type="button" data-act="again">${esc($('e-next').textContent)}</button>` +
     '</div>' +
     '<p class="share-msg" aria-live="polite"></p></div>';
@@ -725,14 +739,14 @@ async function openShare(summary) {
         a.download = 'salary-ladder.png';
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-        msg.textContent = 'Saved to your downloads.';
+        msg.textContent = T('share.saved');
       } else if (act === 'copy') {
-        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = 'Image copied. Paste it anywhere.'; }
-        catch { msg.textContent = 'Copy blocked here. Use Download.'; }
+        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = T('share.imageCopied'); }
+        catch { msg.textContent = T('share.imageBlocked'); }
       } else if (act === 'copylink') {
         // The whole text card (spec 9), the link on its last line.
-        try { await navigator.clipboard.writeText(text); msg.textContent = 'Text + link copied.'; }
-        catch { field.value = text; field.select(); msg.textContent = 'Copy blocked here. The text is selected.'; }
+        try { await navigator.clipboard.writeText(text); msg.textContent = T('share.textCopied'); }
+        catch { field.value = text; field.select(); msg.textContent = T('share.textBlocked'); }
       }
     };
   }
@@ -763,5 +777,5 @@ load().then(() => {
   showIntro();
 }).catch((err) => {
   console.error(err);
-  $('loading').textContent = "Couldn't load the salaries. Check your connection and reload.";
+  $('loading').textContent = T('app.loadFailed');
 });
