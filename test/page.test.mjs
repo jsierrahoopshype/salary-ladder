@@ -63,6 +63,11 @@ test('boards: places run 1, 2, 3 with no gaps, ties share one; your row by handl
   assert.equal(weekStart('2026-10-18'), '2026-10-12', 'Sunday is the end of the week');
 });
 
+test('page: board styles stay inside the boards window', () => {
+  // A bare .empty rule also hits the empty hearts in the play screen's top bar.
+  assert.doesNotMatch(read('page/style.css'), /^\.empty\{/m);
+});
+
 test('page: the HoopsMatic nav bar is hidden during play', () => {
   assert.match(read('index.html'), /body\.playing #hm-nav\{display:none!important\}/);
 });
