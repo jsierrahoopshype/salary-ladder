@@ -1,13 +1,14 @@
-// The Salary Ladder page (build plan B1). Plays the whole game in the
-// browser with the shared game logic; the server only verifies and ranks.
+// The Salary Ladder page (build plan B1, connected to the server in C2).
+// Plays the whole game in the browser with the shared game logic; the server
+// only verifies and ranks.
 // tools/build-page.mjs inlines this file, page/lib.js and shared/game.js
 // into index.html, so the page is one file.
 
 import { CHOICE, preparePool, pickStart, newGame, applyPick, isDone, score, nextChallenger } from '../shared/game.js';
 import { T, TH } from './copy.js';
 import {
-  dailyDate, shortDate, ageOn, money, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
-  shareText, shareLinks, SITE_URL, store, randomHex, cleanName, cleanHandle,
+  dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
+  shareText, shareLinks, SITE_URL, store, randomHex, cleanName, cleanHandle, voteSplit, addVotes, tokenUsable,
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
@@ -45,9 +46,12 @@ document.addEventListener('error', (e) => {
     img.closest('.face').classList.add('noimg');
   }
 }, true);
-// Build plan C2 points this at https://hoopsmatic.com/salary-ladder/api/.
-// Until then the page plays without a server and says rankings are resting.
-const API_BASE = null;
+// The game's two Workers (workers/README.md). The address is absolute, so
+// the GitHub Pages preview reaches them too (the Workers allow that origin).
+const API_BASE = 'https://hoopsmatic.com/salary-ladder/api/';
+const API_WAIT_MS = 8000;     // longest wait for any server answer
+const START_WAIT_MS = 2500;   // longest an Unlimited start waits for its ticket
+const TICKET_KEEP_MS = 12 * 3600_000; // a ticket fetched ahead is used within this
 const ENTER_MS = 240;       // card entrance animation (style.css)
 const IMAGE_WAIT_MS = 2000; // longest wait for a headshot before the clock starts anyway
 
@@ -64,18 +68,40 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Loaded data: today's Daily (or the preview stand-in), the live rules file
-// and the prepared pool.
-const D = { today: null, daily: null, rules: null, pool: null, preview: false, nextSeed: null };
+// Loaded data: today's Daily, the live rules file and the prepared pool.
+// `next` is the next Unlimited game, set up ahead (newRecord).
+const D = { today: null, daily: null, rules: null, pool: null, next: null, nextPending: null };
 // The game on screen: {g: saved game, state, last, armed, t0, timer, turn}.
 let G = null;
 
 // ---------------------------------------------------------------------------
-// Server (build plan B2/C2). Off until API_BASE is set; `recording: false` in
-// the rules file also switches it off. Every failure means "Rankings are
-// resting" and play carries on (spec 18.2).
+// Server (build plan B2/C2). `recording: false` in the rules file switches it
+// off. Every failure means "Rankings are resting" and play carries on (spec
+// 18.2): one attempt per call, no retry loops.
 
 const serverOn = (rules) => Boolean(API_BASE) && rules.recording !== false;
+
+/** One call to the server. Always resolves: the answer, or {ok: false, error}. */
+async function api(path, body) {
+  if (!serverOn(D.rules)) return { ok: false, error: 'resting' };
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), API_WAIT_MS);
+  try {
+    const r = await fetch(API_BASE + path, body === undefined ? { signal: ctl.signal } : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal,
+    });
+    const data = await r.json();
+    return data && typeof data === 'object' ? data : { ok: false, error: 'resting' };
+  } catch {
+    return { ok: false, error: 'resting' };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Answers that mean the game itself didn't pass the server's check, as
+// opposed to the server being away (spec 13.1: "Score not verified, retry").
+const NOT_VERIFIED = /^not verified|^bad picks|^bad or expired ticket|^this game is too old|^this game code was already used|^salary data for this game|^rules mismatch|^token already used/;
 
 // ---------------------------------------------------------------------------
 // Loading
@@ -93,19 +119,10 @@ async function load() {
     getJson(`daily/${D.today}.json`).catch(() => null),
   ]);
   D.rules = rules;
-  if (daily) {
-    D.daily = daily;
-  } else {
-    // No Daily files until the daily job is switched on (build plan C2):
-    // a preview Daily from the preview pool, the same for everyone that day.
-    const snap = await getJson('preview/snapshot.json');
-    const seed = `preview:${D.today}`;
-    D.daily = {
-      date: D.today, number: null, season: snap.season, salaries_as_of: snap.date, rules, seed,
-      start: pickStart(preparePool(snap.players), rules, seed), players: snap.players,
-    };
-    D.preview = true;
-  }
+  // The daily job builds each Daily the day before and catches up a missing
+  // one (spec 17). If today's still isn't published, yesterday's keeps the
+  // game playable; the server only knows today's, so rankings rest.
+  D.daily = daily ?? await getJson(`daily/${addDaysIso(D.today, -1)}.json`);
   D.pool = preparePool(D.daily.players);
 }
 
@@ -178,10 +195,10 @@ function showIntro() {
   $('i-daily').textContent = dailyResult() ? T('intro.dailyDone')
     : settle('daily') ? T('intro.continueDaily') : T(number ? 'intro.playDailyNumbered' : 'intro.playDaily', { number });
   $('i-unlimited').textContent = T(settle('unlimited') ? 'intro.continueUnlimited' : 'intro.playUnlimited');
-  $('i-foot').textContent = [T('salariesAsOf', { date: shortDate(D.daily.salaries_as_of) }),
-    D.preview && T('intro.preview')].filter(Boolean).join(' · ');
+  $('i-foot').textContent = T('salariesAsOf', { date: shortDate(D.daily.salaries_as_of) });
   showScreen('intro');
   preloadFirstPairs();
+  prepareUnlimited();
 }
 
 // ---------------------------------------------------------------------------
@@ -191,15 +208,52 @@ function showIntro() {
 function newRecord(mode) {
   const d = D.daily;
   if (mode === 'daily') {
-    return { mode, date: d.date, number: d.number, dataDate: d.salaries_as_of, rules: d.rules, seed: d.seed, startId: d.start };
+    return { mode, date: d.date, number: d.number, dataDate: d.salaries_as_of, rules: d.rules, seed: d.seed, startId: d.start, ticket: null };
   }
-  // Unlimited: a fresh random start every game (spec 11). The seed is rolled
-  // ahead, so the intro can download the first pair's photos; the game that
-  // starts uses it and the next game gets a new one. C2 takes the seed from
-  // the server's start ticket instead.
-  D.nextSeed ??= randomHex();
-  return { mode, date: d.date, number: null, dataDate: d.salaries_as_of, rules: D.rules, seed: D.nextSeed,
-    startId: pickStart(D.pool, D.rules, D.nextSeed) };
+  // Unlimited: a fresh random start every game (spec 11), set up ahead so the
+  // intro can download the first pair's photos; the game that starts uses it
+  // and the next game gets a new one.
+  const n = (D.next ??= localUnlimited());
+  return { mode, date: d.date, number: null, dataDate: d.salaries_as_of, rules: n.rules, seed: n.seed, startId: n.startId, ticket: n.ticket };
+}
+
+/** An Unlimited game the page sets up by itself, for when the server can't. */
+function localUnlimited() {
+  const seed = randomHex();
+  return { seed, startId: pickStart(D.pool, D.rules, seed), rules: D.rules, ticket: null, at: Date.now(), asked: false };
+}
+
+/**
+ * Asks the server for the next Unlimited game's start ticket (spec 11, 13.1):
+ * the server picks the seed and the start, so the game can be verified. One
+ * attempt per game. Without an answer the page's own seed is played and
+ * rankings rest for that game.
+ */
+function prepareUnlimited() {
+  if (D.next && D.next.ticket && Date.now() - D.next.at > TICKET_KEEP_MS) D.next = null;
+  const n = (D.next ??= localUnlimited());
+  if (n.asked || !serverOn(D.rules)) return D.nextPending ?? Promise.resolve();
+  n.asked = true;
+  D.nextPending = api('start', { mode: 'unlimited' }).then((r) => {
+    D.nextPending = null;
+    // The ticket's day decides which Daily's salaries the server checks the
+    // game against: it must be the one this page plays with.
+    if (!r.ok || r.day !== D.daily.date || !r.rules || !D.pool.byId.has(r.start) || D.next !== n) return;
+    D.next = { seed: r.seed, startId: r.start, rules: r.rules, ticket: r.ticket, at: Date.now(), asked: true };
+    if ($('play').hidden) preloadFirstPairs();
+  });
+  return D.nextPending;
+}
+
+/** The Daily's start ticket (spec 13.1), asked for when the game starts. */
+function requestTicket(g) {
+  api('start', { mode: 'daily' }).then((r) => {
+    if (!r.ok || r.day !== g.date || g.ticket) return;
+    g.ticket = r.ticket;
+    // Saved with the game, unless it has already ended.
+    const saved = store.get(liveKey(g.mode));
+    if (saved && saved.date === g.date && saved.seed === g.seed) store.set(liveKey(g.mode), { ...saved, ticket: r.ticket });
+  });
 }
 
 /**
@@ -216,12 +270,22 @@ function preloadFirstPairs() {
   }
 }
 
-function startGame(mode) {
+let starting = false;
+
+async function startGame(mode) {
+  if (starting) return;
   if (mode === 'daily' && dailyResult()) return showEnd(dailyResult());
   let g = settle(mode);
   if (!g) {
-    g = { ...newRecord(mode), picks: [], pending: false, ticket: null };
-    if (mode === 'unlimited') D.nextSeed = null;
+    if (mode === 'unlimited') {
+      // Usually the ticket is already here; never wait long for it.
+      starting = true;
+      await Promise.race([prepareUnlimited(), wait(START_WAIT_MS)]);
+      starting = false;
+    }
+    g = { ...newRecord(mode), picks: [], pending: false };
+    if (mode === 'unlimited') D.next = null;
+    else requestTicket(g);
     store.set(liveKey(mode), g);
   }
   const { state, last } = rebuild(g);
@@ -447,6 +511,9 @@ function finish() {
     score: score(D.pool, state), endId: state.incumbent, rung: state.rung,
     livesLeft: state.lives, lives: g.rules.lives, totalMs: state.totalMs, finished: state.finished,
     picks: g.picks.length, pair: last ? [last.incumbent, last.challenger] : null, contract: null,
+    // What the server needs to check this game (spec 13.1), and what it said.
+    game: gameOf(g),
+    server: g.ticket && serverOn(D.rules) ? 'pending' : 'resting', rank: null,
   };
 
   // Personal best, one per mode (spec 9).
@@ -461,19 +528,87 @@ function finish() {
   }
 
   // Today's best game per mode, kept so a name claimed later can back-credit
-  // it (spec 12.2). C2 sends it with its start ticket for verification.
+  // it (spec 12.2): its start ticket and picks, which the server can check
+  // again. A game without a ticket can't be checked, so it isn't kept.
   const today = store.get('today', {});
   const prev = today[g.mode];
-  if (!prev || prev.date !== D.today || summary.score > prev.score ||
-      (summary.score === prev.score && summary.totalMs < prev.totalMs)) {
-    today[g.mode] = {
-      date: D.today, score: summary.score, totalMs: summary.totalMs, dataDate: g.dataDate,
-      rulesVersion: g.rules.version, seed: g.seed, startId: g.startId, picks: g.picks, ticket: g.ticket,
-    };
+  if (g.ticket && (!prev || prev.date !== D.today || summary.score > prev.score ||
+      (summary.score === prev.score && summary.totalMs < prev.totalMs))) {
+    today[g.mode] = { date: D.today, score: summary.score, totalMs: summary.totalMs, game: gameOf(g) };
     store.set('today', today);
   }
   store.remove(liveKey(g.mode));
   showEnd(summary);
+}
+
+// ---------------------------------------------------------------------------
+// Recording a game (spec 13.1, 14): the server replays it, records it once
+// and answers with the end-screen percentage and a result token for the
+// boards. Sending the same game again gets the same answer and a fresh token.
+
+// Result tokens by start ticket. Kept in memory only: they last 15 minutes.
+const tokens = new Map();
+// The answer still on its way for a ticket, so nothing asks twice at once.
+const sending = new Map();
+
+/** What the server needs to check a game, and the page to rebuild it. */
+const gameOf = (g) => (g.ticket ? { ticket: g.ticket, picks: g.picks, seed: g.seed, startId: g.startId, rules: g.rules } : null);
+
+/**
+ * Sends a game to the server, or sends it again. Resolves to the server's
+ * answer. The pairs are rebuilt from the game's seed and start, so pairs
+ * this device has already voted on can be left out of the totals.
+ */
+function sendGame(game) {
+  if (sending.has(game.ticket)) return sending.get(game.ticket);
+  const state = newGame({ pool: D.pool, rules: game.rules, seed: game.seed, startId: game.startId });
+  let log = [];
+  try { log = game.picks.map((p) => applyPick(D.pool, game.rules, state, p.c, p.ms)); } catch { /* the server will say */ }
+  const voted = store.get('voted', []);
+  const { novote, fresh } = voteSplit(log, voted);
+  const p = api('finish', { ticket: game.ticket, picks: game.picks, novote }).then((r) => {
+    sending.delete(game.ticket);
+    if (r.ok) {
+      tokens.set(game.ticket, { token: r.token, at: Date.now(), used: false });
+      // Only pairs from a recorded game count as voted (spec 14.1).
+      store.set('voted', addVotes(store.get('voted', []), fresh));
+    }
+    return r;
+  });
+  sending.set(game.ticket, p);
+  return p;
+}
+
+/** The summary on the end screen right now, if any. */
+let shown = null;
+
+/** Sends a finished game and shows what the server says. */
+async function record(summary) {
+  if (summary.server !== 'pending' || !summary.game) return;
+  const r = await sendGame(summary.game);
+  summary.server = r.ok ? 'ok' : 'resting';
+  summary.rank = r.ok ? r.rank : null;
+  if (summary.mode === 'daily') store.set('daily', { date: summary.date, summary });
+  if (shown === summary) showRank(summary);
+  // A device with a name posts its best game of the day by itself (spec 12.2).
+  if (r.ok && store.get('name') && isTodaysBest(summary)) postName(summary);
+}
+
+function isTodaysBest(summary) {
+  const best = store.get('today', {})[summary.mode];
+  return Boolean(best && best.date === D.today && best.game && best.game.ticket === summary.game?.ticket);
+}
+
+/** "Higher than X% of today's players" (spec 9), or why there isn't one. */
+function showRank(summary) {
+  const el = $('e-rank');
+  const rank = summary.rank;
+  el.textContent = summary.server === 'pending' ? ''
+    : summary.server !== 'ok' ? T('end.resting')
+    // No games counted yet today (the counts refresh every 5 minutes): nothing to compare with.
+    : !rank || rank.pct == null ? ''
+    : T(rank.early ? 'end.rankEarly' : 'end.rank', { pct: rank.pct });
+  $('e-boards').hidden = summary.server !== 'ok';
 }
 
 const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
@@ -498,15 +633,17 @@ function showEnd(summary) {
   });
   $('e-player').innerHTML = end ? playerRow(end) : '';
   $('e-best').innerHTML = TH('end.best', { mode: TH(summary.mode === 'daily' ? 'mode.daily' : 'mode.unlimited'), score: `<b>${money(summary.best)}</b>` });
-  // "Higher than X% of today's players" and the boards need the server (C2).
-  $('e-rank').textContent = serverOn(D.rules) ? '' : T('end.resting');
+  shown = summary;
+  // Sends the game; also re-sends one whose answer never came (the page was closed first).
+  if (summary.server === 'pending' && summary.game && !sending.has(summary.game.ticket)) record(summary);
+  showRank(summary);
+  $('e-boards').onclick = () => openBoards(summary);
 
   // Name entry: one name per device (spec 12.2).
   const saved = store.get('name');
   $('e-name-input').value = saved?.name ?? '';
   $('e-handle-input').value = saved?.handle ?? '';
-  $('e-name-msg').textContent = '';
-  $('e-name-msg').className = 'msg';
+  nameMsg('');
 
   showContract(summary);
 
@@ -517,10 +654,11 @@ function showEnd(summary) {
   const daily = summary.mode === 'daily';
   $('e-foot').textContent = [
     modeName(summary.mode, summary.number), daily && shortDate(summary.date),
-    T('salariesAsOf', { date: shortDate(summary.dataDate) }), D.preview && T('end.previewData'), daily && T('end.nextDaily'),
+    T('salariesAsOf', { date: shortDate(summary.dataDate) }), daily && T('end.nextDaily'),
   ].filter(Boolean).join(' · ');
   showScreen('end');
   preloadFirstPairs(); // for Play again / Play Unlimited
+  prepareUnlimited();
 }
 
 function showContract(summary) {
@@ -533,31 +671,152 @@ function showContract(summary) {
     `<button class="opt" type="button" data-id="${p.id}" aria-pressed="${summary.contract === p.id}"${summary.contract ? ' disabled' : ''}>` +
     `${face(p)}<span class="pname">${esc(p.name)}</span><span class="sal">${money(p.salary)}</span></button>`).join('');
   for (const b of box.querySelectorAll('.opt')) {
-    b.onclick = () => {
-      // One optional tap. Saved with the game; C2 adds it to the game record (spec 14).
+    b.onclick = async () => {
+      // One optional tap, added to the game's record (spec 14.1) once the
+      // server has the record.
       summary.contract = Number(b.dataset.id);
       if (summary.mode === 'daily') store.set('daily', { date: summary.date, summary });
       showContract(summary);
       $('e-contract-msg').textContent = T('contract.thanks');
+      if (!summary.game) return;
+      if (sending.has(summary.game.ticket)) await sending.get(summary.game.ticket);
+      if (summary.server === 'ok') api('contract', { ticket: summary.game.ticket, id: summary.contract });
     };
   }
+}
+
+/** The name box's message: text, or HTML when `html`; `err` colours it as a problem. */
+function nameMsg(text, { err = false, html = false } = {}) {
+  const msg = $('e-name-msg');
+  msg[html ? 'innerHTML' : 'textContent'] = text;
+  msg.className = err ? 'msg err' : 'msg';
 }
 
 $('e-name').addEventListener('submit', (e) => {
   e.preventDefault();
   const name = cleanName($('e-name-input').value);
-  const msg = $('e-name-msg');
-  if (!name) {
-    msg.textContent = T('name.length');
-    msg.className = 'msg err';
-    return;
-  }
+  if (!name) return nameMsg(T('name.length'), { err: true });
   const handle = cleanHandle($('e-handle-input').value);
   $('e-handle-input').value = handle;
   store.set('name', { name, handle });
-  msg.className = 'msg';
-  msg.textContent = serverOn(D.rules) ? '' : T('name.savedResting');
+  if (shown) postName(shown);
 });
+
+/** Board labels for the rank lines and the boards window (spec 12.1). */
+const BOARD_KEYS = { day: 'board.today', week: 'board.week', month: 'board.month' };
+function boardLabel(label, summary) {
+  if (label === 'daily') return modeName('daily', summary.number);
+  if (label === 'all') return T('board.allTime', { season: D.daily.season });
+  return T(BOARD_KEYS[label] ?? label);
+}
+
+let posting = null;
+
+/**
+ * Puts the device's name on the boards with today's best game in this mode
+ * (spec 12.2): that's the game a name claimed later back-credits, and the
+ * board keeps each name's best anyway. Uses the game's result token while
+ * it's fresh; otherwise re-sends the game for a new one (spec 13.1), so slow
+ * typers aren't punished.
+ */
+async function postName(summary) {
+  const me = store.get('name');
+  if (!me) return;
+  if (!serverOn(D.rules)) return nameMsg(T('name.savedResting'));
+  const best = store.get('today', {})[summary.mode];
+  const game = best && best.date === D.today && best.game ? best.game : summary.game;
+  if (!game) return nameMsg(T('name.savedResting'));
+  if (posting) return;
+  posting = summary;
+  const here = () => shown === summary;
+  try {
+    if (here()) nameMsg(T('name.checking'));
+    let t = tokens.get(game.ticket);
+    if (!tokenUsable(t, Date.now())) {
+      const r = await sendGame(game);
+      if (!r.ok) return here() && showNotVerified(r.error, summary);
+      t = tokens.get(game.ticket);
+    }
+    t.used = true;
+    const s = await api('board/submit', { token: t.token, name: me.name, handle: me.handle });
+    if (!here()) return;
+    if (s.ok) {
+      const lines = Object.entries(s.ranks || {}).filter(([, r]) => r)
+        .map(([label, r]) => esc(T('name.rankLine', { board: boardLabel(label, summary), rank: r.rank })));
+      nameMsg([esc(T('name.posted')), ...lines].join('<br>'), { html: true });
+    } else if (s.error === T('name.refused') || s.error === T('name.length')) {
+      nameMsg(s.error === T('name.length') ? T('name.length') : T('name.refused'), { err: true });
+    } else {
+      showNotVerified(s.error, summary);
+    }
+  } finally {
+    posting = null;
+  }
+}
+
+/** "Score not verified, retry" with its Retry button, or "resting" when the server is away. */
+function showNotVerified(error, summary) {
+  if (!NOT_VERIFIED.test(String(error))) return nameMsg(T('name.savedResting'));
+  nameMsg(`${esc(T('name.notVerified'))} <button class="btn btn-sm ghost retry" type="button">${esc(T('name.retry'))}</button>`, { err: true, html: true });
+  $('e-name-msg').querySelector('.retry').onclick = () => postName(summary);
+}
+
+// ---------------------------------------------------------------------------
+// The boards (spec 12.1): top 50 per board, plus your rank further down.
+// Daily games have one board; Unlimited has Today, This week, This month and
+// All-time, as tabs.
+
+async function openBoards(summary) {
+  $('board-modal')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'board-modal';
+  ov.className = 'share-modal';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-modal', 'true');
+  ov.setAttribute('aria-label', T('board.title'));
+  ov.innerHTML = '<div class="share-box board-box">' +
+    `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
+    `<h2 class="board-title">${TH('board.title')}</h2>` +
+    '<div class="board-tabs" role="tablist"></div><div class="board-body"></div></div>';
+  document.body.appendChild(ov);
+  const opener = document.activeElement;
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  const close = () => { ov.remove(); document.removeEventListener('keydown', onKey); opener?.focus?.(); };
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
+  ov.querySelector('.share-x').onclick = close;
+  ov.querySelector('.share-x').focus();
+
+  const me = store.get('name');
+  const q = new URLSearchParams({ mode: summary.mode, ...(me ? { name: me.name, handle: me.handle } : {}) });
+  const r = await api(`board?${q}`);
+  const body = ov.querySelector('.board-body');
+  if (!r.ok || !r.boards) {
+    body.innerHTML = `<p class="board-note">${TH('board.resting')}</p>`;
+    return;
+  }
+  const labels = Object.keys(r.boards);
+  const tabs = ov.querySelector('.board-tabs');
+  tabs.innerHTML = labels.map((label, i) =>
+    `<button class="board-tab" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
+  const show = (label) => {
+    for (const t of tabs.querySelectorAll('.board-tab')) t.setAttribute('aria-selected', String(t.dataset.label === label));
+    body.innerHTML = boardTable(r.boards[label], r.me?.[label]);
+  };
+  for (const t of tabs.querySelectorAll('.board-tab')) t.onclick = () => show(t.dataset.label);
+  show(labels[0]);
+}
+
+function boardTable(rows, mine) {
+  if (!rows || !rows.length) return `<p class="board-note">${TH('board.empty')}</p>`;
+  const head = ['board.colRank', 'board.colName', 'board.colScore', 'board.colTime'].map((k) => `<th scope="col">${TH(k)}</th>`).join('');
+  const body = rows.map((row) =>
+    `<tr${mine && mine.rank === row.rank ? ' class="me"' : ''}><td>${row.rank}</td>` +
+    `<td class="who">${esc(row.name)}${row.handle ? ` <span class="handle">${esc(row.handle)}</span>` : ''}</td>` +
+    `<td>${boardMoney(row.score)}</td><td>${clock(row.ms)}</td></tr>`).join('');
+  const you = mine && mine.rank > rows.length ? `<p class="board-note you">${TH('board.you', { rank: mine.rank })}</p>` : '';
+  return `<table class="board-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${you}`;
+}
 
 // ---------------------------------------------------------------------------
 // Share (copied from the 73-9 share modal): a drawn picture of the share card,

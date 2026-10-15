@@ -235,6 +235,27 @@ body.playing .hdr{display:none}
 .share-btns .btn{padding:13px 14px;font-size:12px;letter-spacing:.5px;white-space:nowrap}
 .share-msg{font-size:12px;color:var(--green);min-height:16px;text-align:center}
 
+/* boards window: the share modal's frame, with the 73-9 panel and tabs */
+.board-box{width:min(94vw,480px);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 14px 16px;gap:12px}
+.board-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:3px;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--orange),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.board-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.board-tab{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;
+  border-radius:8px;border:1px solid #4a4a7a;background:transparent;color:#9a9ac4;cursor:pointer}
+.board-tab[aria-selected="true"]{border-color:var(--gold);color:var(--gold);background:#1a1408}
+.board-body{width:100%;max-height:60vh;max-height:60dvh;overflow-y:auto}
+.board-table{width:100%;border-collapse:collapse;font-size:12px}
+.board-table th{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);
+  text-align:left;padding:6px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel2)}
+.board-table td{padding:6px;border-bottom:1px solid #1c1c3a;white-space:nowrap}
+.board-table td:nth-child(3){color:var(--gold);font-weight:600}
+.board-table .who{white-space:normal;word-break:break-word;color:var(--white)}
+.board-table .handle{color:var(--dim);font-size:11px}
+.board-table tr.me td{background:#1a1408}
+.board-note{font-family:var(--display);font-size:13px;letter-spacing:.4px;color:#8a8ab8;text-align:center;padding:10px 0}
+.board-note.you{color:var(--gold)}
+.msg .retry{margin:8px auto 0;display:flex}
+
 @media(max-height:560px){
   .question{margin:.35rem 0}
   .pcard .face{width:min(100%,clamp(64px,21dvh,190px))}

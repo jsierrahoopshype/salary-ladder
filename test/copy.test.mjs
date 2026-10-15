@@ -7,13 +7,9 @@ import { COPY, T, TH } from '../page/copy.js';
 
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 
-// Lines approved now but first used later: from C2 when the page connects to
-// the server, and the "play next" card (D1), which lives in another repo.
-const LATER = new Set([
-  'end.rank', 'end.rankEarly', 'name.refused', 'name.checking', 'name.notVerified', 'name.retry',
-  'name.posted', 'name.rankLine', 'promo.card',
-  ...Object.keys(COPY).filter((k) => k.startsWith('board.')),
-]);
+// Lines approved but not on this page: the "play next" card (D1), which
+// lives in another repo.
+const LATER = new Set(['promo.card']);
 
 /** The Text and Key columns of every table row in the wording doc. */
 function docRows() {

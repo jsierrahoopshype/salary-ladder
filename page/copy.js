@@ -39,7 +39,6 @@ export const COPY = {
   'intro.playUnlimited': 'Play Unlimited',
   'intro.continueUnlimited': 'Continue Unlimited',
   'intro.modes': 'Daily: the same ladder for everyone, one play a day, new at 9 AM ET. Unlimited: as many games as you like.',
-  'intro.preview': 'Preview: the real Daily and rankings start at launch',
 
   // Playing
   'play.question': 'Who gets paid more?',
@@ -77,7 +76,6 @@ export const COPY = {
   'end.playAgain': 'Play again',
   'end.home': 'Home',
   'end.nextDaily': 'New Daily at 9 AM ET',
-  'end.previewData': 'Preview data',
 
   // "Which contract would you rather have?"
   'contract.question': 'Which contract would you rather have?',
@@ -97,7 +95,7 @@ export const COPY = {
   'name.posted': "You're on the boards.",
   'name.rankLine': '{board}: #{rank}',
 
-  // The boards (wired up in build plan C2)
+  // The boards
   'board.open': 'See the boards',
   'board.title': 'Boards',
   'board.today': 'Today',
