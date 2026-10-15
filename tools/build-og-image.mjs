@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 // Draws og-image.jpg, the picture link previews show (X, Bluesky, Facebook,
-// WhatsApp…) for https://hoopsmatic.com/salary-ladder/. 1200×630, the 73-9
+// WhatsApp…) for https://hoopsmatic.com/salary-ladder/. The page points
+// previews at OG_URL, an address without a file extension that the shared
+// hoopsmatic.com Worker answers with this file (Cloudflare Hotlink
+// Protection blocks .jpg/.png addresses requested from other sites). 1200×630, the 73-9
 // look of the share card, and only approved wording from page/copy.js: the
 // title, the play question and the share picture's footer. No eyebrows, no
 // player names or photos, nothing from outside hosts in the file itself.
@@ -19,6 +22,7 @@ import { T } from '../page/copy.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const OG_FILE = 'og-image.jpg';
+export const OG_URL = 'https://hoopsmatic.com/salary-ladder/og-card';
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 // The approved lines the picture carries (test/page.test.mjs checks they exist).

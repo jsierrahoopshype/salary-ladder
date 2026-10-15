@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPage, ROOT } from '../tools/build-page.mjs';
-import { OG_FILE, OG_WIDTH, OG_HEIGHT, OG_TEXT_KEYS } from '../tools/build-og-image.mjs';
+import { OG_FILE, OG_URL, OG_WIDTH, OG_HEIGHT, OG_TEXT_KEYS } from '../tools/build-og-image.mjs';
 import { COPY } from '../page/copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
@@ -218,9 +218,14 @@ test('board money and result tokens', () => {
   assert.ok(TOKEN_USE_MS < 15 * 60_000, 'shorter than the server allows');
 });
 
-test('link-preview picture: in this repo, 1200x630, small, approved wording only', () => {
+test('link-preview picture: extension-less address, 1200x630, small, approved wording only', () => {
   const html = read('index.html');
-  assert.match(html, new RegExp(`<meta property="og:image" content="https://hoopsmatic\\.com/salary-ladder/${OG_FILE.replace('.', '\\.')}">`));
+  // An address without a file extension: Cloudflare Hotlink Protection on
+  // hoopsmatic.com blocks .jpg/.png addresses requested from other sites.
+  assert.equal(OG_URL, 'https://hoopsmatic.com/salary-ladder/og-card');
+  assert.ok(html.includes(`<meta property="og:image" content="${OG_URL}">`));
+  assert.ok(html.includes(`<meta name="twitter:image" content="${OG_URL}">`));
+  assert.doesNotMatch(html, /<meta [^>]*content="[^"]+\.(jpe?g|png)"/, 'no image-extension address in the preview tags');
   assert.match(html, /<meta property="og:image:width" content="1200">/);
   assert.match(html, /<meta property="og:image:height" content="630">/);
   assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
