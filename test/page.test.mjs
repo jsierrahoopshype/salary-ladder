@@ -45,6 +45,15 @@ test('page: the HoopsMatic nav bar is hidden during play', () => {
   assert.match(read('index.html'), /body\.playing #hm-nav\{display:none!important\}/);
 });
 
+test('page: "<body" appears once, as the real tag', () => {
+  // The shared Worker puts the nav bar right after the first "<body" it finds
+  // (injectNav). The same text anywhere earlier, even in a CSS comment, gets
+  // the bar dropped inside <style> and the whole page breaks.
+  const html = read('index.html');
+  assert.equal(html.match(/<body/g).length, 1);
+  assert.match(html, /<\/head>\n<body>/);
+});
+
 test('the inlined page script is one valid module with no leftover imports', () => {
   const html = read('index.html');
   const scripts = [...html.matchAll(/<script type="module">([\s\S]*?)<\/script>/g)];
