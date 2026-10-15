@@ -18,6 +18,11 @@ html{background:#0a0a1a}
 body{background:linear-gradient(160deg,#1a1a3e 0%,#0a0a1a 55%,#050510 100%);background-attachment:fixed;
   color:var(--ink);font-family:var(--mono);min-height:100vh;line-height:1.45;-webkit-font-smoothing:antialiased}
 body.playing{overflow:hidden;overscroll-behavior:none}
+/* The HoopsMatic nav bar, which the shared Worker adds at the top of <body>,
+   is hidden during play: the play screen is exactly one screen tall with
+   scrolling off, so the bar would push the bottom of the game off screen.
+   The id selector plus body.playing outranks the bar's own !important rules. */
+body.playing #hm-nav{display:none!important}
 button,input{font:inherit;color:inherit}
 [hidden]{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
