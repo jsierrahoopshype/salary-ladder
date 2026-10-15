@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { buildPage, ROOT } from '../tools/build-page.mjs';
+import { buildPage, buildSitemap, pageHash, PAGE_URL, ROOT } from '../tools/build-page.mjs';
 import { OG_FILE, OG_URL, OG_WIDTH, OG_HEIGHT, OG_TEXT_KEYS } from '../tools/build-og-image.mjs';
 import { COPY } from '../page/copy.js';
 import {
@@ -19,6 +19,39 @@ const rules = JSON.parse(read('rules/rules.json'));
 
 test('index.html is built from page/ and shared/game.js and is up to date', () => {
   assert.equal(read('index.html'), buildPage(), 'run: node tools/build-page.mjs');
+});
+
+test('sitemap.xml lists the page and was rebuilt with the current index.html', () => {
+  const map = read('sitemap.xml');
+  assert.match(map, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n/);
+  const locs = [...map.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  assert.deepEqual(locs, [PAGE_URL]);
+  // The hash ties the date to the page: if index.html changed without a
+  // rebuild, the hash no longer matches and the date would be stale.
+  assert.ok(map.includes(`<!-- page sha256: ${pageHash(read('index.html'))} -->`), 'run: node tools/build-page.mjs');
+  const lastmod = map.match(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/)[1];
+  assert.ok(lastmod <= new Date().toISOString().slice(0, 10), 'lastmod not in the future');
+  assert.equal(buildSitemap(read('index.html'), map), map, 'a rebuild leaves sitemap.xml as it is');
+});
+
+test('sitemap lastmod: kept while the page is unchanged, today when it changes', () => {
+  const first = buildSitemap('<p>a</p>', null, '2026-10-01');
+  assert.match(first, /<lastmod>2026-10-01<\/lastmod>/);
+  assert.equal(buildSitemap('<p>a</p>', first, '2026-11-20'), first, 'same page: same date');
+  assert.match(buildSitemap('<p>b</p>', first, '2026-11-20'), /<lastmod>2026-11-20<\/lastmod>/, 'new page: new date');
+});
+
+test('page: the HoopsMatic nav bar is hidden during play', () => {
+  assert.match(read('index.html'), /body\.playing #hm-nav\{display:none!important\}/);
+});
+
+test('page: "<body" appears once, as the real tag', () => {
+  // The shared Worker puts the nav bar right after the first "<body" it finds
+  // (injectNav). The same text anywhere earlier, even in a CSS comment, gets
+  // the bar dropped inside <style> and the whole page breaks.
+  const html = read('index.html');
+  assert.equal(html.match(/<body/g).length, 1);
+  assert.match(html, /<\/head>\n<body>/);
 });
 
 test('the inlined page script is one valid module with no leftover imports', () => {
