@@ -5,6 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPage, ROOT } from '../tools/build-page.mjs';
+import { OG_FILE, OG_WIDTH, OG_HEIGHT, OG_TEXT_KEYS } from '../tools/build-og-image.mjs';
+import { COPY } from '../page/copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
   streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
@@ -214,4 +216,22 @@ test('board money and result tokens', () => {
   assert.ok(!tokenUsable({ at: now, used: true }, now), 'tokens work once');
   assert.ok(!tokenUsable(undefined, now));
   assert.ok(TOKEN_USE_MS < 15 * 60_000, 'shorter than the server allows');
+});
+
+test('link-preview picture: in this repo, 1200x630, small, approved wording only', () => {
+  const html = read('index.html');
+  assert.match(html, new RegExp(`<meta property="og:image" content="https://hoopsmatic\\.com/salary-ladder/${OG_FILE.replace('.', '\\.')}">`));
+  assert.match(html, /<meta property="og:image:width" content="1200">/);
+  assert.match(html, /<meta property="og:image:height" content="630">/);
+  assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+  const img = fs.readFileSync(path.join(ROOT, OG_FILE));
+  assert.ok(img.length < 300 * 1024, `${img.length} bytes: WhatsApp skips previews over about 300 KB`);
+  // A baseline JPEG's size is in its SOF0 segment: FF C0, length, precision, height, width.
+  assert.equal(img.readUInt16BE(0), 0xffd8, 'a JPEG');
+  const sof = img.indexOf(Buffer.from([0xff, 0xc0]));
+  assert.ok(sof > 0, 'baseline JPEG');
+  assert.equal(img.readUInt16BE(sof + 5), OG_HEIGHT);
+  assert.equal(img.readUInt16BE(sof + 7), OG_WIDTH);
+  assert.deepEqual([OG_WIDTH, OG_HEIGHT], [1200, 630]);
+  for (const key of OG_TEXT_KEYS) assert.ok(key in COPY, `${key} is approved wording`);
 });
