@@ -160,24 +160,54 @@ export function shareText({ mode, number, date, score, rung, livesLeft, lives, t
 }
 
 /**
- * The share modal's platform buttons (copied from the 73-9 modal). Each opens
- * the platform's own compose page with the share card text; nothing loads
- * until the player taps one. As in 73-9, X and Bluesky also tag HoopsHype.
+ * The share window's platform buttons, built exactly as Spend $15 and the
+ * Daily 73-9 build them. Each opens the platform's own compose page with the
+ * share text; nothing loads until the player taps one. X and Bluesky also tag
+ * HoopsHype. `text` is the share text, whose last line is the link.
  */
 export const HANDLES = { x: '@hoopshype', bsky: '@hoopshypeofficial.bsky.social' };
 
 export function shareLinks(text) {
-  const lines = text.split('\n').filter((l) => l !== SITE_URL);
-  const body = lines.join('\n');
-  const e = encodeURIComponent, u = e(SITE_URL), t = e(body), all = e(`${body}\n${SITE_URL}`);
+  const body = text.split('\n').filter((l) => l !== SITE_URL).join('\n');
+  const e = encodeURIComponent, u = e(SITE_URL), t = e(body);
   return {
-    x: `https://twitter.com/intent/tweet?text=${e(`${body}\n${HANDLES.x}`)}&url=${u}`,
-    bsky: `https://bsky.app/intent/compose?text=${e(`${body}\n${HANDLES.bsky}\n${SITE_URL}`)}`,
+    x: `https://twitter.com/intent/tweet?text=${e(`${body} ${HANDLES.x}`)}&url=${u}`,
+    bsky: `https://bsky.app/intent/compose?text=${e(`${body} ${HANDLES.bsky} ${SITE_URL}`)}`,
     fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
-    wa: `https://wa.me/?text=${all}`,
-    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(lines.join(' · '))}`,
+    wa: `https://wa.me/?text=${e(`${body} ${SITE_URL}`)}`,
+    // Reddit titles are one line.
+    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(body.replace(/\s*\n+\s*/g, ' '))}`,
     telegram: `https://t.me/share/url?url=${u}&text=${t}`,
   };
+}
+
+/**
+ * Places on a board (rows best first): 1, 2, 3... with no gaps, and rows
+ * that tie share a place. A tie is the same score in the same time, since
+ * time is what separates equal scores on the boards.
+ */
+export function boardPlaces(rows) {
+  let place = 0;
+  return rows.map((r, i) => {
+    const prev = rows[i - 1];
+    if (!prev || prev.score !== r.score || prev.ms !== r.ms) place++;
+    return place;
+  });
+}
+
+/**
+ * Whether a board row is this device's name: by @handle when the device has
+ * one (the boards keep one row per handle), otherwise by the name itself.
+ */
+export function isMyRow(row, me) {
+  if (!me || !me.name) return false;
+  if (me.handle) return Boolean(row.handle) && row.handle.toLowerCase() === me.handle.toLowerCase();
+  return !row.handle && String(row.name).toLowerCase() === me.name.toLowerCase();
+}
+
+/** The Monday a game day's week starts on (weeks start Monday 9 AM ET, like the boards). */
+export function weekStart(day) {
+  return addDaysIso(day, -((new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7));
 }
 
 // ---------------------------------------------------------------------------

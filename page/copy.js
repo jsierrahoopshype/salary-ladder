@@ -107,6 +107,8 @@ export const COPY = {
   'board.colScore': 'Score',
   'board.colTime': 'Time',
   'board.you': 'Your rank: #{rank}',
+  'board.youMark': '(you)',
+  'board.weekOf': 'Week of {date}',
   'board.empty': 'No names on this board yet.',
   'board.resting': 'Rankings are down right now.',
 
@@ -114,15 +116,17 @@ export const COPY = {
   'share.dialog': 'Share your result',
   'share.close': 'Close',
   'share.link': 'Link',
-  'share.copyLink': 'Copy text',
+  'share.copyLink': 'Copy',
   'share.on': 'Share on {platform}',
   'share.download': 'Download',
   'share.copyImage': 'Copy image',
+  'share.more': 'More',
+  'share.moreFailed': 'Share unavailable. Use the buttons above.',
   'share.saved': 'Saved to your downloads.',
   'share.imageCopied': 'Image copied. Paste it anywhere.',
   'share.imageBlocked': 'Copy blocked here. Use Download.',
   'share.textCopied': 'Text + link copied.',
-  'share.textBlocked': 'Copy blocked here. The text is selected.',
+  'share.textBlocked': 'Copy blocked here.',
 
   // Share card text (spec 9): no player names, so it never spoils the Daily
   'shareText.dailyHead': 'Salary Ladder #{number} · {date}',

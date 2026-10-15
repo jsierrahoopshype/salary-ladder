@@ -10,7 +10,7 @@ import { COPY } from '../page/copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
   streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
-  voteSplit, addVotes, tokenUsable, TOKEN_USE_MS,
+  voteSplit, addVotes, tokenUsable, TOKEN_USE_MS, boardPlaces, isMyRow, weekStart,
 } from '../page/lib.js';
 import { preparePool, newGame, applyPick, isDone, replay, CHOICE } from '../shared/game.js';
 
@@ -39,6 +39,28 @@ test('sitemap lastmod: kept while the page is unchanged, today when it changes',
   assert.match(first, /<lastmod>2026-10-01<\/lastmod>/);
   assert.equal(buildSitemap('<p>a</p>', first, '2026-11-20'), first, 'same page: same date');
   assert.match(buildSitemap('<p>b</p>', first, '2026-11-20'), /<lastmod>2026-11-20<\/lastmod>/, 'new page: new date');
+});
+
+test('page: the shared games module loads the way Spend $15 loads it, into a slot hidden during play', () => {
+  const html = read('index.html');
+  assert.match(html, /<script src="https:\/\/hoopsmatic\.com\/hoopsmatic-games\.js" data-hm-game="salaryladder" defer><\/script>\n<\/body>/);
+  assert.match(html, /<div id="games-promo"><\/div>\n<\/div>/, 'the slot is the last thing in the page column');
+  assert.match(html, /body\.playing #games-promo\{display:none\}/);
+  assert.match(read('page/app.js'), /window\.HMGames\.playNext\(\$\('games-promo'\)\)/);
+});
+
+test('boards: places run 1, 2, 3 with no gaps, ties share one; your row by handle or name', () => {
+  const r = (score, ms) => ({ score, ms });
+  assert.deepEqual(boardPlaces([r(9, 50), r(9, 50), r(8, 40), r(8, 41), r(8, 41), r(7, 1)]), [1, 1, 2, 3, 3, 4]);
+  assert.deepEqual(boardPlaces([]), []);
+  assert.ok(isMyRow({ name: 'Jorge', handle: '@HoopsHype' }, { name: 'J', handle: '@hoopshype' }), 'the handle decides');
+  assert.ok(!isMyRow({ name: 'Jorge', handle: '' }, { name: 'Jorge', handle: '@hoopshype' }));
+  assert.ok(isMyRow({ name: 'jorge', handle: '' }, { name: 'Jorge', handle: '' }));
+  assert.ok(!isMyRow({ name: 'Jorge', handle: '@x' }, { name: 'Jorge', handle: '' }));
+  assert.ok(!isMyRow({ name: 'Jorge', handle: '' }, null));
+  assert.equal(weekStart('2026-10-15'), '2026-10-12', 'a Thursday belongs to the week from Monday');
+  assert.equal(weekStart('2026-10-12'), '2026-10-12');
+  assert.equal(weekStart('2026-10-18'), '2026-10-12', 'Sunday is the end of the week');
 });
 
 test('page: the HoopsMatic nav bar is hidden during play', () => {
@@ -78,6 +100,8 @@ test('page: canonical, og:url, no outside resources beyond the approved ones', (
     'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Oswald:wght@600;700&display=swap',
     'https://jsierrahoopshype.github.io/nba-headshots/',
     'https://hoopsmatic.com/salary-ladder/',
+    // The shared HoopsMatic games module (approved Oct 15), loaded as Spend $15 loads it.
+    'https://hoopsmatic.com/hoopsmatic-games.js',
   ];
   // The share modal's platform buttons: links opened only when tapped, so
   // nothing loads from these.
@@ -89,7 +113,8 @@ test('page: canonical, og:url, no outside resources beyond the approved ones', (
     assert.ok([...allowed, ...shareButtons].some((a) => url.startsWith(a)), `unexpected outside resource: ${url}`);
   }
   assert.equal(html.match(/<link href="https:\/\/fonts\.googleapis\.com\/css2/g).length, 1, 'one font request');
-  assert.doesNotMatch(html, /<script[^>]+src=/, 'no outside scripts');
+  const srcs = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(srcs, ['https://hoopsmatic.com/hoopsmatic-games.js'], 'the games module is the only script loaded from elsewhere');
   assert.doesNotMatch(html, /<iframe/i);
 });
 
@@ -202,13 +227,18 @@ test('share buttons carry the share card text and the link', () => {
   assert.deepEqual(Object.keys(links), ['x', 'bsky', 'fb', 'wa', 'reddit', 'telegram']);
   const x = new URL(links.x);
   assert.equal(x.searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/');
-  assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12\n@hoopshype');
+  // Built as Spend $15 builds them: the handle (and Bluesky's link) after a space.
+  assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 @hoopshype');
   assert.equal(new URL(links.bsky).searchParams.get('text'),
-    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12\n@hoopshypeofficial.bsky.social\nhttps://hoopsmatic.com/salary-ladder/');
+    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 @hoopshypeofficial.bsky.social https://hoopsmatic.com/salary-ladder/');
+  assert.equal(new URL(links.wa).searchParams.get('text'),
+    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 https://hoopsmatic.com/salary-ladder/');
+  assert.equal(new URL(links.fb).searchParams.get('u'), 'https://hoopsmatic.com/salary-ladder/');
+  assert.equal(new URL(links.telegram).searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12');
   // Only X and Bluesky tag HoopsHype, as in 73-9; the copied text card has no handle.
   for (const k of ['fb', 'wa', 'reddit', 'telegram']) assert.doesNotMatch(decodeURIComponent(links[k]), /@hoopshype/);
   assert.doesNotMatch(text, /@/);
-  assert.equal(new URL(links.reddit).searchParams.get('title'), 'Salary Ladder #12 · Oct 9 · I reached $31.4M (rung 34) · ❤️❤️❤️🖤🖤 · 3:12');
+  assert.equal(new URL(links.reddit).searchParams.get('title'), 'Salary Ladder #12 · Oct 9 I reached $31.4M (rung 34) ❤️❤️❤️🖤🖤 · 3:12');
 });
 
 test('names and handles, vote pair keys', () => {

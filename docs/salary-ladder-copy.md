@@ -154,27 +154,31 @@ Daily games have one board, titled with the Daily's name (like "Daily #12"). Unl
 | Score | Column | `board.colScore` |
 | Time | Column | `board.colTime` |
 | Your rank: #{rank} | Under the top 50, when your name is further down | `board.you` |
+| (you) | After your own name on a board (your row is also highlighted) | `board.youMark` |
+| Week of {date} | Under the tabs on This week, with the Monday it started | `board.weekOf` |
 | No names on this board yet. | A board with nobody on it yet | `board.empty` |
 | Rankings are down right now. | When the boards can't be loaded | `board.resting` |
 
 ## Share window
 
-The X, Bluesky, Facebook, WhatsApp, Reddit and Telegram buttons show the platform's name.
+The same window as Spend $15 and the Daily 73-9: the picture, the link with Copy, the X, Bluesky, Facebook, WhatsApp, Reddit and Telegram buttons (each shows the platform's name), then Download, Copy image and More.
 
 | Text | Shows | Key |
 |---|---|---|
 | Share your result | Read aloud when the window opens | `share.dialog` |
 | Close | Read aloud for the × button | `share.close` |
 | Link | Read aloud for the link field | `share.link` |
-| Copy text | Button next to the link: copies the share text below | `share.copyLink` |
+| Copy | Button next to the link: copies the share text and the link | `share.copyLink` |
 | Share on {platform} | Read aloud for each platform button | `share.on` |
 | Download | Button: saves the picture | `share.download` |
 | Copy image | Button: copies the picture | `share.copyImage` |
+| More | Button, on phones that can share files: opens the phone's own share sheet with the picture | `share.more` |
+| Share unavailable. Use the buttons above. | When the phone's share sheet can't open | `share.moreFailed` |
 | Saved to your downloads. | After Download | `share.saved` |
 | Image copied. Paste it anywhere. | After Copy image | `share.imageCopied` |
 | Copy blocked here. Use Download. | Copy image refused by the browser | `share.imageBlocked` |
 | Text + link copied. | After Copy | `share.textCopied` |
-| Copy blocked here. The text is selected. | Copy refused by the browser | `share.textBlocked` |
+| Copy blocked here. | Copy refused by the browser | `share.textBlocked` |
 
 ## Share text
 

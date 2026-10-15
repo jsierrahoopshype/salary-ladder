@@ -243,52 +243,66 @@ body.playing .hdr{display:none}
 .namebox input::placeholder{color:#5c5c82}
 .namebox .btn{display:flex;margin:0 auto}
 
-/* share modal (73-9 .share-modal) */
-.share-modal{position:fixed;inset:0;z-index:100;background:rgba(5,5,16,.82);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+/* share window: Spend $15's (which mirrors the Daily 73-9's), value for value.
+   z-index above the HoopsMatic nav bar (9999), so the bar dims with the page. */
+.share-modal{position:fixed;inset:0;z-index:10000;background:rgba(5,5,16,.82);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
   display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s;overflow-y:auto}
-.share-box{position:relative;width:min(92vw,440px);display:flex;flex-direction:column;align-items:center;gap:14px;margin:auto}
-.share-img{width:auto;max-width:100%;max-height:44vh;max-height:44dvh;object-fit:contain;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
-.share-x{position:absolute;top:-14px;right:-8px;width:40px;height:40px;border-radius:50%;border:none;background:#1a1a3e;color:#fff;
-  font-size:24px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);z-index:1}
+.share-box{position:relative;max-width:min(92vw,440px);display:flex;flex-direction:column;align-items:center;gap:14px;margin:auto}
+.share-img{width:100%;max-height:46vh;object-fit:contain;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.share-x{position:absolute;top:-16px;right:-16px;width:40px;height:40px;border-radius:50%;border:none;background:#1a1a3e;color:#fff;
+  font-size:24px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);z-index:2}
 .share-link{display:flex;width:100%;gap:8px}
 .share-url{flex:1;min-width:0;background:#0f0f24;border:1px solid var(--line);border-radius:10px;color:#cfcff0;font-family:var(--mono);
   font-size:12px;padding:10px 12px}
-.share-copybtn{flex:none;background:var(--gold);color:#1a1a2e;border:none;border-radius:10px;padding:0 16px;font-family:var(--display);
-  font-weight:700;font-size:14px;cursor:pointer}
+.share-copybtn{flex:0 0 auto;background:var(--gold);color:#1a1a2e;border:none;border-radius:10px;padding:0 16px;font-family:var(--display);
+  font-weight:600;font-size:14px;cursor:pointer}
 .share-social{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
 .soc{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 8px;border-radius:10px;border:none;color:#fff;
   font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.3px;cursor:pointer;transition:transform .08s,filter .15s}
 @media(hover:hover){.soc:hover{transform:translateY(-1px);filter:brightness(1.12)}}
-.soc svg{width:17px;height:17px;flex:none}
+.soc svg{width:17px;height:17px;flex:0 0 auto}
 .soc-x{background:#000;border:1px solid #333}
 .soc-bsky{background:#0a85ff}
 .soc-fb{background:#1877f2}
 .soc-wa{background:#25d366}
 .soc-reddit{background:#ff4500}
 .soc-telegram{background:#26a5e4}
-.share-btns{display:flex;gap:8px;justify-content:center}
-.share-btns .btn{padding:13px 14px;font-size:12px;letter-spacing:.5px;white-space:nowrap}
+.share-btns{display:flex;gap:8px;flex-wrap:nowrap;justify-content:center}
+.share-btns .btn{flex:0 1 auto;padding:13px 14px;font-size:12px;letter-spacing:.5px;white-space:nowrap}
 .share-msg{font-size:12px;color:var(--green);min-height:16px;text-align:center}
+@media(max-width:760px){
+  .share-x{top:-12px;right:-6px}
+  .soc{font-size:12px;padding:10px 4px;gap:5px}
+}
 
-/* boards window: the share modal's frame, with the 73-9 panel and tabs */
+/* boards window: the share window's frame around Spend $15's boards (chips,
+   the line saying which day/week/month, the table) */
 .board-box{width:min(94vw,480px);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 14px 16px;gap:12px}
 .board-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:3px;text-transform:uppercase;
   background:linear-gradient(90deg,var(--orange),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.board-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-.board-tab{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;
-  border-radius:8px;border:1px solid #4a4a7a;background:transparent;color:#9a9ac4;cursor:pointer}
-.board-tab[aria-selected="true"]{border-color:var(--gold);color:var(--gold);background:#1a1408}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.chip{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:6px 12px;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--dim);cursor:pointer}
+.chip.active{background:linear-gradient(135deg,var(--orange),var(--gold));border-color:transparent;color:#1a1206}
 .board-body{width:100%;max-height:60vh;max-height:60dvh;overflow-y:auto}
-.board-table{width:100%;border-collapse:collapse;font-size:12px}
-.board-table th{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);
-  text-align:left;padding:6px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel2)}
-.board-table td{padding:6px;border-bottom:1px solid #1c1c3a;white-space:nowrap}
-.board-table td:nth-child(3){color:var(--gold);font-weight:600}
-.board-table .who{white-space:normal;word-break:break-word;color:var(--white)}
-.board-table .handle{color:var(--dim);font-size:11px}
-.board-table tr.me td{background:#1a1408}
+.board-body .subtitle{color:var(--dim);font-size:12.5px;margin-bottom:12px;text-align:center}
+.table-wrap{background:var(--panel2);border:1px solid var(--line);border-radius:12px;overflow:auto}
+table.lb{width:100%;border-collapse:collapse;font-size:12px}
+table.lb thead th{background:#14142e;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;font-family:var(--display);font-size:11px;
+  font-weight:600;padding:9px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0}
+table.lb th.left,table.lb td.l{text-align:left}
+table.lb td{padding:8px;text-align:center;border-bottom:1px solid rgba(42,42,82,.6);color:var(--ink)}
+table.lb td.l{font-family:var(--display);font-size:14px;font-weight:500;color:#fff;white-space:normal;word-break:break-word}
+table.lb td.n{white-space:nowrap}
+table.lb tr.me td{background:rgba(255,215,0,.08)}
+table.lb .handle{color:var(--dim);font-weight:400}
+table.lb .you{color:var(--gold);font-weight:400}
+.empty{color:var(--dim);font-size:12px;padding:14px;text-align:center}
 .board-note{font-family:var(--display);font-size:13px;letter-spacing:.4px;color:#8a8ab8;text-align:center;padding:10px 0}
 .board-note.you{color:var(--gold)}
+
+/* More HoopsMatic games (the shared module's cards): never on the play screen */
+body.playing #games-promo{display:none}
 .msg .retry{margin:8px auto 0;display:flex}
 
 @media(max-height:560px){
@@ -301,7 +315,6 @@ body.playing .hdr{display:none}
   .hud-title{font-size:12px;letter-spacing:2px}
   .pill{padding:5px 7px;font-size:12px}
   .hearts{font-size:14px;letter-spacing:1px}
-  .soc{font-size:12px;gap:5px;padding:10px 4px}
 }
 </style>
 </head>
@@ -390,6 +403,10 @@ body.playing .hdr{display:none}
 
     <p id="e-foot" class="fine"></p>
   </section>
+
+  <!-- More HoopsMatic games: the shared module's cards, filled in when a game
+       ends, as Spend $15 does. Hidden during play. -->
+  <div id="games-promo"></div>
 </div>
 <noscript><p class="loading">Salary Ladder needs JavaScript.</p></noscript>
 <script type="module">
@@ -775,6 +792,8 @@ const COPY = {
   'board.colScore': 'Score',
   'board.colTime': 'Time',
   'board.you': 'Your rank: #{rank}',
+  'board.youMark': '(you)',
+  'board.weekOf': 'Week of {date}',
   'board.empty': 'No names on this board yet.',
   'board.resting': 'Rankings are down right now.',
 
@@ -782,15 +801,17 @@ const COPY = {
   'share.dialog': 'Share your result',
   'share.close': 'Close',
   'share.link': 'Link',
-  'share.copyLink': 'Copy text',
+  'share.copyLink': 'Copy',
   'share.on': 'Share on {platform}',
   'share.download': 'Download',
   'share.copyImage': 'Copy image',
+  'share.more': 'More',
+  'share.moreFailed': 'Share unavailable. Use the buttons above.',
   'share.saved': 'Saved to your downloads.',
   'share.imageCopied': 'Image copied. Paste it anywhere.',
   'share.imageBlocked': 'Copy blocked here. Use Download.',
   'share.textCopied': 'Text + link copied.',
-  'share.textBlocked': 'Copy blocked here. The text is selected.',
+  'share.textBlocked': 'Copy blocked here.',
 
   // Share card text (spec 9): no player names, so it never spoils the Daily
   'shareText.dailyHead': 'Salary Ladder #{number} · {date}',
@@ -987,24 +1008,54 @@ function shareText({ mode, number, date, score, rung, livesLeft, lives, totalMs 
 }
 
 /**
- * The share modal's platform buttons (copied from the 73-9 modal). Each opens
- * the platform's own compose page with the share card text; nothing loads
- * until the player taps one. As in 73-9, X and Bluesky also tag HoopsHype.
+ * The share window's platform buttons, built exactly as Spend $15 and the
+ * Daily 73-9 build them. Each opens the platform's own compose page with the
+ * share text; nothing loads until the player taps one. X and Bluesky also tag
+ * HoopsHype. `text` is the share text, whose last line is the link.
  */
 const HANDLES = { x: '@hoopshype', bsky: '@hoopshypeofficial.bsky.social' };
 
 function shareLinks(text) {
-  const lines = text.split('\n').filter((l) => l !== SITE_URL);
-  const body = lines.join('\n');
-  const e = encodeURIComponent, u = e(SITE_URL), t = e(body), all = e(`${body}\n${SITE_URL}`);
+  const body = text.split('\n').filter((l) => l !== SITE_URL).join('\n');
+  const e = encodeURIComponent, u = e(SITE_URL), t = e(body);
   return {
-    x: `https://twitter.com/intent/tweet?text=${e(`${body}\n${HANDLES.x}`)}&url=${u}`,
-    bsky: `https://bsky.app/intent/compose?text=${e(`${body}\n${HANDLES.bsky}\n${SITE_URL}`)}`,
+    x: `https://twitter.com/intent/tweet?text=${e(`${body} ${HANDLES.x}`)}&url=${u}`,
+    bsky: `https://bsky.app/intent/compose?text=${e(`${body} ${HANDLES.bsky} ${SITE_URL}`)}`,
     fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
-    wa: `https://wa.me/?text=${all}`,
-    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(lines.join(' · '))}`,
+    wa: `https://wa.me/?text=${e(`${body} ${SITE_URL}`)}`,
+    // Reddit titles are one line.
+    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(body.replace(/\s*\n+\s*/g, ' '))}`,
     telegram: `https://t.me/share/url?url=${u}&text=${t}`,
   };
+}
+
+/**
+ * Places on a board (rows best first): 1, 2, 3... with no gaps, and rows
+ * that tie share a place. A tie is the same score in the same time, since
+ * time is what separates equal scores on the boards.
+ */
+function boardPlaces(rows) {
+  let place = 0;
+  return rows.map((r, i) => {
+    const prev = rows[i - 1];
+    if (!prev || prev.score !== r.score || prev.ms !== r.ms) place++;
+    return place;
+  });
+}
+
+/**
+ * Whether a board row is this device's name: by @handle when the device has
+ * one (the boards keep one row per handle), otherwise by the name itself.
+ */
+function isMyRow(row, me) {
+  if (!me || !me.name) return false;
+  if (me.handle) return Boolean(row.handle) && row.handle.toLowerCase() === me.handle.toLowerCase();
+  return !row.handle && String(row.name).toLowerCase() === me.name.toLowerCase();
+}
+
+/** The Monday a game day's week starts on (weeks start Monday 9 AM ET, like the boards). */
+function weekStart(day) {
+  return addDaysIso(day, -((new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7));
 }
 
 // ---------------------------------------------------------------------------
@@ -1703,9 +1754,21 @@ function showEnd(summary) {
     T('salariesAsOf', { date: shortDate(summary.dataDate) }), daily && T('end.nextDaily'),
   ].filter(Boolean).join(' · ');
   showScreen('end');
+  showGames();
   preloadFirstPairs(); // for Play again / Play Unlimited
   prepareUnlimited();
 }
+
+// More HoopsMatic games (the shared module at hoopsmatic.com/hoopsmatic-games.js):
+// its cards go under the end screen once per visit, as Spend $15 shows them
+// once the day is over. The module loads after this script, so a game that
+// ends straight away (a finished Daily on reload) gets them when it arrives.
+let gamesShown = false;
+function showGames() {
+  if (gamesShown || $('end').hidden || !window.HMGames) return;
+  try { window.HMGames.playNext($('games-promo')); gamesShown = true; } catch { /* the game never depends on it */ }
+}
+window.addEventListener('load', showGames);
 
 function showContract(summary) {
   const box = $('e-contract');
@@ -1810,7 +1873,9 @@ function showNotVerified(error, summary) {
 // ---------------------------------------------------------------------------
 // The boards (spec 12.1): top 50 per board, plus your rank further down.
 // Daily games have one board; Unlimited has Today, This week, This month and
-// All-time, as tabs.
+// All-time. Laid out as Spend $15's boards: the choice of board as chips,
+// a line saying which day/week/month it is, then the table, with places that
+// share a number on a tie and your own row marked "(you)".
 
 async function openBoards(summary) {
   $('board-modal')?.remove();
@@ -1823,7 +1888,7 @@ async function openBoards(summary) {
   ov.innerHTML = '<div class="share-box board-box">' +
     `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
     `<h2 class="board-title">${TH('board.title')}</h2>` +
-    '<div class="board-tabs" role="tablist"></div><div class="board-body"></div></div>';
+    '<div class="chips" role="tablist"></div><div class="board-body"></div></div>';
   document.body.appendChild(ov);
   const opener = document.activeElement;
   const onKey = (e) => { if (e.key === 'Escape') close(); };
@@ -1838,30 +1903,49 @@ async function openBoards(summary) {
   const r = await api(`board?${q}`);
   const body = ov.querySelector('.board-body');
   if (!r.ok || !r.boards) {
-    body.innerHTML = `<p class="board-note">${TH('board.resting')}</p>`;
+    body.innerHTML = `<p class="empty">${TH('board.resting')}</p>`;
     return;
   }
   const labels = Object.keys(r.boards);
-  const tabs = ov.querySelector('.board-tabs');
-  tabs.innerHTML = labels.map((label, i) =>
-    `<button class="board-tab" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
+  const chips = ov.querySelector('.chips');
+  chips.innerHTML = labels.map((label, i) =>
+    `<button class="chip${i === 0 ? ' active' : ''}" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
   const show = (label) => {
-    for (const t of tabs.querySelectorAll('.board-tab')) t.setAttribute('aria-selected', String(t.dataset.label === label));
-    body.innerHTML = boardTable(r.boards[label], r.me?.[label]);
+    for (const c of chips.querySelectorAll('.chip')) {
+      const on = c.dataset.label === label;
+      c.classList.toggle('active', on);
+      c.setAttribute('aria-selected', String(on));
+    }
+    const when = boardWhen(label, r.day);
+    body.innerHTML = (when ? `<p class="subtitle">${esc(when)}</p>` : '') + boardTable(r.boards[label], r.me?.[label], me);
   };
-  for (const t of tabs.querySelectorAll('.board-tab')) t.onclick = () => show(t.dataset.label);
+  for (const c of chips.querySelectorAll('.chip')) c.onclick = () => show(c.dataset.label);
   show(labels[0]);
 }
 
-function boardTable(rows, mine) {
-  if (!rows || !rows.length) return `<p class="board-note">${TH('board.empty')}</p>`;
-  const head = ['board.colRank', 'board.colName', 'board.colScore', 'board.colTime'].map((k) => `<th scope="col">${TH(k)}</th>`).join('');
-  const body = rows.map((row) =>
-    `<tr${mine && mine.rank === row.rank ? ' class="me"' : ''}><td>${row.rank}</td>` +
-    `<td class="who">${esc(row.name)}${row.handle ? ` <span class="handle">${esc(row.handle)}</span>` : ''}</td>` +
-    `<td>${boardMoney(row.score)}</td><td>${clock(row.ms)}</td></tr>`).join('');
-  const you = mine && mine.rank > rows.length ? `<p class="board-note you">${TH('board.you', { rank: mine.rank })}</p>` : '';
-  return `<table class="board-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${you}`;
+/** Which day, week or month a board covers, for the line under the chips. */
+function boardWhen(label, day) {
+  if (!day) return '';
+  if (label === 'daily' || label === 'day') return shortDate(day);
+  if (label === 'week') return T('board.weekOf', { date: shortDate(weekStart(day)) });
+  if (label === 'month') return new Date(`${day}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return '';
+}
+
+function boardTable(rows, mine, me) {
+  const head = `<th scope="col">${TH('board.colRank')}</th><th scope="col" class="left">${TH('board.colName')}</th>` +
+    `<th scope="col">${TH('board.colScore')}</th><th scope="col">${TH('board.colTime')}</th>`;
+  const places = boardPlaces(rows || []);
+  const body = (rows || []).map((row, i) => {
+    const mineRow = isMyRow(row, me);
+    return `<tr${mineRow ? ' class="me"' : ''}><td>${places[i]}</td>` +
+      `<td class="l">${esc(row.name)}${row.handle ? ` <span class="handle">${esc(row.handle)}</span>` : ''}` +
+      `${mineRow ? ` <span class="you">${TH('board.youMark')}</span>` : ''}</td>` +
+      `<td class="n">${boardMoney(row.score)}</td><td class="n">${clock(row.ms)}</td></tr>`;
+  }).join('') || `<tr><td colspan="4" class="empty">${TH('board.empty')}</td></tr>`;
+  const shownMine = (rows || []).some((row) => isMyRow(row, me));
+  const you = mine && !shownMine && mine.rank > (rows || []).length ? `<p class="board-note you">${TH('board.you', { rank: mine.rank })}</p>` : '';
+  return `<div class="table-wrap"><table class="lb"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${you}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -1992,13 +2076,25 @@ async function openShare(summary) {
   await Promise.all([document.fonts.load(`700 100px ${DISPLAY}`), document.fonts.load(`600 70px ${MONO}`)]).catch(() => {});
   let url, blob;
   try {
-    const cv = drawCard(summary);
-    url = cv.toDataURL('image/png');
-    blob = await (await fetch(url)).blob();
+    url = drawCard(summary).toDataURL('image/png');
+    // Same conversion as Spend $15 and the Daily 73-9 (a page's security
+    // policy can block fetching a data: address).
+    const bin = atob(url.split(',')[1]);
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    blob = new Blob([u8], { type: 'image/png' });
   } catch (e) {
     console.warn('share card failed', e);
   }
+  const name = `salary-ladder-${summary.date || D.today}.png`;
+  const file = blob ? new File([blob], name, { type: 'image/png' }) : null;
+  const canCopy = Boolean(blob && navigator.clipboard && window.ClipboardItem);
+  let canShare = false;
+  try { canShare = Boolean(file && navigator.canShare && navigator.canShare({ files: [file] })); } catch { /* not on this browser */ }
 
+  // The Spend $15 / Daily 73-9 share window: picture, link + Copy, the six
+  // platforms, then Download, Copy image (where the browser can) and More
+  // (the phone's own share sheet, where it can share files).
   $('share-modal')?.remove();
   const ov = document.createElement('div');
   ov.id = 'share-modal';
@@ -2006,7 +2102,6 @@ async function openShare(summary) {
   ov.setAttribute('role', 'dialog');
   ov.setAttribute('aria-modal', 'true');
   ov.setAttribute('aria-label', T('share.dialog'));
-  const canCopyImage = Boolean(blob && navigator.clipboard && window.ClipboardItem);
   ov.innerHTML = '<div class="share-box">' +
     `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
     (url ? `<img class="share-img" alt="${esc(text.split('\n').slice(0, 3).join('. '))}" src="${url}">` : '') +
@@ -2015,8 +2110,8 @@ async function openShare(summary) {
       `<button class="soc soc-${k}" type="button" data-soc="${k}" aria-label="${TH('share.on', { platform: name })}">${SOCIAL_ICON[k]}<span>${name}</span></button>`).join('') + '</div>' +
     '<div class="share-btns">' +
       (blob ? `<button class="btn" type="button" data-act="download">${TH('share.download')}</button>` : '') +
-      (canCopyImage ? `<button class="btn ghost" type="button" data-act="copy">${TH('share.copyImage')}</button>` : '') +
-      `<button class="btn ghost" type="button" data-act="again">${esc($('e-next').textContent)}</button>` +
+      (canCopy ? `<button class="btn ghost" type="button" data-act="copy">${TH('share.copyImage')}</button>` : '') +
+      (canShare ? `<button class="btn ghost" type="button" data-act="more">${TH('share.more')}</button>` : '') +
     '</div>' +
     '<p class="share-msg" aria-live="polite"></p></div>';
   document.body.appendChild(ov);
@@ -2037,11 +2132,10 @@ async function openShare(summary) {
   for (const b of ov.querySelectorAll('[data-act]')) {
     b.onclick = async () => {
       const act = b.dataset.act;
-      if (act === 'again') { close(); startGame('unlimited'); return; }
       if (act === 'download') {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'salary-ladder.png';
+        a.download = name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1500);
         msg.textContent = T('share.saved');
@@ -2049,9 +2143,13 @@ async function openShare(summary) {
         try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = T('share.imageCopied'); }
         catch { msg.textContent = T('share.imageBlocked'); }
       } else if (act === 'copylink') {
-        // The whole text card (spec 9), the link on its last line.
+        // The whole share text (spec 9); its last line is the link.
         try { await navigator.clipboard.writeText(text); msg.textContent = T('share.textCopied'); }
-        catch { field.value = text; field.select(); msg.textContent = T('share.textBlocked'); }
+        catch { msg.textContent = T('share.textBlocked'); }
+      } else if (act === 'more') {
+        // The link goes in `url`, so it's left off the text (as Spend $15 does).
+        try { await navigator.share({ files: [file], title: T('app.name'), text: text.split('\n').filter((l) => l !== SITE_URL).join('\n'), url: SITE_URL }); }
+        catch (e) { if (!(e && e.name === 'AbortError')) msg.textContent = T('share.moreFailed'); }
       }
     };
   }
@@ -2085,5 +2183,7 @@ load().then(() => {
   $('loading').textContent = T('app.loadFailed');
 });
 </script>
+<!-- The shared HoopsMatic games module (served by the hoopsmatic.com Worker), loaded as Spend $15 loads it. -->
+<script src="https://hoopsmatic.com/hoopsmatic-games.js" data-hm-game="salaryladder" defer></script>
 </body>
 </html>

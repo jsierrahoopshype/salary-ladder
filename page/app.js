@@ -8,7 +8,7 @@ import { CHOICE, preparePool, pickStart, newGame, applyPick, isDone, score, next
 import { T, TH } from './copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
-  shareText, shareLinks, SITE_URL, store, randomHex, cleanName, cleanHandle, voteSplit, addVotes, tokenUsable,
+  shareText, shareLinks, SITE_URL, store, boardPlaces, isMyRow, weekStart, randomHex, cleanName, cleanHandle, voteSplit, addVotes, tokenUsable,
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
@@ -657,9 +657,21 @@ function showEnd(summary) {
     T('salariesAsOf', { date: shortDate(summary.dataDate) }), daily && T('end.nextDaily'),
   ].filter(Boolean).join(' · ');
   showScreen('end');
+  showGames();
   preloadFirstPairs(); // for Play again / Play Unlimited
   prepareUnlimited();
 }
+
+// More HoopsMatic games (the shared module at hoopsmatic.com/hoopsmatic-games.js):
+// its cards go under the end screen once per visit, as Spend $15 shows them
+// once the day is over. The module loads after this script, so a game that
+// ends straight away (a finished Daily on reload) gets them when it arrives.
+let gamesShown = false;
+function showGames() {
+  if (gamesShown || $('end').hidden || !window.HMGames) return;
+  try { window.HMGames.playNext($('games-promo')); gamesShown = true; } catch { /* the game never depends on it */ }
+}
+window.addEventListener('load', showGames);
 
 function showContract(summary) {
   const box = $('e-contract');
@@ -764,7 +776,9 @@ function showNotVerified(error, summary) {
 // ---------------------------------------------------------------------------
 // The boards (spec 12.1): top 50 per board, plus your rank further down.
 // Daily games have one board; Unlimited has Today, This week, This month and
-// All-time, as tabs.
+// All-time. Laid out as Spend $15's boards: the choice of board as chips,
+// a line saying which day/week/month it is, then the table, with places that
+// share a number on a tie and your own row marked "(you)".
 
 async function openBoards(summary) {
   $('board-modal')?.remove();
@@ -777,7 +791,7 @@ async function openBoards(summary) {
   ov.innerHTML = '<div class="share-box board-box">' +
     `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
     `<h2 class="board-title">${TH('board.title')}</h2>` +
-    '<div class="board-tabs" role="tablist"></div><div class="board-body"></div></div>';
+    '<div class="chips" role="tablist"></div><div class="board-body"></div></div>';
   document.body.appendChild(ov);
   const opener = document.activeElement;
   const onKey = (e) => { if (e.key === 'Escape') close(); };
@@ -792,30 +806,49 @@ async function openBoards(summary) {
   const r = await api(`board?${q}`);
   const body = ov.querySelector('.board-body');
   if (!r.ok || !r.boards) {
-    body.innerHTML = `<p class="board-note">${TH('board.resting')}</p>`;
+    body.innerHTML = `<p class="empty">${TH('board.resting')}</p>`;
     return;
   }
   const labels = Object.keys(r.boards);
-  const tabs = ov.querySelector('.board-tabs');
-  tabs.innerHTML = labels.map((label, i) =>
-    `<button class="board-tab" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
+  const chips = ov.querySelector('.chips');
+  chips.innerHTML = labels.map((label, i) =>
+    `<button class="chip${i === 0 ? ' active' : ''}" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
   const show = (label) => {
-    for (const t of tabs.querySelectorAll('.board-tab')) t.setAttribute('aria-selected', String(t.dataset.label === label));
-    body.innerHTML = boardTable(r.boards[label], r.me?.[label]);
+    for (const c of chips.querySelectorAll('.chip')) {
+      const on = c.dataset.label === label;
+      c.classList.toggle('active', on);
+      c.setAttribute('aria-selected', String(on));
+    }
+    const when = boardWhen(label, r.day);
+    body.innerHTML = (when ? `<p class="subtitle">${esc(when)}</p>` : '') + boardTable(r.boards[label], r.me?.[label], me);
   };
-  for (const t of tabs.querySelectorAll('.board-tab')) t.onclick = () => show(t.dataset.label);
+  for (const c of chips.querySelectorAll('.chip')) c.onclick = () => show(c.dataset.label);
   show(labels[0]);
 }
 
-function boardTable(rows, mine) {
-  if (!rows || !rows.length) return `<p class="board-note">${TH('board.empty')}</p>`;
-  const head = ['board.colRank', 'board.colName', 'board.colScore', 'board.colTime'].map((k) => `<th scope="col">${TH(k)}</th>`).join('');
-  const body = rows.map((row) =>
-    `<tr${mine && mine.rank === row.rank ? ' class="me"' : ''}><td>${row.rank}</td>` +
-    `<td class="who">${esc(row.name)}${row.handle ? ` <span class="handle">${esc(row.handle)}</span>` : ''}</td>` +
-    `<td>${boardMoney(row.score)}</td><td>${clock(row.ms)}</td></tr>`).join('');
-  const you = mine && mine.rank > rows.length ? `<p class="board-note you">${TH('board.you', { rank: mine.rank })}</p>` : '';
-  return `<table class="board-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${you}`;
+/** Which day, week or month a board covers, for the line under the chips. */
+function boardWhen(label, day) {
+  if (!day) return '';
+  if (label === 'daily' || label === 'day') return shortDate(day);
+  if (label === 'week') return T('board.weekOf', { date: shortDate(weekStart(day)) });
+  if (label === 'month') return new Date(`${day}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return '';
+}
+
+function boardTable(rows, mine, me) {
+  const head = `<th scope="col">${TH('board.colRank')}</th><th scope="col" class="left">${TH('board.colName')}</th>` +
+    `<th scope="col">${TH('board.colScore')}</th><th scope="col">${TH('board.colTime')}</th>`;
+  const places = boardPlaces(rows || []);
+  const body = (rows || []).map((row, i) => {
+    const mineRow = isMyRow(row, me);
+    return `<tr${mineRow ? ' class="me"' : ''}><td>${places[i]}</td>` +
+      `<td class="l">${esc(row.name)}${row.handle ? ` <span class="handle">${esc(row.handle)}</span>` : ''}` +
+      `${mineRow ? ` <span class="you">${TH('board.youMark')}</span>` : ''}</td>` +
+      `<td class="n">${boardMoney(row.score)}</td><td class="n">${clock(row.ms)}</td></tr>`;
+  }).join('') || `<tr><td colspan="4" class="empty">${TH('board.empty')}</td></tr>`;
+  const shownMine = (rows || []).some((row) => isMyRow(row, me));
+  const you = mine && !shownMine && mine.rank > (rows || []).length ? `<p class="board-note you">${TH('board.you', { rank: mine.rank })}</p>` : '';
+  return `<div class="table-wrap"><table class="lb"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${you}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -946,13 +979,25 @@ async function openShare(summary) {
   await Promise.all([document.fonts.load(`700 100px ${DISPLAY}`), document.fonts.load(`600 70px ${MONO}`)]).catch(() => {});
   let url, blob;
   try {
-    const cv = drawCard(summary);
-    url = cv.toDataURL('image/png');
-    blob = await (await fetch(url)).blob();
+    url = drawCard(summary).toDataURL('image/png');
+    // Same conversion as Spend $15 and the Daily 73-9 (a page's security
+    // policy can block fetching a data: address).
+    const bin = atob(url.split(',')[1]);
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    blob = new Blob([u8], { type: 'image/png' });
   } catch (e) {
     console.warn('share card failed', e);
   }
+  const name = `salary-ladder-${summary.date || D.today}.png`;
+  const file = blob ? new File([blob], name, { type: 'image/png' }) : null;
+  const canCopy = Boolean(blob && navigator.clipboard && window.ClipboardItem);
+  let canShare = false;
+  try { canShare = Boolean(file && navigator.canShare && navigator.canShare({ files: [file] })); } catch { /* not on this browser */ }
 
+  // The Spend $15 / Daily 73-9 share window: picture, link + Copy, the six
+  // platforms, then Download, Copy image (where the browser can) and More
+  // (the phone's own share sheet, where it can share files).
   $('share-modal')?.remove();
   const ov = document.createElement('div');
   ov.id = 'share-modal';
@@ -960,7 +1005,6 @@ async function openShare(summary) {
   ov.setAttribute('role', 'dialog');
   ov.setAttribute('aria-modal', 'true');
   ov.setAttribute('aria-label', T('share.dialog'));
-  const canCopyImage = Boolean(blob && navigator.clipboard && window.ClipboardItem);
   ov.innerHTML = '<div class="share-box">' +
     `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
     (url ? `<img class="share-img" alt="${esc(text.split('\n').slice(0, 3).join('. '))}" src="${url}">` : '') +
@@ -969,8 +1013,8 @@ async function openShare(summary) {
       `<button class="soc soc-${k}" type="button" data-soc="${k}" aria-label="${TH('share.on', { platform: name })}">${SOCIAL_ICON[k]}<span>${name}</span></button>`).join('') + '</div>' +
     '<div class="share-btns">' +
       (blob ? `<button class="btn" type="button" data-act="download">${TH('share.download')}</button>` : '') +
-      (canCopyImage ? `<button class="btn ghost" type="button" data-act="copy">${TH('share.copyImage')}</button>` : '') +
-      `<button class="btn ghost" type="button" data-act="again">${esc($('e-next').textContent)}</button>` +
+      (canCopy ? `<button class="btn ghost" type="button" data-act="copy">${TH('share.copyImage')}</button>` : '') +
+      (canShare ? `<button class="btn ghost" type="button" data-act="more">${TH('share.more')}</button>` : '') +
     '</div>' +
     '<p class="share-msg" aria-live="polite"></p></div>';
   document.body.appendChild(ov);
@@ -991,11 +1035,10 @@ async function openShare(summary) {
   for (const b of ov.querySelectorAll('[data-act]')) {
     b.onclick = async () => {
       const act = b.dataset.act;
-      if (act === 'again') { close(); startGame('unlimited'); return; }
       if (act === 'download') {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'salary-ladder.png';
+        a.download = name;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1500);
         msg.textContent = T('share.saved');
@@ -1003,9 +1046,13 @@ async function openShare(summary) {
         try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = T('share.imageCopied'); }
         catch { msg.textContent = T('share.imageBlocked'); }
       } else if (act === 'copylink') {
-        // The whole text card (spec 9), the link on its last line.
+        // The whole share text (spec 9); its last line is the link.
         try { await navigator.clipboard.writeText(text); msg.textContent = T('share.textCopied'); }
-        catch { field.value = text; field.select(); msg.textContent = T('share.textBlocked'); }
+        catch { msg.textContent = T('share.textBlocked'); }
+      } else if (act === 'more') {
+        // The link goes in `url`, so it's left off the text (as Spend $15 does).
+        try { await navigator.share({ files: [file], title: T('app.name'), text: text.split('\n').filter((l) => l !== SITE_URL).join('\n'), url: SITE_URL }); }
+        catch (e) { if (!(e && e.name === 'AbortError')) msg.textContent = T('share.moreFailed'); }
       }
     };
   }
