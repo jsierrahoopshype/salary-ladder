@@ -14,6 +14,8 @@ Every piece of text the player sees, screen by screen. The page shows exactly th
 
 Fixed text in the page. The season is written in, so it changes by hand each season.
 
+The link-preview picture (`og-image.jpg`, 1200×630) shows three lines from this doc, in capitals: `app.name`, `play.question` and `image.footer`. Its description for screen readers is `meta.ogTitle`. Changing any of them means redrawing the picture with `node tools/build-og-image.mjs`.
+
 | Text | Shows | Key |
 |---|---|---|
 | Salary Ladder: Who gets paid more? \| HoopsMatic | Browser tab and Google result title | `meta.title` |
