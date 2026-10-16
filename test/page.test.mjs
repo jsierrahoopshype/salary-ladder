@@ -10,7 +10,7 @@ import { COPY } from '../page/copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
   streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
-  voteSplit, addVotes, tokenUsable, TOKEN_USE_MS, boardPlaces, isMyRow, weekStart,
+  voteSplit, addVotes, tokenUsable, TOKEN_USE_MS, boardPlaces, isMyRow, weekStart, climbSalaries, climbBars,
 } from '../page/lib.js';
 import { preparePool, newGame, applyPick, isDone, replay, CHOICE } from '../shared/game.js';
 
@@ -61,6 +61,35 @@ test('boards: places run 1, 2, 3 with no gaps, ties share one; your row by handl
   assert.equal(weekStart('2026-10-15'), '2026-10-12', 'a Thursday belongs to the week from Monday');
   assert.equal(weekStart('2026-10-12'), '2026-10-12');
   assert.equal(weekStart('2026-10-18'), '2026-10-12', 'Sunday is the end of the week');
+});
+
+test('share picture: the climb runs from the start salary to the score, one step per rung', () => {
+  const daily = JSON.parse(read(`daily/${fs.readdirSync(path.join(ROOT, 'daily')).sort().pop()}`));
+  const pool = preparePool(daily.players);
+  const r = { ...rules, ...daily.rules };
+  const state = newGame({ pool, rules: r, seed: daily.seed, startId: daily.start });
+  const log = [];
+  // Always pick the richer player, so the game climbs until its lives run out on timeouts.
+  for (let i = 0; i < 30 && !isDone(state); i++) {
+    const inc = pool.byId.get(state.incumbent), ch = pool.byId.get(state.challenger);
+    log.push(applyPick(pool, r, state, ch.salary > inc.salary ? CHOICE.CHALLENGER : CHOICE.INCUMBENT, 1500));
+  }
+  const climb = climbSalaries(pool.byId.get(daily.start).salary, log);
+  assert.equal(climb.length, state.rung + 1);
+  assert.equal(climb[0], pool.byId.get(daily.start).salary);
+  assert.equal(climb.at(-1), pool.byId.get(state.incumbent).salary, 'ends at the score');
+  for (let i = 1; i < climb.length; i++) assert.ok(climb[i] > climb[i - 1], 'every rung pays more');
+});
+
+test('share picture: a long climb is sampled to 40 bars, keeping both ends', () => {
+  const long = Array.from({ length: 73 }, (_, i) => 1e6 + i);
+  const bars = climbBars(long);
+  assert.equal(bars.length, 40);
+  assert.equal(bars[0], long[0]);
+  assert.equal(bars.at(-1), long.at(-1));
+  for (let i = 1; i < bars.length; i++) assert.ok(bars[i] > bars[i - 1]);
+  assert.deepEqual(climbBars([5, 6, 7]), [5, 6, 7]);
+  assert.deepEqual(climbSalaries(5, []), [5], 'rung 0: just the start');
 });
 
 test('page: board styles stay inside the boards window', () => {

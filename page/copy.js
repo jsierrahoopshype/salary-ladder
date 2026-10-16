@@ -135,7 +135,12 @@ export const COPY = {
   'shareText.line': 'I reached {score} (rung {rung})',
 
   // Share picture (drawn in capitals)
+  'image.tagline': 'Guess the bigger NBA salary and climb to the highest-paid player.',
+  'image.climbedTo': 'I climbed to',
+  'image.stayedAt': 'I stayed at',
+  'image.start': 'Start',
   'image.rung': 'Rung {rung}',
+  'image.rungLabel': 'Rung',
   'image.lives': 'Lives',
   'image.time': 'Time',
   'image.footer': 'Climb your own ladder at hoopsmatic.com/salary-ladder',

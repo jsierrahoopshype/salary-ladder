@@ -199,7 +199,7 @@ How each kind of player is handled:
   - **the leaderboard prompt**: enter a display name to appear on the board (section 12);
   - **one optional tap: "Which contract would you rather have?"** comparing the last two players you saw (section 14);
   - the share button, and for Daily a link to play Unlimited.
-- **Share card** (no player names, so it never spoils the day):
+- **Share text** (no player names, so it never spoils the day):
 
   ```
   Salary Ladder #12 · Oct 9
@@ -209,7 +209,13 @@ How each kind of player is handled:
   ```
 
   `#12` is the Daily number (#1 = launch day). For Unlimited the first line reads "Salary Ladder · Unlimited".
-- **Share buttons** (the 73-9 share modal, section 20): Copy copies the card above exactly. The X and Bluesky buttons add HoopsHype's handle on its own line after the card text, as 73-9 does: **@hoopshype** on X, **@hoopshypeofficial.bsky.social** on Bluesky. Facebook, WhatsApp, Reddit and Telegram get the card with no handle.
+- **Share picture** (approved October 16, 2026; drawn in the 73-9 card look, 1080×1350). Unlike the text card above, **it names the player you reached**:
+  - a line saying what the game is ("Guess the bigger NBA salary and climb to the highest-paid player.");
+  - the headshot of the player you climbed to (face2 from nba-headshots, then face, then his team's logo, then initials, as on the play cards), with "I climbed to", his name and your score;
+  - your climb: one bar per rung won, from the start salary to your score, each bar as tall as its salary within the climb, the first and last salaries labelled, "Start" and "Rung N" under the ends (very long climbs are sampled to 40 bars, keeping both ends);
+  - rung, lives and time in three tiles; which game it was; and "Climb your own ladder at hoopsmatic.com/salary-ladder".
+  - Accepted trade-off: on the Daily, the picture shows one player from that day's ladder. The text card stays name-free.
+- **Share window** (Spend $15's, which mirrors the Daily 73-9's; since October 15, 2026): the picture, the link with Copy (copies the share text above exactly), the six platforms, then Download, Copy image and More (the phone's share sheet). The X and Bluesky buttons add HoopsHype's handle after the text, as Spend $15 does: **@hoopshype** on X, **@hoopshypeofficial.bsky.social** (then the link) on Bluesky. Facebook, WhatsApp, Reddit and Telegram get the text with no handle.
 
 ---
 
