@@ -116,10 +116,16 @@
 
     <p id="e-foot" class="fine"></p>
   </section>
+
+  <!-- More HoopsMatic games: the shared module's cards, filled in when a game
+       ends, as Spend $15 does. Hidden during play. -->
+  <div id="games-promo"></div>
 </div>
 <noscript><p class="loading">{{app.noscript}}</p></noscript>
 <script type="module">
 /*__SCRIPT__*/
 </script>
+<!-- The shared HoopsMatic games module (served by the hoopsmatic.com Worker), loaded as Spend $15 loads it. -->
+<script src="https://hoopsmatic.com/hoopsmatic-games.js" data-hm-game="salaryladder" defer></script>
 </body>
 </html>
