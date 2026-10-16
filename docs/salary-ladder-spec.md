@@ -210,7 +210,7 @@ How each kind of player is handled:
 
   `#12` is the Daily number (#1 = launch day). For Unlimited the first line reads "Salary Ladder · Unlimited".
 - **Share picture** (approved October 16, 2026; drawn in the 73-9 card look, 1080×1350). Unlike the text card above, **it names the player you reached**:
-  - a line saying what the game is ("Pick who gets paid more. Climb the NBA salary ladder.");
+  - a line saying what the game is ("Guess the bigger NBA salary and climb to the highest-paid player.");
   - the headshot of the player you climbed to (face2 from nba-headshots, then face, then his team's logo, then initials, as on the play cards), with "I climbed to", his name and your score;
   - your climb: one bar per rung won, from the start salary to your score, each bar as tall as its salary within the climb, the first and last salaries labelled, "Start" and "Rung N" under the ends (very long climbs are sampled to 40 bars, keeping both ends);
   - rung, lives and time in three tiles; which game it was; and "Climb your own ladder at hoopsmatic.com/salary-ladder".

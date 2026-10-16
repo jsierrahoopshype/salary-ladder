@@ -135,7 +135,7 @@ export const COPY = {
   'shareText.line': 'I reached {score} (rung {rung})',
 
   // Share picture (drawn in capitals)
-  'image.tagline': 'Pick who gets paid more. Climb the NBA salary ladder.',
+  'image.tagline': 'Guess the bigger NBA salary and climb to the highest-paid player.',
   'image.climbedTo': 'I climbed to',
   'image.stayedAt': 'I stayed at',
   'image.start': 'Start',

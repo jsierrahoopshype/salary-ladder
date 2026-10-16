@@ -206,7 +206,7 @@ The 73-9 card look, 1080×1350. Top to bottom: the title; the line saying what t
 
 | Text | Shows | Key |
 |---|---|---|
-| Pick who gets paid more. Climb the NBA salary ladder. | Under the title: what the game is | `image.tagline` |
+| Guess the bigger NBA salary and climb to the highest-paid player. | Under the title: what the game is | `image.tagline` |
 | I climbed to | Beside the headshot, above the player's name and salary | `image.climbedTo` |
 | I stayed at | The same place, in a game that never left the first player (rung 0) | `image.stayedAt` |
 | Start | Under the first bar of the climb (its salary is above it) | `image.start` |
