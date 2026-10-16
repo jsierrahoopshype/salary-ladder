@@ -824,7 +824,12 @@ const COPY = {
   'shareText.line': 'I reached {score} (rung {rung})',
 
   // Share picture (drawn in capitals)
+  'image.tagline': 'Pick who gets paid more. Climb the NBA salary ladder.',
+  'image.climbedTo': 'I climbed to',
+  'image.stayedAt': 'I stayed at',
+  'image.start': 'Start',
   'image.rung': 'Rung {rung}',
+  'image.rungLabel': 'Rung',
   'image.lives': 'Lives',
   'image.time': 'Time',
   'image.footer': 'Climb your own ladder at hoopsmatic.com/salary-ladder',
@@ -1060,6 +1065,26 @@ function isMyRow(row, me) {
 /** The Monday a game day's week starts on (weeks start Monday 9 AM ET, like the boards). */
 function weekStart(day) {
   return addDaysIso(day, -((new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7));
+}
+
+/**
+ * The salaries of a game's climb, for the share picture: the start player's,
+ * then each new player's as the rungs were won. `log` is applyPick's answers
+ * in order.
+ */
+function climbSalaries(startSalary, log) {
+  return [startSalary, ...log.filter((r) => r.climbed).map((r) => r.challengerSalary)];
+}
+
+/**
+ * At most `max` bars for the picture: a long climb is sampled evenly, always
+ * keeping the first and the last.
+ */
+function climbBars(salaries, max = 40) {
+  if (salaries.length <= max) return salaries.slice();
+  const out = [];
+  for (let i = 0; i < max; i++) out.push(salaries[Math.round((i * (salaries.length - 1)) / (max - 1))]);
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -1607,7 +1632,12 @@ function finish() {
   const { g, state, last } = G;
   G = null;
   preloaded.clear();
+  // The salary at every rung won, for the share picture's climb.
+  const again = newGame({ pool: D.pool, rules: g.rules, seed: g.seed, startId: g.startId });
+  const climb = climbSalaries(D.pool.byId.get(g.startId).salary,
+    g.picks.map((p) => applyPick(D.pool, g.rules, again, p.c, p.ms)));
   const summary = {
+    climb,
     mode: g.mode, date: g.date, number: g.number, dataDate: g.dataDate,
     score: score(D.pool, state), endId: state.incumbent, rung: state.rung,
     livesLeft: state.lives, lives: g.rules.lives, totalMs: state.totalMs, finished: state.finished,
@@ -1953,10 +1983,12 @@ function boardTable(rows, mine, me) {
 }
 
 // ---------------------------------------------------------------------------
-// Share (copied from the 73-9 share modal): a drawn picture of the share card,
-// the link with Copy, the platform buttons, then Download / Copy / Play again.
-// The picture carries exactly what the text card says (spec 9): no player
-// names, and no outside images, so the canvas never taints.
+// Share: a drawn picture (the 73-9 card look) and the Spend $15 share window.
+// The picture says what the game is, shows the player you climbed to with his
+// headshot and salary, your climb rung by rung, and rung, lives and time
+// (spec 9). The text card still names no player. The headshot is loaded with
+// CORS (GitHub Pages allows any origin), so the canvas can still be saved;
+// if a picture is refused anyway, the card is drawn again without it.
 
 function roundRect(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
@@ -1988,8 +2020,31 @@ function heart(ctx, cx, cy, size) {
 const DISPLAY = 'Oswald, "DM Sans", sans-serif';
 const MONO = '"JetBrains Mono", monospace';
 
-function drawCard(sm) {
-  const W = 1080, H = 1350, SS = 2;
+/** One picture for the canvas, loaded with CORS; null if it fails or is slow. */
+function canvasImage(url, ms = 4000) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    const t = setTimeout(() => resolve(null), ms);
+    img.onload = () => { clearTimeout(t); resolve(img.naturalWidth ? img : null); };
+    img.onerror = () => { clearTimeout(t); resolve(null); };
+    img.src = url;
+  });
+}
+
+/** The reached player's picture, with the play cards' fallbacks: face2, face, team logo. */
+async function cardPhoto(p) {
+  if (!p) return null;
+  for (const url of photoUrls(p, CARD_CROPS)) {
+    const img = await canvasImage(url);
+    if (img) return { img, logo: url.startsWith(LOGOS) };
+  }
+  return null;
+}
+
+/** The share picture. `photo` is cardPhoto()'s answer (null: initials). */
+function drawCard(sm, photo) {
+  const W = 1080, H = 1350, SS = 2, L = 96, R = W - 96;
   const cv = document.createElement('canvas');
   cv.width = W * SS; cv.height = H * SS;
   const ctx = cv.getContext('2d');
@@ -2005,61 +2060,137 @@ function drawCard(sm) {
   roundRect(ctx, 28, 28, W - 56, H - 56, 30); ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
 
-  // Title, and which game (the share text's first line).
+  // Title, then what the game is, in a plain sentence.
   const grd = ctx.createLinearGradient(W / 2 - 400, 0, W / 2 + 400, 0);
   grd.addColorStop(0, '#ff6b35'); grd.addColorStop(0.5, '#ffd700'); grd.addColorStop(1, '#ff6b35');
   const title = T('app.name').toUpperCase();
   spacing(ctx, '4px'); ctx.fillStyle = grd; fitFont(ctx, title, W - 160, 700, 112, DISPLAY, 70);
-  ctx.fillText(title, W / 2, 190);
-  const which = (sm.mode === 'daily'
-    ? `${modeName('daily', sm.number)}  ·  ${shortDate(sm.date)}` : modeName('unlimited')).toUpperCase();
-  spacing(ctx, '4px'); ctx.fillStyle = '#ffd84d'; ctx.font = `700 30px ${DISPLAY}`;
-  ctx.fillText(which, W / 2, 262);
+  ctx.fillText(title, W / 2, 168);
+  spacing(ctx, '0.5px'); ctx.fillStyle = '#dcdcf7'; fitFont(ctx, T('image.tagline'), W - 180, 600, 38, DISPLAY, 26);
+  ctx.fillText(T('image.tagline'), W / 2, 236);
 
-  // The score, and the rung under it.
-  spacing(ctx, '0px'); ctx.fillStyle = '#fff'; fitFont(ctx, money(sm.score), W - 200, 700, 190, DISPLAY, 100);
-  ctx.fillText(money(sm.score), W / 2, 470);
-  spacing(ctx, '3px'); ctx.fillStyle = '#dcdcf7'; ctx.font = `700 28px ${DISPLAY}`;
-  const rung = T('image.rung', { rung: sm.rung });
-  ctx.fillText((sm.finished ? `${T('end.top')}  ·  ${rung}` : rung).toUpperCase(), W / 2, 528);
+  // The player you climbed to: headshot (the play cards' frame), then
+  // "I climbed to" / name / salary beside it.
+  const end = D.pool.byId.get(sm.endId);
+  const px = L, py = 300, ps = 290;
+  ctx.save();
+  roundRect(ctx, px, py, ps, ps, 26); ctx.clip();
+  const well = ctx.createRadialGradient(px + ps / 2, py + ps * 0.4, 10, px + ps / 2, py + ps * 0.4, ps * 0.75);
+  well.addColorStop(0, '#22224a'); well.addColorStop(1, '#0a0a1e');
+  ctx.fillStyle = well; ctx.fillRect(px, py, ps, ps);
+  if (photo && photo.logo) {
+    const pad = ps * 0.16;
+    ctx.drawImage(photo.img, px + pad, py + pad, ps - 2 * pad, ps - 2 * pad);
+  } else if (photo) {
+    // The top-centre 82% of the crop: face2 puts every head in the same place
+    // with an empty band under the shoulders, so this zooms in a little and
+    // fills the frame with head and shoulders.
+    const { naturalWidth: iw, naturalHeight: ih } = photo.img;
+    const sw = iw * 0.82, sh = Math.min(ih, sw);
+    ctx.drawImage(photo.img, (iw - sw) / 2, 0, sw, sh, px, py, ps, ps);
+  } else if (end) {
+    spacing(ctx, '2px'); ctx.fillStyle = '#cfcff0'; ctx.font = `700 110px ${DISPLAY}`;
+    ctx.fillText(initials(end.name), px + ps / 2, py + ps / 2 + 40);
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#26264c'; ctx.lineWidth = 2; roundRect(ctx, px, py, ps, ps, 26); ctx.stroke();
 
-  // The climb: one bar per rung, rising to the last one.
-  const n = Math.min(Math.max(sm.rung, 1), 40);
-  const x0 = 96, x1 = W - 96, base = 870, top = 590, gap = n > 24 ? 6 : 10;
-  const bw = (x1 - x0 - gap * (n - 1)) / n;
+  const tx = px + ps + 44, tw = R - tx;
+  ctx.textAlign = 'left';
+  spacing(ctx, '0.5px'); ctx.fillStyle = '#dcdcf7'; ctx.font = `600 40px ${DISPLAY}`;
+  ctx.fillText(T(sm.rung > 0 ? 'image.climbedTo' : 'image.stayedAt'), tx, py + 58);
+  const name = end ? end.name : '';
+  spacing(ctx, '0px'); ctx.fillStyle = '#fff'; fitFont(ctx, name, tw, 700, 74, DISPLAY, 40);
+  ctx.fillText(name, tx, py + 150);
+  ctx.fillStyle = '#ffd700'; fitFont(ctx, money(sm.score), tw, 700, 128, DISPLAY, 80);
+  ctx.fillText(money(sm.score), tx, py + 276);
+  ctx.textAlign = 'center';
+
+  // The climb: one bar per rung won, from the start salary to the last one,
+  // each as tall as its salary within the climb; both ends labelled.
+  const cy0 = 650, base = 940, x0 = L, x1 = R;
+  const bars = sm.climb ? climbBars(sm.climb) : null;
+  const n = bars ? bars.length : Math.min(Math.max(sm.rung + 1, 1), 40);
+  const gap = n > 24 ? 6 : n > 12 ? 10 : 14;
+  const bw = Math.min(120, (x1 - x0 - gap * (n - 1)) / n);
+  const left = x0 + (x1 - x0 - (bw * n + gap * (n - 1))) / 2;
+  const lo = bars ? Math.min(...bars) : 0, hi = bars ? Math.max(...bars) : 1;
+  const minH = 34, maxH = base - cy0 - 56;
+  const barH = (i) => (bars
+    ? (hi === lo ? maxH : minH + (maxH - minH) * ((bars[i] - lo) / (hi - lo)))
+    : minH + (maxH - minH) * (n === 1 ? 1 : i / (n - 1)));
   for (let i = 0; i < n; i++) {
-    const h = sm.rung === 0 ? 24 : 24 + (base - top - 24) * (n === 1 ? 1 : i / (n - 1));
-    const x = x0 + i * (bw + gap);
+    const h = barH(i), x = left + i * (bw + gap), last = i === n - 1;
     const fill = ctx.createLinearGradient(0, base - h, 0, base);
-    const last = i === n - 1 && sm.rung > 0;
     fill.addColorStop(0, last ? '#ffd700' : 'rgba(255,184,64,0.75)');
     fill.addColorStop(1, last ? '#ff6b35' : 'rgba(255,107,53,0.35)');
-    ctx.fillStyle = sm.rung === 0 ? '#2a2a52' : fill;
+    ctx.fillStyle = fill;
     roundRect(ctx, x, base - h, bw, h, Math.min(8, bw / 2)); ctx.fill();
   }
-
-  // Lives and time, in two tiles.
-  const ty = 920, th = 210, tw = (W - 96 * 2 - 24) / 2;
-  for (const [i, label] of [T('image.lives'), T('image.time')].map((l) => l.toUpperCase()).entries()) {
-    const tx = 96 + i * (tw + 24);
-    ctx.fillStyle = 'rgba(255,255,255,0.04)'; roundRect(ctx, tx, ty, tw, th, 18); ctx.fill();
-    spacing(ctx, '3px'); ctx.fillStyle = '#9a9ac8'; ctx.font = `700 24px ${DISPLAY}`;
-    ctx.fillText(label, tx + tw / 2, ty + th - 34);
+  ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.fillRect(x0, base + 6, x1 - x0, 2);
+  // Each end's salary sits above every bar its text spans, so it never runs into one.
+  spacing(ctx, '0px'); ctx.font = `700 34px ${DISPLAY}`;
+  const lastX = left + (n - 1) * (bw + gap);
+  const clearY = (a, b) => {
+    let y = base;
+    for (let i = 0; i < n; i++) {
+      const x = left + i * (bw + gap);
+      if (x < b && x + bw > a) y = Math.min(y, base - barH(i));
+    }
+    return y - 14;
+  };
+  if (bars && n > 1) {
+    const t = money(bars[0]), w = ctx.measureText(t).width;
+    ctx.textAlign = 'left'; ctx.fillStyle = '#e6c46a';
+    ctx.fillText(t, left, clearY(left, left + w));
   }
-  const hs = 52, hg = 14, hx = 96 + tw / 2 - ((sm.lives - 1) * (hs + hg)) / 2;
+  const tEnd = money(sm.score), wEnd = ctx.measureText(tEnd).width;
+  ctx.textAlign = n > 1 ? 'right' : 'center'; ctx.fillStyle = '#ffd700';
+  ctx.fillText(tEnd, n > 1 ? lastX + bw : left + bw / 2,
+    n > 1 ? clearY(lastX + bw - wEnd, lastX + bw) : base - barH(0) - 14);
+  spacing(ctx, '3px'); ctx.font = `700 26px ${DISPLAY}`; ctx.fillStyle = '#9a9ac8';
+  ctx.textAlign = 'left'; ctx.fillText(T('image.start').toUpperCase(), x0, base + 48);
+  ctx.textAlign = 'right';
+  const rung = T('image.rung', { rung: sm.rung });
+  ctx.fillText((sm.finished ? `${T('end.top')}  ·  ${rung}` : rung).toUpperCase(), x1, base + 48);
+  ctx.textAlign = 'center';
+
+  // Rung, lives and time, in three tiles.
+  const ty = 1032, th = 160, gw = 24, tl = (R - L - gw * 2) / 3;
+  const labels = [T('image.rungLabel'), T('image.lives'), T('image.time')];
+  for (let i = 0; i < 3; i++) {
+    const x = L + i * (tl + gw);
+    ctx.fillStyle = 'rgba(255,255,255,0.04)'; roundRect(ctx, x, ty, tl, th, 18); ctx.fill();
+    spacing(ctx, '3px'); ctx.fillStyle = '#9a9ac8'; ctx.font = `700 22px ${DISPLAY}`;
+    ctx.fillText(labels[i].toUpperCase(), x + tl / 2, ty + th - 26);
+  }
+  spacing(ctx, '0px'); ctx.fillStyle = '#ffd700'; ctx.font = `700 76px ${DISPLAY}`;
+  ctx.fillText(String(sm.rung), L + tl / 2, ty + 88);
+  const hs = 38, hg = 10, hx = L + tl + gw + tl / 2 - ((sm.lives - 1) * (hs + hg)) / 2;
   for (let i = 0; i < sm.lives; i++) {
-    heart(ctx, hx + i * (hs + hg), ty + 92, hs);
+    heart(ctx, hx + i * (hs + hg), ty + 66, hs);
     ctx.fillStyle = i < sm.livesLeft ? '#ff6666' : '#2a2a52'; ctx.fill();
   }
-  spacing(ctx, '0px'); ctx.fillStyle = '#ffd700'; ctx.font = `600 76px ${MONO}`;
-  ctx.fillText(clock(sm.totalMs), 96 + tw + 24 + tw / 2, ty + 120);
+  ctx.fillStyle = '#ffd700'; ctx.font = `600 62px ${MONO}`;
+  ctx.fillText(clock(sm.totalMs), L + 2 * (tl + gw) + tl / 2, ty + 86);
 
-  // Footer.
+  // Footer: which game, then where to play.
+  const which = (sm.mode === 'daily'
+    ? `${modeName('daily', sm.number)}  ·  ${shortDate(sm.date)}` : modeName('unlimited')).toUpperCase();
+  spacing(ctx, '4px'); ctx.fillStyle = '#ffd84d'; ctx.font = `700 26px ${DISPLAY}`;
+  ctx.fillText(which, W / 2, H - 118);
   const footer = T('image.footer').toUpperCase();
   spacing(ctx, '2px'); ctx.fillStyle = '#aeaed4'; fitFont(ctx, footer, W - 140, 700, 26, DISPLAY, 18);
-  ctx.fillText(footer, W / 2, H - 76);
+  ctx.fillText(footer, W / 2, H - 72);
   spacing(ctx, '0px');
   return cv;
+}
+
+/** The share picture as a data: address. Drawn without the photo if the photo taints the canvas. */
+async function shareCardUrl(sm) {
+  const photo = await cardPhoto(D.pool.byId.get(sm.endId));
+  try { return drawCard(sm, photo).toDataURL('image/png'); }
+  catch { return drawCard(sm, null).toDataURL('image/png'); }
 }
 
 const SOCIAL = [['x', 'X'], ['bsky', 'Bluesky'], ['fb', 'Facebook'], ['wa', 'WhatsApp'], ['reddit', 'Reddit'], ['telegram', 'Telegram']];
@@ -2080,7 +2211,7 @@ async function openShare(summary) {
   await Promise.all([document.fonts.load(`700 100px ${DISPLAY}`), document.fonts.load(`600 70px ${MONO}`)]).catch(() => {});
   let url, blob;
   try {
-    url = drawCard(summary).toDataURL('image/png');
+    url = await shareCardUrl(summary);
     // Same conversion as Spend $15 and the Daily 73-9 (a page's security
     // policy can block fetching a data: address).
     const bin = atob(url.split(',')[1]);

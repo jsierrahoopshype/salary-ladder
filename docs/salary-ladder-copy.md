@@ -202,11 +202,16 @@ https://hoopsmatic.com/salary-ladder/
 
 ## Share picture
 
-Drawn in capitals. It also shows the title, which game it was, the score, a bar per rung, the hearts and the time.
+The 73-9 card look, 1080×1350. Top to bottom: the title; the line saying what the game is; the headshot of the player you climbed to (the play cards' face2 crop, then the face crop, then his team's logo, then initials) with "I climbed to", his name and the score; the climb, one bar per rung won from the start salary to the score, both labelled; tiles for rung, lives and time; which game it was; the bottom line. The labels, the tile labels, which game and the bottom line are drawn in capitals; the line under the title and "I climbed to" are not. The picture names the player you reached; the share text does not.
 
 | Text | Shows | Key |
 |---|---|---|
-| Rung {rung} | Under the score (after "Top of the ladder ·" when you reached it) | `image.rung` |
+| Pick who gets paid more. Climb the NBA salary ladder. | Under the title: what the game is | `image.tagline` |
+| I climbed to | Beside the headshot, above the player's name and salary | `image.climbedTo` |
+| I stayed at | The same place, in a game that never left the first player (rung 0) | `image.stayedAt` |
+| Start | Under the first bar of the climb (its salary is above it) | `image.start` |
+| Rung {rung} | Under the last bar of the climb (after "Top of the ladder ·" when you reached it) | `image.rung` |
+| Rung | Label of the rung tile | `image.rungLabel` |
 | Lives | Label under the hearts | `image.lives` |
 | Time | Label under the time | `image.time` |
 | Climb your own ladder at hoopsmatic.com/salary-ladder | Bottom line | `image.footer` |

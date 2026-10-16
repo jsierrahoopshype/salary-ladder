@@ -210,6 +210,26 @@ export function weekStart(day) {
   return addDaysIso(day, -((new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7));
 }
 
+/**
+ * The salaries of a game's climb, for the share picture: the start player's,
+ * then each new player's as the rungs were won. `log` is applyPick's answers
+ * in order.
+ */
+export function climbSalaries(startSalary, log) {
+  return [startSalary, ...log.filter((r) => r.climbed).map((r) => r.challengerSalary)];
+}
+
+/**
+ * At most `max` bars for the picture: a long climb is sampled evenly, always
+ * keeping the first and the last.
+ */
+export function climbBars(salaries, max = 40) {
+  if (salaries.length <= max) return salaries.slice();
+  const out = [];
+  for (let i = 0; i < max; i++) out.push(salaries[Math.round((i * (salaries.length - 1)) / (max - 1))]);
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Device storage (spec 16). Every read and write is wrapped, so the game
 // still plays when the browser blocks storage; things just aren't remembered.
