@@ -10,11 +10,14 @@
 //   GET  /status                                 -> is it configured and recording
 //   GET  /admin/totals?key=&table=pairs|contracts|gaps|accuracy   -> CSV
 //   GET  /admin/run?key=                         -> runs the totals job now
+//   GET  /badge-totals  (Authorization: Bearer BADGES_ADMIN_KEY)
+//                        -> totals only, for the HoopsMatic Badges count
 //   cron every 5 min: score counts for the end-screen percentage
 //   cron hourly at :23: the daily totals job and clean-up (spec 14.2)
 //
 // Bindings: DB (D1). Secrets: VERIFY_SECRET, ADMIN_KEY (set in the Cloudflare
-// dashboard, never in this repo). Vars: DATA_BASE (where daily/ and rules/
+// dashboard, never in this repo), BADGES_ADMIN_KEY (copied in by the
+// hoopsmatic-badges "Copy a key to a Worker" button). Vars: DATA_BASE (where daily/ and rules/
 // are published), RECORDING ('off' stops recording, as does
 // "recording": false in rules/rules.json).
 
@@ -412,6 +415,37 @@ async function admin(path, request, env, now) {
 }
 
 // ---------------------------------------------------------------------------
+// HoopsMatic Badges count (badges build plan, step 3). Totals only: how many
+// games reached each rung and how many finished, over the game records still
+// kept (RAW_KEEP_DAYS). Games, not players: records carry no player or device
+// ID, by design. The key travels in a header, never in the URL.
+
+const badgesKeyOk = (env, request) => {
+  const auth = request.headers.get('authorization') || '';
+  return Boolean(env.BADGES_ADMIN_KEY) && auth.startsWith('Bearer ') && sameString(auth.slice(7).trim(), env.BADGES_ADMIN_KEY);
+};
+
+export async function badgeTotals(env) {
+  const [rungs, finished, span] = await Promise.all([
+    env.DB.prepare('SELECT rung, COUNT(*) AS n FROM games GROUP BY rung ORDER BY rung').all(),
+    env.DB.prepare('SELECT finished, COUNT(*) AS n FROM games GROUP BY finished').all(),
+    env.DB.prepare("SELECT COUNT(*) AS total, MIN(day) AS first, MAX(day) AS last, SUM(mode = 'daily') AS daily FROM games").first(),
+  ]);
+  const rung = {};
+  for (const r of rungs.results) rung[r.rung] = r.n;
+  const fin = { true: 0, false: 0 };
+  for (const r of finished.results) fin[r.finished ? 'true' : 'false'] = r.n;
+  return {
+    game: 'salaryladder',
+    unit: 'games',
+    total: span.total || 0,
+    window: { from: span.first, to: span.last },
+    modes: { daily: span.daily || 0, unlimited: (span.total || 0) - (span.daily || 0) },
+    distributions: { rung, finished: fin },
+  };
+}
+
+// ---------------------------------------------------------------------------
 
 export async function handle(request, env, now = Date.now()) {
   return serve(request, async () => {
@@ -421,6 +455,10 @@ export async function handle(request, env, now = Date.now()) {
       return json({ ok: true, configured: ok, recording: ok ? await recordingOn(env, now) : false, day: gameDay(now) });
     }
     if (path.startsWith('/admin/') && request.method === 'GET') return admin(path, request, env, now);
+    if (path === '/badge-totals' && request.method === 'GET') {
+      if (!badgesKeyOk(env, request)) return bad('unauthorized', 403);
+      return json(await badgeTotals(env));
+    }
     if (request.method !== 'POST') return bad('not found', 404);
     if (!configured(env)) return json({ ok: false, error: 'not configured' }, 503);
     if (!(await recordingOn(env, now))) return resting();

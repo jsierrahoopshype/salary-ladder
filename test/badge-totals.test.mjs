@@ -1,0 +1,57 @@
+// GET /salary-ladder/api/badge-totals: the HoopsMatic Badges count. Totals
+// only, behind BADGES_ADMIN_KEY in a header.
+
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import * as game from '../workers/game/game.js';
+import { fakeD1 } from './helpers/cloudflare.mjs';
+
+const KEY = 'test-badges-key';
+
+function envWithGames(rows) {
+  const DB = fakeD1();
+  const ins = DB.raw.prepare(`INSERT INTO games (code, mode, day, season, rv, data_date, score, rung, total_ms, lives_used, finished, picks, created)
+    VALUES (?, ?, ?, '2026-27', 1, '2026-10-12', 0, ?, 1000, 5, ?, '[]', 1)`);
+  rows.forEach(([mode, day, rung, finished], i) => ins.run(`code${i}`, mode, day, rung, finished ? 1 : 0));
+  return { DB, BADGES_ADMIN_KEY: KEY };
+}
+
+async function get(env, headers = {}) {
+  const res = await game.handle(new Request('https://hoopsmatic.com/salary-ladder/api/badge-totals', { headers }), env);
+  return { status: res.status, data: await res.json() };
+}
+
+test('badge totals: rung and finish counts over the kept games, nothing per game', async () => {
+  const env = envWithGames([
+    ['daily', '2026-10-13', 3, false], ['daily', '2026-10-13', 12, false], ['unlimited', '2026-10-14', 12, false],
+    ['unlimited', '2026-10-15', 66, true], ['daily', '2026-10-15', 0, false],
+  ]);
+  const { status, data } = await get(env, { Authorization: `Bearer ${KEY}` });
+  assert.equal(status, 200);
+  assert.deepEqual(data, {
+    game: 'salaryladder', unit: 'games', total: 5,
+    window: { from: '2026-10-13', to: '2026-10-15' },
+    modes: { daily: 3, unlimited: 2 },
+    distributions: { rung: { 0: 1, 3: 1, 12: 2, 66: 1 }, finished: { true: 1, false: 4 } },
+  });
+  const text = JSON.stringify(data);
+  assert.ok(!/code\d|picks|total_ms/.test(text), 'no game records or codes in the reply');
+});
+
+test('badge totals: no games yet is a zero report, not an error', async () => {
+  const { status, data } = await get(envWithGames([]), { Authorization: `Bearer ${KEY}` });
+  assert.equal(status, 200);
+  assert.equal(data.total, 0);
+  assert.deepEqual(data.distributions, { rung: {}, finished: { true: 0, false: 0 } });
+});
+
+test('badge totals: refused without the badges key, with a wrong key, or with the key in the URL', async () => {
+  const env = envWithGames([['daily', '2026-10-13', 3, false]]);
+  assert.equal((await get(env)).status, 403);
+  assert.equal((await get(env, { Authorization: 'Bearer wrong' })).status, 403);
+  assert.equal((await get(env, { Authorization: KEY })).status, 403);
+  const res = await game.handle(new Request(`https://hoopsmatic.com/salary-ladder/api/badge-totals?key=${KEY}`), env);
+  assert.equal(res.status, 403);
+  // The Worker's own ADMIN_KEY is not the badges key.
+  assert.equal((await get({ ...env, BADGES_ADMIN_KEY: undefined, ADMIN_KEY: KEY }, { Authorization: `Bearer ${KEY}` })).status, 403);
+});
