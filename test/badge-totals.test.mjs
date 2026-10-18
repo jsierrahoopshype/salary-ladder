@@ -21,18 +21,21 @@ async function get(env, headers = {}) {
   return { status: res.status, data: await res.json() };
 }
 
-test('badge totals: rung and finish counts over the kept games, nothing per game', async () => {
+test('badge totals: Daily games are the headline, Unlimited is reported separately', async () => {
   const env = envWithGames([
     ['daily', '2026-10-13', 3, false], ['daily', '2026-10-13', 12, false], ['unlimited', '2026-10-14', 12, false],
-    ['unlimited', '2026-10-15', 66, true], ['daily', '2026-10-15', 0, false],
+    ['unlimited', '2026-10-15', 66, true], ['daily', '2026-10-15', 0, false], ['unlimited', '2026-10-16', 30, false],
   ]);
   const { status, data } = await get(env, { Authorization: `Bearer ${KEY}` });
   assert.equal(status, 200);
   assert.deepEqual(data, {
-    game: 'salaryladder', unit: 'games', total: 5,
+    game: 'salaryladder', unit: 'games', basis: 'daily', total: 3,
     window: { from: '2026-10-13', to: '2026-10-15' },
-    modes: { daily: 3, unlimited: 2 },
-    distributions: { rung: { 0: 1, 3: 1, 12: 2, 66: 1 }, finished: { true: 1, false: 4 } },
+    distributions: { rung: { 0: 1, 3: 1, 12: 1 }, finished: { true: 0, false: 3 } },
+    unlimited: {
+      total: 3, window: { from: '2026-10-14', to: '2026-10-16' },
+      distributions: { rung: { 12: 1, 30: 1, 66: 1 }, finished: { true: 1, false: 2 } },
+    },
   });
   const text = JSON.stringify(data);
   assert.ok(!/code\d|picks|total_ms/.test(text), 'no game records or codes in the reply');
@@ -43,6 +46,7 @@ test('badge totals: no games yet is a zero report, not an error', async () => {
   assert.equal(status, 200);
   assert.equal(data.total, 0);
   assert.deepEqual(data.distributions, { rung: {}, finished: { true: 0, false: 0 } });
+  assert.equal(data.unlimited.total, 0);
 });
 
 test('badge totals: refused without the badges key, with a wrong key, or with the key in the URL', async () => {

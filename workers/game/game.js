@@ -415,33 +415,43 @@ async function admin(path, request, env, now) {
 }
 
 // ---------------------------------------------------------------------------
-// HoopsMatic Badges count (badges build plan, step 3). Totals only: how many
-// games reached each rung and how many finished, over the game records still
-// kept (RAW_KEEP_DAYS). Games, not players: records carry no player or device
-// ID, by design. The key travels in a header, never in the URL.
+// HoopsMatic Badges count (badges build plan, step 3). Totals only, over the
+// game records still kept (RAW_KEEP_DAYS). The key travels in a header, never
+// in the URL.
+//
+// The headline numbers are DAILY games only. A Daily is one official game per
+// device per day, so each Daily game is one player's day, the nearest thing to
+// "share of players" a game without player IDs can measure. Unlimited games
+// are reported separately for reference and left out of the headline: one
+// person can play any number of them, which would tilt every share toward the
+// keenest players.
 
 const badgesKeyOk = (env, request) => {
   const auth = request.headers.get('authorization') || '';
   return Boolean(env.BADGES_ADMIN_KEY) && auth.startsWith('Bearer ') && sameString(auth.slice(7).trim(), env.BADGES_ADMIN_KEY);
 };
 
-export async function badgeTotals(env) {
+async function modeTotals(env, mode) {
   const [rungs, finished, span] = await Promise.all([
-    env.DB.prepare('SELECT rung, COUNT(*) AS n FROM games GROUP BY rung ORDER BY rung').all(),
-    env.DB.prepare('SELECT finished, COUNT(*) AS n FROM games GROUP BY finished').all(),
-    env.DB.prepare("SELECT COUNT(*) AS total, MIN(day) AS first, MAX(day) AS last, SUM(mode = 'daily') AS daily FROM games").first(),
+    env.DB.prepare('SELECT rung, COUNT(*) AS n FROM games WHERE mode = ? GROUP BY rung ORDER BY rung').bind(mode).all(),
+    env.DB.prepare('SELECT finished, COUNT(*) AS n FROM games WHERE mode = ? GROUP BY finished').bind(mode).all(),
+    env.DB.prepare('SELECT COUNT(*) AS total, MIN(day) AS first, MAX(day) AS last FROM games WHERE mode = ?').bind(mode).first(),
   ]);
   const rung = {};
   for (const r of rungs.results) rung[r.rung] = r.n;
   const fin = { true: 0, false: 0 };
   for (const r of finished.results) fin[r.finished ? 'true' : 'false'] = r.n;
+  return { total: span.total || 0, window: { from: span.first, to: span.last }, distributions: { rung, finished: fin } };
+}
+
+export async function badgeTotals(env) {
+  const [daily, unlimited] = await Promise.all([modeTotals(env, 'daily'), modeTotals(env, 'unlimited')]);
   return {
     game: 'salaryladder',
     unit: 'games',
-    total: span.total || 0,
-    window: { from: span.first, to: span.last },
-    modes: { daily: span.daily || 0, unlimited: (span.total || 0) - (span.daily || 0) },
-    distributions: { rung, finished: fin },
+    basis: 'daily',
+    ...daily,
+    unlimited,
   };
 }
 
