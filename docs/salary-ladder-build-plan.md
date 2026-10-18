@@ -289,7 +289,7 @@ Launch only when all of these are true:
 
 - **D1. "Play next" cross-promo card.** The session for whichever repo holds the module (from C1's report) tells Jorge exactly what it will change before touching anything. Card text, which Jorge confirms: "Salary Ladder: Who gets paid more? Climb to the top."
 - **D2. Social post drafts.** For whichever accounts Jorge chooses; **each one confirmed by Jorge before posting**. No emojis, no hashtags, no em dashes, one idea per post.
-- **D3. First calibration review** (salary-ladder; rules file only). After at least 5,000 games and at least a week: read the accuracy totals, run `tools/simulate.mjs`, recommend lives. During a season lives only go up. Jorge decides.
+- **D3. First calibration review** (salary-ladder; rules file only). After at least 5,000 games and at least a week: read the accuracy totals and run `tools/simulate.mjs`. Lives are fixed at 5 for the 2026-27 season (spec section 7), so the review doesn't recommend a lives change; it reports what the numbers say for next season. Any other setting change is Jorge's decision.
 - **D4. Career-earnings version.** Its own short interview first. It needs the 45 same-team amounts settled by the sheet owner, the Cam Whitmore merge, and a recount after A2.
 
 ---
@@ -312,4 +312,4 @@ Launch only when all of these are true:
 | C4 (if separate) | Approve and merge the privacy update | https://hoopsmatic.com/privacy |
 | C3 | Run the end-to-end test | https://hoopsmatic.com/salary-ladder/ |
 | C5 | Submit the sitemap; request indexing | https://search.google.com/search-console |
-| After launch | Confirm the cross-promo change and text; confirm each post; decide lives after the calibration review | this chat |
+| After launch | Confirm the cross-promo change and text; confirm each post; read the calibration review (lives stay at 5 this season) | this chat |
