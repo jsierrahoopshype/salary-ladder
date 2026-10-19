@@ -38,7 +38,7 @@ The link-preview picture (`og-image.jpg`, 1200×630) shows three lines from this
 
 ## Intro
 
-How to play is a numbered list. Its numbers come from `rules/rules.json` and are shown in bold, so changing the rules file changes this text by itself: today {band} is 10, {lives} is 5, {seconds} is 8. {season} is 2026-27.
+How to play is a numbered list. Its numbers come from `rules/rules.json` and are shown in bold, so changing the rules file changes this text by itself: today {band} is 15 (rules version 2; it was 10 in version 1), {lives} is 5, {seconds} is 8. {season} is 2026-27.
 
 | Text | Shows | Key |
 |---|---|---|

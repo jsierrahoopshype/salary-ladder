@@ -110,7 +110,7 @@ How each kind of player is handled:
 | Player type | In or out | Notes |
 |---|---|---|
 | Minimum-salary veterans | In | Ties with identical amounts are never paired (section 6). |
-| Rookie minimum ($1,357,763) | In, but **never shown** | Nobody else is within 10% of them, so they can't come up. 2 players today. |
+| Rookie minimum ($1,357,763) | In, but **never shown** | Nobody else is within the band (±15%) of them, so they can't come up. 2 players today. |
 | Rookie-scale contracts | In | |
 | Non-guaranteed and partially guaranteed | In | Waived players drop out at the next daily update. |
 | Two-way contracts | **Out** | Also unreachable anyway: all at the same $678,882. |
@@ -127,10 +127,10 @@ How each kind of player is handled:
 ### 6.1 The challenger
 
 - **Coin flip every pick:** 50% of the time the challenger earns more than the incumbent, 50% of the time less. Never tilted.
-- **Band:** the challenger's salary is between 90% and 110% of the incumbent's.
+- **Band:** the challenger's salary is between 85% and 115% of the incumbent's (±15%). This is rules version 2, from the first Daily built after October 19, 2026; version 1 used ±10%, and games played on it keep their own rules (section 15).
 - **Exact ties are never paired.** A challenger with exactly the incumbent's salary is never drawn.
 - **No repeats:** a player shown in the last 10 picks isn't drawn again unless nobody else fits.
-- **Empty side:** if the coin says "richer" but nobody richer is inside the band, the band widens just enough to include the next richer salary. The same goes for "poorer". If there's nobody poorer at all, the challenger is richer. (In testing with today's data, the band never ran dry on the way up.)
+- **Empty side:** if the coin says "richer" but nobody richer is inside the band, the band widens just enough to include the next richer salary. The same goes for "poorer". If there's nobody poorer at all, the challenger is richer. (In testing with today's data, the band never ran dry on the way up. Checked again at ±15% on the October 15-19 pools: from the start window to the top, every incumbent has at least one richer player inside the band.)
 - The incumbent is never his own challenger.
 
 ### 6.2 Start
@@ -148,7 +148,7 @@ How each kind of player is handled:
 - Picking the incumbent correctly: you stay.
 - You never move down, so your last incumbent is always the highest point you reached.
 - **Finish:** the game ends in a win the moment your incumbent is the highest-paid player in the pool (Stephen Curry, $62,587,158, today). If several players are ever tied at the top salary, reaching any of them counts as the top.
-- **Length** (simulated, a player who never misses): a median of **66 climbs** (61–72) and **132 picks** (114–151) from start to top.
+- **Length** (simulated, a player who never misses): at ±15%, a median of **46 climbs** (42–52) and **93 picks** from start to top (October 19 pool of 514). At the original ±10% it was 66 climbs (61–72) and 132 picks (114–151).
 
 ---
 
@@ -161,6 +161,7 @@ How each kind of player is handled:
 - **The timer keeps running if you switch apps or tabs.** It can't be paused; pausing would allow looking salaries up.
 - **Reloading or closing the page in the middle of a pick counts that pick as a timeout** (life lost). Then the game resumes from the saved state, so reloading can't be used to escape a hard pick.
 - **Daily and Unlimited use identical lives and timer.**
+- **The ±15% band (section 6.1, rules version 2) changes neither lives nor the timer.**
 - **Lives are fixed at 5 for the 2026-27 season** (Jorge's decision, October 18, 2026). They don't change during the season, including at the 5,000-game review. A new salary season may set a different number through the rules file (section 15).
 
 ---
@@ -260,6 +261,7 @@ How each kind of player is handled:
 
 - **All boundaries are at 9:00 AM Eastern.** Daily turns over each day. Weekly runs from Monday 9:00 AM ET. Monthly runs from the 1st at 9:00 AM ET. All-time counts since launch.
 - All-time entries are labeled with their season ("2026-27"), because the pool and the lives can change between seasons.
+- **The band change to ±15% (rules version 2) didn't touch the boards:** no resets, no labels, no separate boards. Games played at ±10% and at ±15% share every board.
 - Ranking is by score, then total time (section 9).
 - **Display: top 50 rows per board** (same as the Daily 73-9), plus your own rank if you have a name and you're outside the top 50.
 - **Money on the boards is shown as "$31.42M"** (two decimals) next to total time. Sorting always uses the exact dollar amount.
@@ -352,7 +354,7 @@ A scheduled job runs once a day after the 9 AM ET reset. It adds the day's recor
 - **Pair totals**, keyed by (season version, salary-data date, player A + salary, player B + salary), where A is the lower NBA ID. Counts: times shown, picked A, picked B, correct, timeouts.
   - Because both salaries are in the key, every vote carries the amounts actually shown. That answers "who do fans think is paid more than he really is" with the salaries as they were.
 - **Contract preference totals** (the end-screen question): pair + which contract was preferred.
-- **Accuracy by gap size** (0–2%, 2–4%, 4–6%, 6–8%, 8–10%): right / wrong / timeout counts. Used to see how hard picks are and how often the timer runs out (section 15). Lives are fixed at 5 this season (section 7).
+- **Accuracy by gap size** (0–2%, 2–4%, 4–6%, 6–8%, 8–10%, and 10%+ for gaps the ±15% band allows): right / wrong / timeout counts. Used to see how hard picks are and how often the timer runs out (section 15). Lives are fixed at 5 this season (section 7).
 - **Accuracy per game:** how many games ended at each accuracy level (5-point buckets, games with 20+ picks). This shows how good the best players are, which is what decides the finish rate.
 - *Built (B2):* the job runs hourly at :23 and counts each day once, two days after it (a game started just before 9 AM ET may arrive up to 24 hours later). Each step writes its totals and its place together, so a stop never counts a game twice. The end-screen percentage reads score counts that a 5-minute job rebuilds from the records, so each game end reads one small row.
 
@@ -373,11 +375,11 @@ An admin-key endpoint downloads the totals as CSV. That is how the Trade Machine
 - **Policy:**
   - Change one setting at a time, at most once a week, and only after at least 5,000 games.
   - **Lives are fixed at 5 for the 2026-27 season** (section 7). The 5,000-game review doesn't change them. A new salary season may set a different number.
-  - **The band stays at ±10%**: changing it changes the ladder length.
+  - **The band is ±15% from rules version 2** (Jorge's decision, October 19, 2026, ahead of the 5,000-game mark; version 1 was ±10%). Changing it changes the ladder length: 66 climbs at ±10%, 46 at ±15%. The leaderboards were not reset (section 12.1).
 - **Calibration:**
   - Real accuracy comes from the section 14.2 totals.
   - The simulator used to write this spec is committed as `tools/simulate.mjs` (JavaScript, so it runs the exact game code the page and server use). Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers. This season that is for reading the numbers and for the next season's decision; lives stay at 5.
-- **Target:** about 1 in 1,000 players reaches the top. With 5 lives that needs the best players to be right about **89%** of the time on salaries within 10% of each other (section 23). Jorge's view: regulars will learn the ~448-player pool over the season, so that is realistic. Measure after launch.
+- **Target:** about 1 in 1,000 players reaches the top. With 5 lives that needs the best players to be right about **84%** of the time at ±15% (it was about 89% at ±10%; section 23). Jorge's view: regulars will learn the ~448-player pool over the season, so that is realistic. Measure after launch.
 
 ---
 
@@ -538,7 +540,7 @@ Also state:
 
 ## 23. Simulation results (2026-27 rules)
 
-Pool of 448; start rule as in section 6.2; band ±10%; 50/50 coin flip; ties excluded; 20,000 games per row.
+Pool of 448; start rule as in section 6.2; band ±10%; 50/50 coin flip; ties excluded; 20,000 games per row. These are the rules version 1 numbers; the band is ±15% from version 2 (see the ±15% row below and section 6.3).
 
 **Perfect player:** 66 climbs (61–72), 132 picks (114–151). The band never needed widening.
 
@@ -559,7 +561,7 @@ Pool of 448; start rule as in section 6.2; band ±10%; 50/50 coin flip; ties exc
 - Half a point of accuracy moves the finish rate about 1.6 times.
 - 1% of picks timing out turns 1 in 1,550 into 1 in 3,758.
 
-**What else would change the accuracy needed** (for reference only; the band and start are fixed):
+**What else would change the accuracy needed** (for reference; the band moved to ±15% in rules version 2, and the start is fixed):
 
 | Change | Climbs | Accuracy needed for 1 in 1,000 with 5 lives |
 |---|---|---|

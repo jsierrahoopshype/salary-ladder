@@ -103,6 +103,35 @@ test('1,000 games played the page way all verify, with the same score', async ()
   assert.equal(n, 1000, 'one game record per game');
 });
 
+test('a rules change mid-season: games on the old version still verify with their own rules', async () => {
+  // Version 1 was ±10%; the rules file now holds a later version.
+  const v1 = { ...rules, version: 1, band: 0.10 };
+  assert.notEqual(rules.version, v1.version);
+  const oldDaily = makeDaily({ date: DAY, snapshot: snap, snapshotDate: '2026-10-12', rules: v1, config: { daily_number_start: DAY }, seed: 'seed-v1' });
+  const files = { 'rules/rules.json': v1, [`daily/${DAY}.json`]: oldDaily };
+  const { genv } = setup({ files });
+  // An Unlimited game started under version 1...
+  const unl = (await G(genv, 'POST', '/start', { mode: 'unlimited' })).data;
+  assert.equal(unl.rules.version, 1);
+  // ...then the rules file moves on. The Daily already built keeps version 1.
+  files['rules/rules.json'] = rules;
+  game.resetCaches();
+  const local = playLikeThePage(unl, { files, seed: 'v1-unlimited' });
+  const fin = await G(genv, 'POST', '/finish', { ticket: unl.ticket, picks: local.picks }, NOON + local.wall);
+  assert.equal(fin.status, 200, JSON.stringify(fin.data));
+  assert.equal(fin.data.result.score, local.score);
+  const daily = await playOne(genv, files, 'daily', 'v1-daily');
+  assert.equal(daily.start.rules, undefined, 'a Daily takes its rules from its own file');
+  assert.equal(daily.fin.status, 200, JSON.stringify(daily.fin.data));
+  assert.equal(daily.fin.data.result.score, daily.local.score);
+  // New Unlimited games get the new version.
+  const now2 = (await G(genv, 'POST', '/start', { mode: 'unlimited' })).data;
+  assert.equal(now2.rules.version, rules.version);
+  assert.equal(now2.rules.band, rules.band);
+  const rows = genv.DB.raw.prepare('SELECT mode, rv FROM games ORDER BY id').all();
+  assert.deepEqual(rows.map((r) => [r.mode, r.rv]), [['unlimited', 1], ['daily', 1]]);
+});
+
 test('each time rule rejects: 299 ms pick, 8,001 ms without a timeout, more time than passed', async () => {
   const { genv, published } = setup();
   const base = await playOne(genv, published, 'daily', 'rules-base', { skill: 0.9 });
@@ -376,7 +405,7 @@ test('contract answer, end-screen percentage, totals job, CSV and clean-up', asy
   assert.equal(genv.DB.raw.prepare('SELECT SUM(shown) AS n FROM pair_totals').get().n, shown);
 
   const csvRes = await G(genv, 'GET', `/admin/totals?key=${ADMIN}&table=pairs`, undefined, next);
-  assert.match(csvRes.data, /^season,rv,data_date,a,sa,b,sb,shown,picked_a,picked_b,correct,timeouts\n2026-27,1,2026-10-12,/);
+  assert.match(csvRes.data, new RegExp(`^season,rv,data_date,a,sa,b,sb,shown,picked_a,picked_b,correct,timeouts\\n2026-27,${rules.version},2026-10-12,`));
   assert.equal((await G(genv, 'GET', '/admin/totals?key=nope', undefined, next)).status, 403);
 
   // Codes go after 48 hours, records 7 days after their day.
