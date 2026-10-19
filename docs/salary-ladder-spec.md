@@ -161,7 +161,7 @@ How each kind of player is handled:
 - **The timer keeps running if you switch apps or tabs.** It can't be paused; pausing would allow looking salaries up.
 - **Reloading or closing the page in the middle of a pick counts that pick as a timeout** (life lost). Then the game resumes from the saved state, so reloading can't be used to escape a hard pick.
 - **Daily and Unlimited use identical lives and timer.**
-- **Changing lives later:** only through the rules file (section 15). Lives may only be raised during a season, and may be reset only at the start of a new salary season.
+- **Lives are fixed at 5 for the 2026-27 season** (Jorge's decision, October 18, 2026). They don't change during the season, including at the 5,000-game review. A new salary season may set a different number through the rules file (section 15).
 
 ---
 
@@ -352,7 +352,7 @@ A scheduled job runs once a day after the 9 AM ET reset. It adds the day's recor
 - **Pair totals**, keyed by (season version, salary-data date, player A + salary, player B + salary), where A is the lower NBA ID. Counts: times shown, picked A, picked B, correct, timeouts.
   - Because both salaries are in the key, every vote carries the amounts actually shown. That answers "who do fans think is paid more than he really is" with the salaries as they were.
 - **Contract preference totals** (the end-screen question): pair + which contract was preferred.
-- **Accuracy by gap size** (0–2%, 2–4%, 4–6%, 6–8%, 8–10%): right / wrong / timeout counts. Used to calibrate lives (section 15).
+- **Accuracy by gap size** (0–2%, 2–4%, 4–6%, 6–8%, 8–10%): right / wrong / timeout counts. Used to see how hard picks are and how often the timer runs out (section 15). Lives are fixed at 5 this season (section 7).
 - **Accuracy per game:** how many games ended at each accuracy level (5-point buckets, games with 20+ picks). This shows how good the best players are, which is what decides the finish rate.
 - *Built (B2):* the job runs hourly at :23 and counts each day once, two days after it (a game started just before 9 AM ET may arrive up to 24 hours later). Each step writes its totals and its place together, so a stop never counts a game twice. The end-screen percentage reads score counts that a 5-minute job rebuilds from the records, so each game end reads one small row.
 
@@ -372,11 +372,11 @@ An admin-key endpoint downloads the totals as CSV. That is how the Trade Machine
 - **Every stored total and every board entry carries the rules version**, so numbers from before and after a change never mix.
 - **Policy:**
   - Change one setting at a time, at most once a week, and only after at least 5,000 games.
-  - **Lives may only go up during a season** and may be reset only at the start of a new salary season.
+  - **Lives are fixed at 5 for the 2026-27 season** (section 7). The 5,000-game review doesn't change them. A new salary season may set a different number.
   - **The band stays at ±10%**: changing it changes the ladder length.
 - **Calibration:**
   - Real accuracy comes from the section 14.2 totals.
-  - The simulator used to write this spec is committed as `tools/simulate.mjs` (JavaScript, so it runs the exact game code the page and server use). Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers.
+  - The simulator used to write this spec is committed as `tools/simulate.mjs` (JavaScript, so it runs the exact game code the page and server use). Feed it the real accuracy-per-game numbers and it predicts the finish rate for any number of lives, in days rather than the months it would take to count real finishers. This season that is for reading the numbers and for the next season's decision; lives stay at 5.
 - **Target:** about 1 in 1,000 players reaches the top. With 5 lives that needs the best players to be right about **89%** of the time on salaries within 10% of each other (section 23). Jorge's view: regulars will learn the ~448-player pool over the season, so that is realistic. Measure after launch.
 
 ---
@@ -688,7 +688,7 @@ To be added in a separate Salary Finder session with Jorge's OK. Nothing in this
 
 16. Cross-promo card in the HoopsMatic games "play next" module: find where it lives, tell Jorge before touching it, card text "Salary Ladder: Who gets paid more? Climb to the top." (Jorge confirms; separate approved change).
 17. Social posts drafted after launch, each confirmed by Jorge before posting. No emojis, no hashtags, no em dashes.
-18. First calibration review after at least 5,000 games and at least 1 week (section 15).
+18. First calibration review after at least 5,000 games and at least 1 week (section 15). Lives are not part of it: they are fixed at 5 this season.
 
 ---
 
