@@ -39,7 +39,7 @@ test('same seed and same choices give the same challengers', () => {
   assert.ok(firsts.size > 1, 'different seeds should give different games');
 });
 
-test('challenger: inside ±10%, never a tie, never the incumbent, about half richer', () => {
+test('challenger: inside the rules band, never a tie, never the incumbent, about half richer', () => {
   let richer = 0, total = 0, widened = 0;
   // Incumbents a game can reach: you start in the window and never move down.
   const lowest = Math.min(...startCandidates(pool, rules).map((p) => p.salary));
@@ -48,7 +48,7 @@ test('challenger: inside ±10%, never a tie, never the incumbent, about half ric
       const ch = pool.byId.get(nextChallenger(pool, rules, 'band', i, p.id, []));
       assert.notEqual(ch.id, p.id);
       assert.notEqual(ch.salary, p.salary);
-      if (ch.salary > p.salary * 1.1 || ch.salary < p.salary * 0.9) widened++;
+      if (ch.salary > p.salary * (1 + rules.band) || ch.salary < p.salary * (1 - rules.band)) widened++;
       if (ch.salary > p.salary) richer++;
       total++;
     }
@@ -78,10 +78,14 @@ test('start players sit in the 5th-25th percentile window with 15+ neighbours', 
   }
 });
 
-test('a perfect player needs about 66 climbs (spec 6.3)', () => {
-  const climbs = Array.from({ length: 1500 }, (_, i) => play(`ladder-${i}`, perfect).rung).sort((a, b) => a - b);
-  const median = climbs[climbs.length >> 1];
-  assert.ok(median >= 60 && median <= 72, `median climbs ${median}`);
+test('a perfect player needs about 66 climbs at ±10% and about 46 at ±15% (spec 6.3)', () => {
+  const medianClimbs = (band) => {
+    const climbs = Array.from({ length: 1500 }, (_, i) => play(`ladder-${i}`, perfect, { ...rules, band }).rung).sort((a, b) => a - b);
+    return climbs[climbs.length >> 1];
+  };
+  const m10 = medianClimbs(0.10), m15 = medianClimbs(0.15);
+  assert.ok(m10 >= 60 && m10 <= 72, `±10% median climbs ${m10}`);
+  assert.ok(m15 >= 40 && m15 <= 52, `±15% median climbs ${m15}`);
 });
 
 test('lives: 5 misses end the game; the score is the last incumbent', () => {

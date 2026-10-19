@@ -1,8 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "season": "2026-27",
   "lives": 5,
-  "band": 0.10,
+  "band": 0.15,
   "timer_seconds": 8,
   "start": {
     "pct_low": 0.05,
