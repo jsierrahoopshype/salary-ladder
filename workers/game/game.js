@@ -425,6 +425,9 @@ async function admin(path, request, env, now) {
 // are reported separately for reference and left out of the headline: one
 // person can play any number of them, which would tilt every share toward the
 // keenest players.
+//
+// `groups` repeats the counts per mode, game day and rules version, for the
+// count's by-day tables and its split by rules version.
 
 const badgesKeyOk = (env, request) => {
   const auth = request.headers.get('authorization') || '';
@@ -444,14 +447,33 @@ async function modeTotals(env, mode) {
   return { total: span.total || 0, window: { from: span.first, to: span.last }, distributions: { rung, finished: fin } };
 }
 
+// The same counts split by mode, game day and rules version (rv), so the
+// count can show each day and never mix games played under different rules
+// (rules version 2 widened the band from ±10% to ±15%).
+async function groupTotals(env) {
+  const { results } = await env.DB.prepare(`SELECT mode, day, rv, rung, finished, COUNT(*) AS n FROM games
+      GROUP BY mode, day, rv, rung, finished ORDER BY mode, day, rv, rung`).all();
+  const groups = new Map();
+  for (const r of results) {
+    const k = `${r.mode}|${r.day}|${r.rv}`;
+    let g = groups.get(k);
+    if (!g) groups.set(k, (g = { mode: r.mode, day: r.day, rv: r.rv, total: 0, rung: {}, finished: { true: 0, false: 0 } }));
+    g.total += r.n;
+    g.rung[r.rung] = (g.rung[r.rung] || 0) + r.n;
+    g.finished[r.finished ? 'true' : 'false'] += r.n;
+  }
+  return [...groups.values()];
+}
+
 export async function badgeTotals(env) {
-  const [daily, unlimited] = await Promise.all([modeTotals(env, 'daily'), modeTotals(env, 'unlimited')]);
+  const [daily, unlimited, groups] = await Promise.all([modeTotals(env, 'daily'), modeTotals(env, 'unlimited'), groupTotals(env)]);
   return {
     game: 'salaryladder',
     unit: 'games',
     basis: 'daily',
     ...daily,
     unlimited,
+    groups,
   };
 }
 
