@@ -249,11 +249,9 @@ body.playing .hdr{display:none}
   .soc{font-size:12px;padding:10px 4px;gap:5px}
 }
 
-/* boards window: the share window's frame around Spend $15's boards (chips,
-   the line saying which day/week/month, the table) */
-.board-box{width:min(94vw,480px);background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 14px 16px;gap:12px}
-.board-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:3px;text-transform:uppercase;
-  background:linear-gradient(90deg,var(--orange),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+/* boards: shown right on the end screen, Spend $15's boards (chips, the
+   line saying which day/week/month, the table) */
+.boards .chips{margin-bottom:12px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .chip{font-family:var(--display);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:6px 12px;
   border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--dim);cursor:pointer}

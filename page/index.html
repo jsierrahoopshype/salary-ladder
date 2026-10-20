@@ -93,7 +93,6 @@
 
     <div class="actions">
       <button id="e-share" class="btn" type="button">{{end.share}}</button>
-      <button id="e-boards" class="btn ghost" type="button" hidden>{{board.open}}</button>
       <button id="e-next" class="btn ghost" type="button"></button>
       <button id="e-home" class="btn ghost" type="button">{{end.home}}</button>
     </div>
@@ -113,6 +112,13 @@
       <button class="btn btn-sm" type="submit">{{name.save}}</button>
       <p id="e-name-msg" class="msg" aria-live="polite"></p>
     </form>
+
+    <!-- The boards, shown right on the end screen (no extra click). -->
+    <div id="e-boards" class="sq boards" hidden>
+      <p class="sq-hdr">{{board.title}}</p>
+      <div class="chips" role="tablist" aria-label="{{board.title}}"></div>
+      <div class="board-body" aria-live="polite"></div>
+    </div>
 
     <p id="e-foot" class="fine"></p>
   </section>
