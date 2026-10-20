@@ -613,7 +613,6 @@ function showRank(summary) {
     // No games counted yet today (the counts refresh every 5 minutes): nothing to compare with.
     : !rank || rank.pct == null ? ''
     : T(rank.early ? 'end.rankEarly' : 'end.rank', { pct: rank.pct });
-  $('e-boards').hidden = summary.server !== 'ok';
 }
 
 const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
@@ -642,7 +641,7 @@ function showEnd(summary) {
   // Sends the game; also re-sends one whose answer never came (the page was closed first).
   if (summary.server === 'pending' && summary.game && !sending.has(summary.game.ticket)) record(summary);
   showRank(summary);
-  $('e-boards').onclick = () => openBoards(summary);
+  showBoards(summary);
 
   // Name entry: one name per device (spec 12.2).
   const saved = store.get('name');
@@ -761,6 +760,7 @@ async function postName(summary) {
       const lines = Object.entries(s.ranks || {}).filter(([, r]) => r)
         .map(([label, r]) => esc(T('name.rankLine', { board: boardLabel(label, summary), rank: r.rank })));
       nameMsg([esc(T('name.posted')), ...lines].join('<br>'), { html: true });
+      showBoards(summary);
     } else if (s.error === T('name.refused') || s.error === T('name.length')) {
       nameMsg(s.error === T('name.length') ? T('name.length') : T('name.refused'), { err: true });
     } else {
@@ -785,40 +785,43 @@ function showNotVerified(error, summary) {
 // a line saying which day/week/month it is, then the table, with places that
 // share a number on a tie and your own row marked "(you)".
 
-async function openBoards(summary) {
-  $('board-modal')?.remove();
-  const ov = document.createElement('div');
-  ov.id = 'board-modal';
-  ov.className = 'share-modal';
-  ov.setAttribute('role', 'dialog');
-  ov.setAttribute('aria-modal', 'true');
-  ov.setAttribute('aria-label', T('board.title'));
-  ov.innerHTML = '<div class="share-box board-box">' +
-    `<button class="share-x" type="button" aria-label="${TH('share.close')}">×</button>` +
-    `<h2 class="board-title">${TH('board.title')}</h2>` +
-    '<div class="chips" role="tablist"></div><div class="board-body"></div></div>';
-  document.body.appendChild(ov);
-  const opener = document.activeElement;
-  const onKey = (e) => { if (e.key === 'Escape') close(); };
-  const close = () => { ov.remove(); document.removeEventListener('keydown', onKey); opener?.focus?.(); };
-  document.addEventListener('keydown', onKey);
-  ov.addEventListener('click', (e) => { if (e.target === ov) close(); });
-  ov.querySelector('.share-x').onclick = close;
-  ov.querySelector('.share-x').focus();
+// Which board chip is selected, kept while the boards refresh (e.g. right
+// after a name is saved) and per mode, so a refresh never jumps tabs.
+const boardTab = {};
+// Each refresh gets a number; an older answer arriving late is dropped.
+let boardsSeq = 0;
 
+/** Fills the boards box on the end screen. Called when the end screen shows
+ * and again once a name is saved, so the player's own row appears. */
+async function showBoards(summary) {
+  const box = $('e-boards');
+  if (!serverOn(D.rules)) { box.hidden = true; return; }
+  box.hidden = false;
+  const chips = box.querySelector('.chips');
+  const body = box.querySelector('.board-body');
+  const seq = ++boardsSeq;
+  // Keep what's on screen during a refresh; only the first load says "loading".
+  if (!body.dataset.mode || body.dataset.mode !== summary.mode) {
+    chips.innerHTML = '';
+    body.innerHTML = '';
+  }
   const me = store.get('name');
   const q = new URLSearchParams({ mode: summary.mode, ...(me ? { name: me.name, handle: me.handle } : {}) });
   const r = await api(`board?${q}`);
-  const body = ov.querySelector('.board-body');
+  if (seq !== boardsSeq || shown !== summary) return;
   if (!r.ok || !r.boards) {
+    chips.innerHTML = '';
+    body.dataset.mode = '';
     body.innerHTML = `<p class="empty">${TH('board.resting')}</p>`;
     return;
   }
+  body.dataset.mode = summary.mode;
   const labels = Object.keys(r.boards);
-  const chips = ov.querySelector('.chips');
-  chips.innerHTML = labels.map((label, i) =>
-    `<button class="chip${i === 0 ? ' active' : ''}" type="button" role="tab" data-label="${label}" aria-selected="${i === 0}">${esc(boardLabel(label, summary))}</button>`).join('');
+  if (!labels.includes(boardTab[summary.mode])) boardTab[summary.mode] = labels[0];
+  chips.innerHTML = labels.map((label) =>
+    `<button class="chip" type="button" role="tab" data-label="${label}">${esc(boardLabel(label, summary))}</button>`).join('');
   const show = (label) => {
+    boardTab[summary.mode] = label;
     for (const c of chips.querySelectorAll('.chip')) {
       const on = c.dataset.label === label;
       c.classList.toggle('active', on);
@@ -828,7 +831,7 @@ async function openBoards(summary) {
     body.innerHTML = (when ? `<p class="subtitle">${esc(when)}</p>` : '') + boardTable(r.boards[label], r.me?.[label], me);
   };
   for (const c of chips.querySelectorAll('.chip')) c.onclick = () => show(c.dataset.label);
-  show(labels[0]);
+  show(boardTab[summary.mode]);
 }
 
 /** Which day, week or month a board covers, for the line under the chips. */

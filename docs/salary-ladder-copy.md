@@ -143,7 +143,6 @@ Daily games have one board, titled with the Daily's name (like "Daily #12"). Unl
 
 | Text | Shows | Key |
 |---|---|---|
-| See the boards | Button on the end screen | `board.open` |
 | Boards | Heading | `board.title` |
 | Today | Unlimited: today's board (turns over at 9 AM ET) | `board.today` |
 | This week | Unlimited: weekly board (from Monday 9 AM ET) | `board.week` |

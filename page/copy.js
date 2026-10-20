@@ -96,7 +96,6 @@ export const COPY = {
   'name.rankLine': '{board}: #{rank}',
 
   // The boards
-  'board.open': 'See the boards',
   'board.title': 'Boards',
   'board.today': 'Today',
   'board.week': 'This week',
