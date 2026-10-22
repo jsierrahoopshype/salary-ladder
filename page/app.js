@@ -8,7 +8,7 @@ import { CHOICE, preparePool, pickStart, newGame, applyPick, isDone, score, next
 import { T, TH } from './copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, streakAfter, liveStreak, streakAtStake,
-  shareText, shareLinks, SITE_URL, store, boardPlaces, isMyRow, weekStart, climbSalaries, climbBars, randomHex, cleanName, cleanHandle, voteSplit, addVotes, tokenUsable,
+  shareText, shareLinks, shareUrl, shareRef, SITE_URL, store, boardPlaces, isMyRow, weekStart, climbSalaries, climbBars, randomHex, cleanName, cleanHandle, voteSplit, addVotes, tokenUsable,
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
@@ -73,6 +73,26 @@ const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').match
 const D = { today: null, daily: null, rules: null, pool: null, next: null, nextPending: null };
 // The game on screen: {g: saved game, state, last, armed, t0, timer, turn}.
 let G = null;
+
+// Share tagging (HoopsMatic Badges game contract, requirement 7): a page opened
+// from a tagged share link (?ref=share-salaryladder-<app>) sends the tag with
+// its first /start, once, and the server adds one to that day's total for the
+// app. The tag then leaves the address bar, so a link copied from there isn't
+// credited to the wrong app.
+let shareTag = null;
+try {
+  shareTag = shareRef(location.search);
+  if (shareTag) {
+    const q = new URLSearchParams(location.search);
+    q.delete('ref');
+    history.replaceState(history.state, '', location.pathname + (q.toString() ? `?${q}` : '') + location.hash);
+  }
+} catch { /* the game never depends on it */ }
+function startBody(mode) {
+  const body = { mode };
+  if (shareTag) { body.ref = shareTag; shareTag = null; }
+  return body;
+}
 
 // ---------------------------------------------------------------------------
 // Server (build plan B2/C2). `recording: false` in the rules file switches it
@@ -234,7 +254,7 @@ function prepareUnlimited() {
   const n = (D.next ??= localUnlimited());
   if (n.asked || !serverOn(D.rules)) return D.nextPending ?? Promise.resolve();
   n.asked = true;
-  D.nextPending = api('start', { mode: 'unlimited' }).then((r) => {
+  D.nextPending = api('start', startBody('unlimited')).then((r) => {
     D.nextPending = null;
     // The ticket's day decides which Daily's salaries the server checks the
     // game against: it must be the one this page plays with.
@@ -247,7 +267,7 @@ function prepareUnlimited() {
 
 /** The Daily's start ticket (spec 13.1), asked for when the game starts. */
 function requestTicket(g) {
-  api('start', { mode: 'daily' }).then((r) => {
+  api('start', startBody('daily')).then((r) => {
     if (!r.ok || r.day !== g.date || g.ticket) return;
     g.ticket = r.ticket;
     // Saved with the game, unless it has already ended.
@@ -597,6 +617,9 @@ async function record(summary) {
   if (shown === summary) showRank(summary);
   // A device with a name posts its best game of the day by itself (spec 12.2).
   if (r.ok && store.get('name') && isTodaysBest(summary)) postName(summary);
+  // HoopsMatic Badges: the server's sealed receipt goes to the shared games script, which sends it to
+  // hoopsmatic.com/badges when it could count. A game without a receipt changes nothing.
+  if (r.ok && r.badgeReceipt && window.HMGames && window.HMGames.badgeResult) window.HMGames.badgeResult('salaryladder', r.badgeReceipt);
 }
 
 function isTodaysBest(summary) {
@@ -1155,8 +1178,8 @@ async function openShare(summary) {
         try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); msg.textContent = T('share.imageCopied'); }
         catch { msg.textContent = T('share.imageBlocked'); }
       } else if (act === 'copylink') {
-        // The whole share text (spec 9); its last line is the link.
-        try { await navigator.clipboard.writeText(text); msg.textContent = T('share.textCopied'); }
+        // The whole share text (spec 9); its last line is the link, tagged as copied.
+        try { await navigator.clipboard.writeText(text.split('\n').map((l) => (l === SITE_URL ? shareUrl('copy') : l)).join('\n')); msg.textContent = T('share.textCopied'); }
         catch { msg.textContent = T('share.textBlocked'); }
       } else if (act === 'more') {
         // The link goes in `url`, so it's left off the text (as Spend $15 does).

@@ -9,7 +9,7 @@ import { OG_FILE, OG_URL, OG_WIDTH, OG_HEIGHT, OG_TEXT_KEYS } from '../tools/bui
 import { COPY } from '../page/copy.js';
 import {
   dailyDate, addDaysIso, shortDate, ageOn, money, boardMoney, gapText, clock, pickTiming, pairKey,
-  streakAfter, liveStreak, streakAtStake, shareText, shareLinks, cleanName, cleanHandle,
+  streakAfter, liveStreak, streakAtStake, shareText, shareLinks, shareUrl, shareRef, cleanName, cleanHandle,
   voteSplit, addVotes, tokenUsable, TOKEN_USE_MS, boardPlaces, isMyRow, weekStart, climbSalaries, climbBars,
 } from '../page/lib.js';
 import { preparePool, newGame, applyPick, isDone, replay, CHOICE } from '../shared/game.js';
@@ -260,19 +260,30 @@ test('share buttons carry the share card text and the link', () => {
   const links = shareLinks(text);
   assert.deepEqual(Object.keys(links), ['x', 'bsky', 'fb', 'wa', 'reddit', 'telegram']);
   const x = new URL(links.x);
-  assert.equal(x.searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/');
+  // Each link says which app it went through (badges game contract, requirement 7).
+  assert.equal(x.searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-x');
   // Built as Spend $15 builds them: the handle (and Bluesky's link) after a space.
   assert.equal(x.searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 @hoopshype');
   assert.equal(new URL(links.bsky).searchParams.get('text'),
-    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 @hoopshypeofficial.bsky.social https://hoopsmatic.com/salary-ladder/');
+    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 @hoopshypeofficial.bsky.social https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-bsky');
   assert.equal(new URL(links.wa).searchParams.get('text'),
-    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 https://hoopsmatic.com/salary-ladder/');
-  assert.equal(new URL(links.fb).searchParams.get('u'), 'https://hoopsmatic.com/salary-ladder/');
+    'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12 https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-wa');
+  assert.equal(new URL(links.fb).searchParams.get('u'), 'https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-fb');
+  assert.equal(new URL(links.reddit).searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-reddit');
+  assert.equal(new URL(links.telegram).searchParams.get('url'), 'https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-tg');
   assert.equal(new URL(links.telegram).searchParams.get('text'), 'Salary Ladder #12 · Oct 9\nI reached $31.4M (rung 34)\n❤️❤️❤️🖤🖤 · 3:12');
   // Only X and Bluesky tag HoopsHype, as in 73-9; the copied text card has no handle.
   for (const k of ['fb', 'wa', 'reddit', 'telegram']) assert.doesNotMatch(decodeURIComponent(links[k]), /@hoopshype/);
   assert.doesNotMatch(text, /@/);
   assert.equal(new URL(links.reddit).searchParams.get('title'), 'Salary Ladder #12 · Oct 9 I reached $31.4M (rung 34) ❤️❤️❤️🖤🖤 · 3:12');
+});
+
+test('share tags: only Salary Ladder share tags on the contract apps', () => {
+  assert.equal(shareUrl('copy'), 'https://hoopsmatic.com/salary-ladder/?ref=share-salaryladder-copy');
+  for (const t of ['x', 'bsky', 'fb', 'wa', 'reddit', 'tg', 'copy']) assert.equal(shareRef(`?ref=share-salaryladder-${t}`), `share-salaryladder-${t}`);
+  for (const bad of ['', '?ref=share-salaryladder-telegram', '?ref=share-spend15-x', '?ref=salaryladder-footer', '?x=1'])
+    assert.equal(shareRef(bad), null);
+  assert.equal(shareRef('?a=1&ref=share-salaryladder-wa'), 'share-salaryladder-wa');
 });
 
 test('names and handles, vote pair keys', () => {

@@ -437,3 +437,71 @@ test('Worker entry files export only what Cloudflare accepts: handlers and Durab
   assert.equal(typeof b.BoardDO, 'function');
   for (const m of [g, b]) for (const k of Object.keys(m.default)) assert.equal(typeof m.default[k], 'function');
 });
+
+// ---------------------------------------------------------------------------
+// HoopsMatic Badges (badges build plan, step 7): the sealed receipt in /finish
+// and share tagging on /start.
+
+const b64u = (bytes) => Buffer.from(bytes).toString('base64url');
+async function badgeKeys() {
+  const pair = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+  return { secret: b64u(new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey))), publicKey: pair.publicKey };
+}
+/** The badge server's check (hoopsmatic-badges src/receipt.js): the seal over "hmr1.<payload>". */
+async function openReceipt(token, publicKey) {
+  const [p, body, sig] = token.split('.');
+  assert.equal(p, 'hmr1');
+  assert.equal(await crypto.subtle.verify({ name: 'Ed25519' }, publicKey, Buffer.from(sig, 'base64url'), new TextEncoder().encode(`${p}.${body}`)), true);
+  return JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+}
+
+test('badges: /finish carries a sealed receipt of the verified result, the same one when re-sent', async () => {
+  const { secret, publicKey } = await badgeKeys();
+  const { genv, published } = setup({ gameEnv: { BADGE_SIGNING_KEY: secret } });
+  for (const mode of ['daily', 'unlimited']) {
+    const { start, local, fin, finishedAt } = await playOne(genv, published, mode, `badge-${mode}`, { skill: 0.9 });
+    assert.equal(fin.status, 200, JSON.stringify(fin.data));
+    const r = await openReceipt(fin.data.badgeReceipt, publicKey);
+    const { result } = fin.data;
+    assert.deepEqual(r, {
+      v: 1, game: 'salaryladder', id: r.id, t: finishedAt, day: DAY, mode,
+      seed: mode === 'daily' ? `daily:${DAY}` : start.seed, dv: published[`daily/${DAY}.json`].salaries_as_of,
+      result: { mode, rung: result.rung, finished: result.finished, score: result.score, livesLeft: result.livesLeft,
+        lives: result.lives, totalMs: result.totalMs, rv: mode === 'daily' ? published[`daily/${DAY}.json`].rules.version : start.rules.version },
+    });
+    assert.match(r.id, /^[0-9a-f]{40}$/);
+    // What the badges settings file asks of a salaryladder receipt.
+    for (const [f, type] of Object.entries({ mode: 'string', rung: 'number', finished: 'boolean', score: 'number' })) assert.equal(typeof r.result[f], type, f);
+    // The same game sent again later: the same receipt, so it counts once.
+    const again = await G(genv, 'POST', '/finish', { ticket: start.ticket, picks: local.picks }, finishedAt + 2 * H);
+    assert.equal(again.data.badgeReceipt, fin.data.badgeReceipt);
+  }
+  // Two games, two one-time IDs.
+  const ids = await Promise.all((await Promise.all([1, 2].map((i) => playOne(genv, published, 'unlimited', `ids-${i}`))))
+    .map((g) => openReceipt(g.fin.data.badgeReceipt, publicKey).then((r) => r.id)));
+  assert.notEqual(ids[0], ids[1]);
+});
+
+test('badges: no signing key, no receipt, and the game records still carry no ID', async () => {
+  const { genv, published } = setup();
+  const { fin } = await playOne(genv, published, 'daily', 'no-key');
+  assert.equal(fin.status, 200);
+  assert.equal(fin.data.badgeReceipt, null);
+  const cols = genv.DB.raw.prepare('PRAGMA table_info(games)').all().map((c) => c.name);
+  for (const c of cols) assert.doesNotMatch(c, /device|user|pass|ip/i);
+});
+
+test('share tagging: a start from a tagged link adds one per day and app, nothing else', async () => {
+  const { genv } = setup();
+  for (const ref of ['share-salaryladder-wa', 'share-salaryladder-wa', 'share-salaryladder-x', 'share-spend15-x', 'salaryladder-footer', 'share-salaryladder-telegram']) {
+    const r = await G(genv, 'POST', '/start', { mode: 'unlimited', ref });
+    assert.equal(r.data.ok, true, 'a start never fails over its tag');
+  }
+  await G(genv, 'POST', '/start', { mode: 'daily' });
+  assert.deepEqual(genv.DB.raw.prepare('SELECT day, game, channel, n FROM share_counts ORDER BY channel').all().map((r) => ({ ...r })), [
+    { day: DAY, game: 'salaryladder', channel: 'wa', n: 2 },
+    { day: DAY, game: 'salaryladder', channel: 'x', n: 1 },
+  ]);
+  const csvOut = await G(genv, 'GET', `/admin/totals?key=${ADMIN}&table=shares`);
+  assert.match(csvOut.data, /^day,game,channel,n\n/);
+});
