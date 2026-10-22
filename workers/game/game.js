@@ -4,11 +4,12 @@
 // the server replays every game with the same code the page runs and signs
 // the result it computed itself; the leaderboard trusts nothing else.
 //
-//   POST /start     {mode}                      -> {ticket, ...}  signed start ticket, nothing stored
-//   POST /finish    {ticket, picks, novote?}    -> {result, token, rank}
+//   POST /start     {mode, ref?}                -> {ticket, ...}  signed start ticket; nothing about
+//                                                  the game is stored (a share tag in ref adds one to a daily total)
+//   POST /finish    {ticket, picks, novote?}    -> {result, token, rank, badgeReceipt}
 //   POST /contract  {ticket, id}                -> {ok}  "Which contract would you rather have?"
 //   GET  /status                                 -> is it configured and recording
-//   GET  /admin/totals?key=&table=pairs|contracts|gaps|accuracy   -> CSV
+//   GET  /admin/totals?key=&table=pairs|contracts|gaps|accuracy|shares   -> CSV
 //   GET  /admin/run?key=                         -> runs the totals job now
 //   GET  /badge-totals  (Authorization: Bearer BADGES_ADMIN_KEY)
 //                        -> totals only, for the HoopsMatic Badges count
@@ -17,7 +18,8 @@
 //
 // Bindings: DB (D1). Secrets: VERIFY_SECRET, ADMIN_KEY (set in the Cloudflare
 // dashboard, never in this repo), BADGES_ADMIN_KEY (copied in by the
-// hoopsmatic-badges "Copy a key to a Worker" button). Vars: DATA_BASE (where daily/ and rules/
+// hoopsmatic-badges "Copy a key to a Worker" button), BADGE_SIGNING_KEY (put
+// in by its "Make signing key for a game" button; seals badge receipts). Vars: DATA_BASE (where daily/ and rules/
 // are published), RECORDING ('off' stops recording, as does
 // "recording": false in rules/rules.json).
 
@@ -25,6 +27,7 @@ import { preparePool, pickStart, replay, CHOICE } from '../../shared/game.js';
 import { sign, open, randomHex, sha256Hex, sameString } from '../lib/sign.js';
 import { gameDay, addDays } from '../lib/days.js';
 import { json, csv, serve, readJson, apiPath } from '../lib/http.js';
+import { gameReceipt, shareChannel, GAME_ID } from '../lib/badge.js';
 
 export const TICKET_MAX_AGE_MS = 30 * 3600_000; // a game can be re-sent the same day (back-credit, re-verify)
 export const FIRST_FINISH_MAX_AGE_MS = 24 * 3600_000; // but must first finish within 24 hours of its ticket
@@ -85,13 +88,27 @@ const resting = () => json({ ok: false, error: 'resting' }, 503);
 const bad = (error, status = 400) => json({ ok: false, error }, status);
 
 // ---------------------------------------------------------------------------
-// Start (spec 13.1 step 1): a signed ticket. Nothing is stored.
+// Start (spec 13.1 step 1): a signed ticket. Nothing about the game is stored.
+// A game started from a share link (ref = share-salaryladder-<channel>, badges
+// game contract requirement 7) adds one to that day's total for the channel.
+
+async function countShare(env, day, ref) {
+  const channel = shareChannel(ref);
+  if (!channel) return;
+  try {
+    await env.DB.prepare(`INSERT INTO share_counts (day, game, channel, n) VALUES (?, ?, ?, 1)
+        ON CONFLICT (day, game, channel) DO UPDATE SET n = n + 1`).bind(day, GAME_ID, channel).run();
+  } catch (err) {
+    console.error('share count', err && err.message); // never stops a game from starting
+  }
+}
 
 async function start(request, env, now) {
   const body = (await readJson(request)) || {};
   const mode = body.mode === 'unlimited' ? 'unlimited' : body.mode === 'daily' ? 'daily' : null;
   if (!mode) return bad('mode must be daily or unlimited');
   const day = gameDay(now);
+  if (body.ref) await countShare(env, day, body.ref);
   const entry = await dailyFor(env, day);
   if (!entry) return json({ ok: false, error: 'no daily', day }, 503);
   const { daily, pool } = entry;
@@ -144,12 +161,14 @@ async function finish(request, env, now) {
   const hash = await sha256Hex(JSON.stringify(picks));
 
   // The same game again (back-credit, quiet re-verify, a lost reply) gets
-  // the same result and a fresh token. Another game on a used code doesn't.
-  const known = await env.DB.prepare('SELECT picks_hash, result FROM codes WHERE code = ?').bind(tk.code).first();
+  // the same result, a fresh token and the same badge receipt. Another game
+  // on a used code doesn't.
+  const known = await env.DB.prepare('SELECT picks_hash, result, created FROM codes WHERE code = ?').bind(tk.code).first();
   if (known) {
     if (known.picks_hash !== hash) return bad('this game code was already used', 409);
     const result = JSON.parse(known.result);
-    return json({ ok: true, result, token: await resultToken(env, tk, result, now), rank: await rankFor(env, tk.mode, tk.d, result.score, now) });
+    return json({ ok: true, result, token: await resultToken(env, tk, result, now), rank: await rankFor(env, tk.mode, tk.d, result.score, now),
+      badgeReceipt: await gameReceipt(env, tk, result, known.created) });
   }
 
   // A game's record must arrive within 24 hours, so by the time the totals
@@ -182,6 +201,7 @@ async function finish(request, env, now) {
   };
 
   // Two writes per game (spec 18.3): the code with its result, and the record.
+  let firstAt = now;
   try {
     await env.DB.batch([
       env.DB.prepare('INSERT INTO codes (code, picks_hash, result, created) VALUES (?, ?, ?, ?)')
@@ -194,10 +214,14 @@ async function finish(request, env, now) {
   } catch (err) {
     // Two finishes for one code at the same moment: the other one won.
     if (!/UNIQUE|constraint/i.test(String(err && err.message))) throw err;
-    const again = await env.DB.prepare('SELECT picks_hash FROM codes WHERE code = ?').bind(tk.code).first();
+    const again = await env.DB.prepare('SELECT picks_hash, created FROM codes WHERE code = ?').bind(tk.code).first();
     if (!again || again.picks_hash !== hash) return bad('this game code was already used', 409);
+    firstAt = again.created;
   }
-  return json({ ok: true, result, token: await resultToken(env, tk, result, now), rank: await rankFor(env, tk.mode, tk.d, r.score, now) });
+  // HoopsMatic Badges: the sealed receipt for this verified result (workers/lib/badge.js), sealed
+  // with the time the game first finished so a re-send gets the same receipt. Null without a key.
+  return json({ ok: true, result, token: await resultToken(env, tk, result, now), rank: await rankFor(env, tk.mode, tk.d, r.score, now),
+    badgeReceipt: await gameReceipt(env, tk, result, firstAt) });
 }
 
 // ---------------------------------------------------------------------------
@@ -388,6 +412,7 @@ const TABLES = {
       FROM contract_totals ORDER BY season, rv, data_date, a, b`, file: 'contract-totals' },
   gaps: { sql: `SELECT season, rv, gap, right_ AS "right", wrong, timeouts FROM gap_totals ORDER BY season, rv, gap`, file: 'gap-accuracy' },
   accuracy: { sql: 'SELECT season, rv, mode, bucket, games FROM accuracy_totals ORDER BY season, rv, mode, bucket', file: 'game-accuracy' },
+  shares: { sql: 'SELECT day, game, channel, n FROM share_counts ORDER BY day, channel', file: 'share-counts' },
 };
 
 export function toCsv(rows) {
@@ -403,7 +428,7 @@ async function admin(path, request, env, now) {
   if (!adminOk(env, request.url)) return bad('unauthorized', 403);
   if (path === '/admin/totals') {
     const t = TABLES[new URL(request.url).searchParams.get('table') || 'pairs'];
-    if (!t) return bad('table must be pairs, contracts, gaps or accuracy');
+    if (!t) return bad('table must be pairs, contracts, gaps, accuracy or shares');
     const { results } = await env.DB.prepare(t.sql).all();
     return csv(toCsv(results), `salary-ladder-${t.file}-${gameDay(now)}.csv`);
   }

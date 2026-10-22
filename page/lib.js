@@ -169,16 +169,33 @@ export const HANDLES = { x: '@hoopshype', bsky: '@hoopshypeofficial.bsky.social'
 
 export function shareLinks(text) {
   const body = text.split('\n').filter((l) => l !== SITE_URL).join('\n');
-  const e = encodeURIComponent, u = e(SITE_URL), t = e(body);
+  const e = encodeURIComponent, t = e(body);
+  const link = (k) => shareUrl(k), u = (k) => e(link(k));
   return {
-    x: `https://twitter.com/intent/tweet?text=${e(`${body} ${HANDLES.x}`)}&url=${u}`,
-    bsky: `https://bsky.app/intent/compose?text=${e(`${body} ${HANDLES.bsky} ${SITE_URL}`)}`,
-    fb: `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`,
-    wa: `https://wa.me/?text=${e(`${body} ${SITE_URL}`)}`,
+    x: `https://twitter.com/intent/tweet?text=${e(`${body} ${HANDLES.x}`)}&url=${u('x')}`,
+    bsky: `https://bsky.app/intent/compose?text=${e(`${body} ${HANDLES.bsky} ${link('bsky')}`)}`,
+    fb: `https://www.facebook.com/sharer/sharer.php?u=${u('fb')}&quote=${t}`,
+    wa: `https://wa.me/?text=${e(`${body} ${link('wa')}`)}`,
     // Reddit titles are one line.
-    reddit: `https://www.reddit.com/submit?url=${u}&title=${e(body.replace(/\s*\n+\s*/g, ' '))}`,
-    telegram: `https://t.me/share/url?url=${u}&text=${t}`,
+    reddit: `https://www.reddit.com/submit?url=${u('reddit')}&title=${e(body.replace(/\s*\n+\s*/g, ' '))}`,
+    telegram: `https://t.me/share/url?url=${u('telegram')}&text=${t}`,
   };
+}
+
+/**
+ * Share tagging (HoopsMatic Badges game contract, requirement 7): every
+ * share link says which app it went through, ?ref=share-salaryladder-<tag>.
+ * The page's canonical address and og:url stay without it.
+ */
+export const SHARE_TAGS = { x: 'x', bsky: 'bsky', fb: 'fb', wa: 'wa', reddit: 'reddit', telegram: 'tg', copy: 'copy' };
+export function shareUrl(channel) {
+  return `${SITE_URL}?ref=share-salaryladder-${SHARE_TAGS[channel]}`;
+}
+
+/** The share tag a page address carries (its ?ref=), or null if it isn't one. */
+export function shareRef(search) {
+  const ref = new URLSearchParams(search || '').get('ref') || '';
+  return /^share-salaryladder-(x|bsky|fb|wa|reddit|tg|copy)$/.test(ref) ? ref : null;
 }
 
 /**
