@@ -29,3 +29,12 @@ export function weekOf(day) {
 export function monthOf(day) {
   return day.slice(0, 7);
 }
+
+/** The same date `months` months earlier, clamped to that month's last day. */
+export function monthsBefore(day, months) {
+  const [y, m, d] = day.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1 - months, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(d, last));
+  return t.toISOString().slice(0, 10);
+}

@@ -10,7 +10,9 @@
 //     differ only by trailing digits share a row, which keeps the best score;
 //   - the Daily 73-9 name filter when a name is saved and again when a board
 //     is served, plus the acrostic check down the served column;
-//   - admin scrub (hide a name everywhere, stored, undoable) and remove.
+//   - admin scrub (hide a name everywhere, stored, undoable) and remove;
+//   - as the Daily 73-9: a player who hasn't played for 24 months loses all
+//     their rows (housekeeping, once per game day).
 //
 //   GET  /board?mode=daily|unlimited[&name=&handle=]  -> top 50 per board (+ your rank)
 //   POST /board/submit {token, name, handle}           -> your rank on each board
@@ -26,12 +28,14 @@
 // (the same value as salary-ladder-game's), ADMIN_KEY.
 
 import { open, sameString } from '../lib/sign.js';
-import { gameDay, weekOf, monthOf } from '../lib/days.js';
+import { gameDay, weekOf, monthOf, monthsBefore } from '../lib/days.js';
 import { nameAllowed, nameCollapse, boardClean, cleanName, cleanHandle, rowKey } from '../lib/names.js';
 import { json, serve, readJson, apiPath } from '../lib/http.js';
 
 export const TOKEN_MAX_AGE_MS = 15 * 60_000; // as 73-9: a token is only good right after its game
 export const TOP = 50;                       // spec 12.1: top 50 rows per board
+export const KEEP_MONTHS = 24;               // rows of players inactive this long are deleted
+export const CLEANUP_KEYS = 500;             // at most this many players' rows per day
 const NAME_REFUSED = "That name can't go on the boards. Pick another.";
 
 /** The boards a verified game goes on. */
@@ -51,6 +55,8 @@ export class BoardDO {
       'CREATE INDEX IF NOT EXISTS rows_rank ON rows (board, score DESC, ms, ts)',
       'CREATE TABLE IF NOT EXISTS used_tokens (n TEXT PRIMARY KEY, exp INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS hidden_names (collapsed TEXT PRIMARY KEY, ts INTEGER NOT NULL)',
+      'CREATE INDEX IF NOT EXISTS rows_key_ts ON rows (key, ts)',
+      'CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)',
     ]) this.sql.exec(q);
   }
 
@@ -70,6 +76,7 @@ export class BoardDO {
     const url = new URL(request.url);
     const now = Number(request.headers.get('x-now')) || Date.now();
     const p = url.searchParams;
+    this.housekeeping(now);
     if (url.pathname === '/board') return json(this.read(p.get('mode'), p.get('name'), p.get('handle'), now));
     if (url.pathname === '/submit') return json(await this.submit(await readJson(request), now));
     if (url.pathname === '/admin/scrub') return json(this.scrub(p.get('name'), p.get('remove') === '1', now));
@@ -137,6 +144,26 @@ export class BoardDO {
       if (key) me[label] = this.rankOf(board, key);
     }
     return { ok: true, mode, day, boards, ...(key ? { me } : {}) };
+  }
+
+  // 24-month inactivity rule, once per game day (run by that day's first
+  // request). Every submit writes a row on a board of its own day (daily:<day>
+  // or u:day:<day>), so a player's newest row ts is when they last played.
+  // Players whose newest row is older than 24 months lose every row, at most
+  // CLEANUP_KEYS players a day; a backlog continues the next day.
+  housekeeping(now) {
+    const day = gameDay(now);
+    if (this._gcDay === day) return;
+    this._gcDay = day;
+    try {
+      if (this.q("SELECT v FROM meta WHERE k = 'gc_day'")[0]?.v === day) return;
+      const cutoff = Date.parse(`${monthsBefore(day, KEEP_MONTHS)}T13:00:00Z`);
+      const keys = this.q('SELECT key FROM rows GROUP BY key HAVING MAX(ts) < ? LIMIT ?', cutoff, CLEANUP_KEYS).map((r) => r.key);
+      for (const k of keys) this.sql.exec('DELETE FROM rows WHERE key = ?', k);
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('gc_day', ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v", day);
+      this.sql.exec("INSERT INTO meta (k, v) VALUES ('gc_last', ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v",
+        JSON.stringify({ day, cutoff: monthsBefore(day, KEEP_MONTHS), players: keys.length }));
+    } catch (err) { /* the boards keep working; it runs again when the instance restarts or tomorrow */ }
   }
 
   // Admin (spec 12.2). Scrub hides a name on every board, now and in future,
