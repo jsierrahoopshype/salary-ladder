@@ -12,39 +12,30 @@ import {
 } from './lib.js';
 
 const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/headshots/';
-// Headshot crops, best first; each one that fails falls back to the next,
-// then to the team logo (as the Daily 73-9 does), then to initials. The data
-// files name each player's face-tight file; the other
-// crops share its file name. Play cards use face2, as the Daily 73-9 does
-// (every head the same size and position), then the regular face crop. When
-// the mid-size face2 WebP lands in nba-headshots, it goes first in CARD_CROPS.
-const CARD_CROPS = [['face2', 'png'], ['face', 'png']];
-// Small spots (end screen, contract pick): face2-160, the same framing at 160px.
-const SMALL_CROPS = [['face2-160', 'webp'], ['face', 'png']];
-const crop = (p, dir, ext) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.${ext}`;
+// Headshots: the face-fill set (the face fills the circle), the one HoopsMatic
+// look. The data files name each player's face-tight file; face-fill shares
+// its file name. Play cards and the share picture use the 320px files, the
+// small spots (end screen, contract pick) the 160px ones. A player with no
+// face-fill file shows his initials in the same circle.
+const CARD_CROP = 'face-fill-320';
+const FACE_BG = '#3a3a44'; // the circle behind a headshot (style.css: .face)
+const SMALL_CROP = 'face-fill';
+const crop = (p, dir) => `${HEADSHOTS}${dir}/${p.img.split('/').pop().replace(/\.\w+$/, '')}.webp`;
 const LOGOS = 'https://jsierrahoopshype.github.io/nba-headshots/teams/logos/current/svg/';
 const logoUrl = (p) => `${LOGOS}${p.team.toLowerCase()}.svg`;
-/** Every picture to try for a player, in order: the crops, then the team logo. */
-const photoUrls = (p, crops = CARD_CROPS) => [...crops.map(([dir, ext]) => crop(p, dir, ext)), logoUrl(p)];
+/** Every picture to try for a player, in order (one: his face-fill file). */
+const photoUrls = (p, dir = CARD_CROP) => [crop(p, dir)];
 function faceImg(p, small = false) {
-  const [src, ...rest] = photoUrls(p, small ? SMALL_CROPS : CARD_CROPS);
-  return `<img src="${esc(src)}" data-fallback="${esc(rest.join(' '))}" alt=""${small ? '' : ' decoding="async"'}>`;
+  const [src] = photoUrls(p, small ? SMALL_CROP : CARD_CROP);
+  return `<img src="${esc(src)}" alt=""${small ? '' : ' decoding="async"'}>`;
 }
 
-// A headshot that fails moves to its next picture; the team logo is shown
-// whole rather than cropped. When nothing is left, the frame shows initials
-// (play cards) or stays empty. Capturing, because image errors don't bubble.
+// A headshot that fails leaves the circle to the player's initials.
+// Capturing, because image errors don't bubble.
 document.addEventListener('error', (e) => {
   const img = e.target;
   if (!(img instanceof HTMLImageElement) || !img.closest('.face')) return;
-  const rest = (img.dataset.fallback ?? '').split(' ').filter(Boolean);
-  if (rest.length) {
-    img.src = rest.shift();
-    img.dataset.fallback = rest.join(' ');
-    img.closest('.face').classList.toggle('is-logo', img.src.startsWith(LOGOS));
-  } else {
-    img.closest('.face').classList.add('noimg');
-  }
+  img.closest('.face').classList.add('noimg');
 }, true);
 // The game's two Workers (workers/README.md). The address is absolute, so
 // the GitHub Pages preview reaches them too (the Workers allow that origin).
@@ -365,8 +356,7 @@ function imageReady(el) {
   return Promise.race([
     new Promise((r) => {
       img.addEventListener('load', r, { once: true });
-      // An error that only switches to the fallback crop isn't the end.
-      img.addEventListener('error', () => { if (img.closest('.face').classList.contains('noimg')) r(); });
+      img.addEventListener('error', r, { once: true });
     }),
     wait(IMAGE_WAIT_MS),
   ]);
@@ -376,7 +366,7 @@ function imageReady(el) {
 // game ends, so the browser can't drop a download halfway.
 const preloaded = new Map();
 
-/** Downloads a player's card photo, following the same crops as the card. */
+/** Downloads a player's card photo, the same file as the card. */
 function preload(p) {
   if (preloaded.has(p.id)) return;
   const urls = photoUrls(p);
@@ -638,7 +628,7 @@ function showRank(summary) {
     : T(rank.early ? 'end.rankEarly' : 'end.rank', { pct: rank.pct });
 }
 
-const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
+const face = (p) => `<span class="face">${faceImg(p, true)}<span class="initials">${esc(initials(p.name))}</span></span>`;
 
 function playerRow(p) {
   return `${face(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(metaLine(p))}</div></div>`;
@@ -932,12 +922,12 @@ function canvasImage(url, ms = 4000) {
   });
 }
 
-/** The reached player's picture, with the play cards' fallbacks: face2, face, team logo. */
+/** The reached player's picture (his face-fill file); null: initials. */
 async function cardPhoto(p) {
   if (!p) return null;
-  for (const url of photoUrls(p, CARD_CROPS)) {
+  for (const url of photoUrls(p, CARD_CROP)) {
     const img = await canvasImage(url);
-    if (img) return { img, logo: url.startsWith(LOGOS) };
+    if (img) return { img };
   }
   return null;
 }
@@ -969,31 +959,22 @@ function drawCard(sm, photo) {
   spacing(ctx, '0.5px'); ctx.fillStyle = '#dcdcf7'; fitFont(ctx, T('image.tagline'), W - 180, 600, 38, DISPLAY, 26);
   ctx.fillText(T('image.tagline'), W / 2, 236);
 
-  // The player you climbed to: headshot (the play cards' frame), then
-  // "I climbed to" / name / salary beside it.
+  // The player you climbed to: his face-fill headshot in a grey circle (the
+  // play cards' circle), then "I climbed to" / name / salary beside it.
   const end = D.pool.byId.get(sm.endId);
   const px = L, py = 300, ps = 290;
+  const circle = () => { ctx.beginPath(); ctx.arc(px + ps / 2, py + ps / 2, ps / 2, 0, Math.PI * 2); };
   ctx.save();
-  roundRect(ctx, px, py, ps, ps, 26); ctx.clip();
-  const well = ctx.createRadialGradient(px + ps / 2, py + ps * 0.4, 10, px + ps / 2, py + ps * 0.4, ps * 0.75);
-  well.addColorStop(0, '#22224a'); well.addColorStop(1, '#0a0a1e');
-  ctx.fillStyle = well; ctx.fillRect(px, py, ps, ps);
-  if (photo && photo.logo) {
-    const pad = ps * 0.16;
-    ctx.drawImage(photo.img, px + pad, py + pad, ps - 2 * pad, ps - 2 * pad);
-  } else if (photo) {
-    // The top-centre 82% of the crop: face2 puts every head in the same place
-    // with an empty band under the shoulders, so this zooms in a little and
-    // fills the frame with head and shoulders.
-    const { naturalWidth: iw, naturalHeight: ih } = photo.img;
-    const sw = iw * 0.82, sh = Math.min(ih, sw);
-    ctx.drawImage(photo.img, (iw - sw) / 2, 0, sw, sh, px, py, ps, ps);
+  circle(); ctx.clip();
+  ctx.fillStyle = FACE_BG; ctx.fillRect(px, py, ps, ps);
+  if (photo) {
+    ctx.drawImage(photo.img, px, py, ps, ps);
   } else if (end) {
     spacing(ctx, '2px'); ctx.fillStyle = '#cfcff0'; ctx.font = `700 110px ${DISPLAY}`;
     ctx.fillText(initials(end.name), px + ps / 2, py + ps / 2 + 40);
   }
   ctx.restore();
-  ctx.strokeStyle = '#26264c'; ctx.lineWidth = 2; roundRect(ctx, px, py, ps, ps, 26); ctx.stroke();
+  ctx.strokeStyle = '#26264c'; ctx.lineWidth = 2; circle(); ctx.stroke();
 
   const tx = px + ps + 44, tw = R - tx;
   ctx.textAlign = 'left';

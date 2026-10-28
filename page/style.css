@@ -112,21 +112,20 @@ body.playing .hdr{display:none}
 @media(hover:hover){.pcard:not(.revealed):hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 20px rgba(255,215,0,.12)}}
 .pcard .role{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--orange);
   background:#2a1a10;border:1px solid #4a2e18;padding:2px 7px;border-radius:5px}
-/* Headshot frame: the 73-9 reel window (dark radial well, inner line) with
-   the same drop shadow 73-9 puts on its logos. */
-/* The photo takes the card's full width and grows into the height the screen
-   leaves (the cards fill the play screen), up to 1.5x its width; on a short
-   phone it is what gives way, so the play screen never scrolls. Photos are
-   anchored at the top, where the head is. */
+/* Headshot frame: takes the card's full width and grows into the height the
+   screen leaves (the cards fill the play screen), up to 1.5x its width; on a
+   short phone it is what gives way, so the play screen never scrolls. The
+   face-fill headshot is the largest circle that fits in it. */
 .pcard .face{position:relative;display:block;width:100%;flex:1 1 auto;min-height:72px;max-height:240px;max-height:150cqw;margin:5px 0 3px;
-  border-radius:10px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#22224a,#0a0a1e 75%);border:1px solid #26264c}
-.pcard .face img{width:100%;height:100%;object-fit:cover;object-position:50% 0;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-.pcard .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  container-type:size}
+/* the headshot (face-fill) is a grey circle as big as the frame allows, centred */
+.pcard .face img,.pcard .initials{position:absolute;inset:0;margin:auto;width:100cqmin;height:100cqmin;border-radius:50%;
+  background:#3a3a44;border:1px solid #26264c;box-sizing:border-box}
+.pcard .face img{object-fit:cover;display:block}
+.pcard .initials{display:none;align-items:center;justify-content:center;
   font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
 .face.noimg img{visibility:hidden}
-/* the team logo when no photo loads: whole, centred, as the Daily 73-9 shows it */
-.face.is-logo img{object-fit:contain;padding:16%}
-.pcard .face.noimg .initials{display:flex}
+.face.noimg .initials{display:flex}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
 .pcard .pmeta{display:block;font-size:12.5px;line-height:1.35;color:#9b9bc2;letter-spacing:.2px;
@@ -185,9 +184,12 @@ body.playing .hdr{display:none}
 .war-panel{padding:16px 18px;border-radius:14px;background:linear-gradient(160deg,rgba(30,42,92,.5),rgba(10,12,30,.5));
   border:1px solid #ffd70033;text-align:center}
 .reached{display:flex;align-items:center;justify-content:center;gap:12px;text-align:left}
-.reached .face{width:64px;height:64px;flex:none;border-radius:10px;overflow:hidden;
-  background:radial-gradient(circle at 50% 40%,#22224a,#0a0a1e 75%);border:1px solid #26264c}
+.reached .face{position:relative;width:64px;height:64px;flex:none;border-radius:50%;overflow:hidden;
+  background:#3a3a44;border:1px solid #26264c}
 .reached .face img{width:100%;height:100%;object-fit:cover;display:block}
+.reached .initials,.contract .opt .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:700;letter-spacing:.5px;color:#cfcff0;font-size:20px}
+.contract .opt .initials{font-size:17px}
 .reached .pname{font-family:var(--display);font-weight:700;font-size:20px;color:#fff;line-height:1.15}
 .reached .pmeta{font-size:12px;color:#9b9bc2;margin-top:2px}
 .best{font-family:var(--display);font-size:14px;letter-spacing:.4px;color:#bcbce6;margin-top:12px}
@@ -201,8 +203,8 @@ body.playing .hdr{display:none}
 .contract .opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;cursor:pointer;text-align:center;
   background:linear-gradient(160deg,#16162f,#0e0e22);border:1px solid var(--line);border-radius:10px;transition:transform .12s,border-color .12s}
 @media(hover:hover){.contract .opt:not(:disabled):hover{transform:translateY(-3px);border-color:var(--gold)}}
-.contract .opt .face{width:52px;height:52px;border-radius:8px;overflow:hidden;
-  background:radial-gradient(circle at 50% 40%,#22224a,#0a0a1e 75%);border:1px solid #26264c}
+.contract .opt .face{position:relative;width:52px;height:52px;border-radius:50%;overflow:hidden;
+  background:#3a3a44;border:1px solid #26264c}
 .contract .opt img{width:100%;height:100%;object-fit:cover;display:block}
 .contract .opt .pname{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.15;color:var(--white)}
 .contract .opt .sal{font-family:var(--display);font-weight:700;font-size:17px;color:var(--gold)}
