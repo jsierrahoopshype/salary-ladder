@@ -320,6 +320,12 @@ body.playing #games-promo{display:none}
   .hearts{font-size:15px;letter-spacing:1px}
   .pcard .role{font-size:10px;letter-spacing:.5px;padding:2px 5px}
 }
+
+/* The contact footer (same lines as every HoopsMatic game), under the page column. */
+.app-footer{max-width:34rem;margin:0 auto;padding:4px max(.85rem,env(safe-area-inset-right)) 2rem max(.85rem,env(safe-area-inset-left));
+  text-align:center;font-size:12px;line-height:1.7;color:#6a6a8c}
+.app-footer a{color:#9a9ac4}
+body.playing .app-footer{display:none}
 </style>
 </head>
 <body>
@@ -418,6 +424,12 @@ body.playing #games-promo{display:none}
        ends, as Spend $15 does. Hidden during play. -->
   <div id="games-promo"></div>
 </div>
+<!-- Contact lines, the same as every HoopsMatic game. Below the page column,
+     so the games cards stay the column's last item. -->
+<footer class="app-footer">
+  <p>Anything wrong? Email us at <a href="mailto:hoopsmatic@hoopsmatic.com">hoopsmatic@hoopsmatic.com</a></p>
+  <p>For any other inquiry, contact us at <a href="mailto:ads@hoopsmatic.com">ads@hoopsmatic.com</a></p>
+</footer>
 <noscript><p class="loading">Salary Ladder needs JavaScript.</p></noscript>
 <script type="module">
 // ---- shared/game.js ----
