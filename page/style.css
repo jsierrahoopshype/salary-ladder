@@ -290,3 +290,9 @@ body.playing #games-promo{display:none}
   .hearts{font-size:15px;letter-spacing:1px}
   .pcard .role{font-size:10px;letter-spacing:.5px;padding:2px 5px}
 }
+
+/* The contact footer (same lines as every HoopsMatic game), under the page column. */
+.app-footer{max-width:34rem;margin:0 auto;padding:4px max(.85rem,env(safe-area-inset-right)) 2rem max(.85rem,env(safe-area-inset-left));
+  text-align:center;font-size:12px;line-height:1.7;color:#6a6a8c}
+.app-footer a{color:#9a9ac4}
+body.playing .app-footer{display:none}
