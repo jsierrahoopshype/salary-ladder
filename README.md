@@ -1,4 +1,4 @@
-Salary Ladder, a HoopsMatic game.
+Salary Ladder, a HoopsMatic game. Play it at https://hoopsmatic.com/salary-ladder/
 
 Spec: `docs/salary-ladder-spec.md`. Build plan: `docs/salary-ladder-build-plan.md`.
 
