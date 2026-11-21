@@ -70,7 +70,6 @@ body.playing .hdr{display:none}
 
 /* intro */
 .intro{text-align:center;animation:fadeIn .4s}
-.tagline{font-family:var(--display);font-size:13px;font-weight:600;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin:10px 0 0}
 .streak{display:inline-block;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.3px;color:#1a1206;
   background:linear-gradient(135deg,#ffe08a,#ffc24d);border-radius:8px;padding:4px 10px;margin-top:16px}
 .howto{list-style:none;counter-reset:n;margin:22px auto 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;

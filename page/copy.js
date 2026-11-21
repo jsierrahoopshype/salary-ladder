@@ -25,7 +25,6 @@ export const COPY = {
   'salariesAsOf': 'Salaries as of {date}',
 
   // Intro
-  'intro.tagline': 'Who gets paid more in {season}?',
   'intro.howto.1': 'Two players, paid within {band}% of each other. Tap the one who makes more in {season}.',
   'intro.howto.2': "Pick the challenger and you're right: he becomes your player and you climb a rung. Pick your player and you're right: you stay where you are.",
   'intro.howto.3': 'A wrong pick or a timeout costs a life. {lives} lives, {seconds} seconds a pick.',
