@@ -187,7 +187,6 @@ function showScreen(id) {
 function showIntro() {
   const r = D.rules;
   const season = esc(D.daily.season);
-  $('i-tagline').textContent = T('intro.tagline', { season: D.daily.season });
   // How to play, with the numbers from the rules file (spec 15).
   $('i-howto').innerHTML = [
     TH('intro.howto.1', { band: `<b>${Math.round(r.band * 100)}</b>`, season }),

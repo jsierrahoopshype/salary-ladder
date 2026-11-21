@@ -42,7 +42,6 @@ How to play is a numbered list. Its numbers come from `rules/rules.json` and are
 
 | Text | Shows | Key |
 |---|---|---|
-| Who gets paid more in {season}? | Under the heading (shown in capitals) | `intro.tagline` |
 | Two players, paid within {band}% of each other. Tap the one who makes more in {season}. | How to play, 1 | `intro.howto.1` |
 | Pick the challenger and you're right: he becomes your player and you climb a rung. Pick your player and you're right: you stay where you are. | How to play, 2 | `intro.howto.2` |
 | A wrong pick or a timeout costs a life. {lives} lives, {seconds} seconds a pick. | How to play, 3 | `intro.howto.3` |

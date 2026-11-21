@@ -100,7 +100,6 @@ body.playing .hdr{display:none}
 
 /* intro */
 .intro{text-align:center;animation:fadeIn .4s}
-.tagline{font-family:var(--display);font-size:13px;font-weight:600;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin:10px 0 0}
 .streak{display:inline-block;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.3px;color:#1a1206;
   background:linear-gradient(135deg,#ffe08a,#ffc24d);border-radius:8px;padding:4px 10px;margin-top:16px}
 .howto{list-style:none;counter-reset:n;margin:22px auto 0;background:var(--panel);border:1px solid var(--line);border-radius:12px;
@@ -337,7 +336,6 @@ body.playing .app-footer{display:none}
   <p id="loading" class="loading">Loading salaries…</p>
 
   <section id="intro" class="screen intro" hidden>
-    <p id="i-tagline" class="tagline"></p>
     <p id="i-streak" class="streak" hidden></p>
     <ol id="i-howto" class="howto"></ol>
     <div class="actions">
@@ -732,7 +730,6 @@ const COPY = {
   'salariesAsOf': 'Salaries as of {date}',
 
   // Intro
-  'intro.tagline': 'Who gets paid more in {season}?',
   'intro.howto.1': 'Two players, paid within {band}% of each other. Tap the one who makes more in {season}.',
   'intro.howto.2': "Pick the challenger and you're right: he becomes your player and you climb a rung. Pick your player and you're right: you stay where you are.",
   'intro.howto.3': 'A wrong pick or a timeout costs a life. {lives} lives, {seconds} seconds a pick.',
@@ -1347,7 +1344,6 @@ function showScreen(id) {
 function showIntro() {
   const r = D.rules;
   const season = esc(D.daily.season);
-  $('i-tagline').textContent = T('intro.tagline', { season: D.daily.season });
   // How to play, with the numbers from the rules file (spec 15).
   $('i-howto').innerHTML = [
     TH('intro.howto.1', { band: `<b>${Math.round(r.band * 100)}</b>`, season }),
