@@ -16,7 +16,7 @@ const HEADSHOTS = 'https://jsierrahoopshype.github.io/nba-headshots/players/head
 // look. The data files name each player's face-tight file; face-fill shares
 // its file name. Play cards and the share picture use the 320px files, the
 // small spots (end screen, contract pick) the 160px ones. A player with no
-// face-fill file shows his initials in the same circle.
+// face-fill file shows no circle at all (never initials).
 const CARD_CROP = 'face-fill-320';
 const FACE_BG = '#3a3a44'; // the circle behind a headshot (style.css: .face)
 const SMALL_CROP = 'face-fill';
@@ -30,7 +30,7 @@ function faceImg(p, small = false) {
   return `<img src="${esc(src)}" alt=""${small ? '' : ' decoding="async"'}>`;
 }
 
-// A headshot that fails leaves the circle to the player's initials.
+// A headshot that fails hides its circle (never initials).
 // Capturing, because image errors don't bubble.
 document.addEventListener('error', (e) => {
   const img = e.target;
@@ -340,7 +340,7 @@ function fillCard(el, p, role) {
   el.innerHTML =
     `<span class="role">${label}</span>` +
     `<span class="mark" aria-hidden="true"></span>` +
-    `<span class="face">${faceImg(p)}<span class="initials">${esc(initials(p.name))}</span></span>` +
+    `<span class="face">${faceImg(p)}</span>` +
     `<span class="pname">${esc(p.name)}</span>` +
     `<span class="pmeta team"><img class="logo" src="${esc(logoUrl(p))}" alt=""><span>${esc(teamName(p))}</span></span>` +
     `<span class="pmeta">${esc(posAge(p)) || '&nbsp;'}</span>` +
@@ -627,7 +627,7 @@ function showRank(summary) {
     : T(rank.early ? 'end.rankEarly' : 'end.rank', { pct: rank.pct });
 }
 
-const face = (p) => `<span class="face">${faceImg(p, true)}<span class="initials">${esc(initials(p.name))}</span></span>`;
+const face = (p) => `<span class="face">${faceImg(p, true)}</span>`;
 
 function playerRow(p) {
   return `${face(p)}<div><div class="pname">${esc(p.name)}</div><div class="pmeta">${esc(metaLine(p))}</div></div>`;
