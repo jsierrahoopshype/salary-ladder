@@ -118,13 +118,13 @@ body.playing .hdr{display:none}
 .pcard .face{position:relative;display:block;width:100%;flex:1 1 auto;min-height:72px;max-height:240px;max-height:150cqw;margin:5px 0 3px;
   container-type:size}
 /* the headshot (face-fill) is a grey circle as big as the frame allows, centred */
-.pcard .face img,.pcard .initials{position:absolute;inset:0;margin:auto;width:100cqmin;height:100cqmin;border-radius:50%;
+.pcard .face img{position:absolute;inset:0;margin:auto;width:100cqmin;height:100cqmin;border-radius:50%;
   background:#3a3a44;border:1px solid #26264c;box-sizing:border-box}
 .pcard .face img{object-fit:cover;display:block}
-.pcard .initials{display:none;align-items:center;justify-content:center;
-  font-family:var(--display);font-size:2rem;font-weight:700;letter-spacing:1px;color:#cfcff0}
-.face.noimg img{visibility:hidden}
-.face.noimg .initials{display:flex}
+/* no headshot: no circle at all, never initials (the play card keeps the
+   space so the card doesn't jump; the small spots drop it) */
+.face.noimg{visibility:hidden;border:0;background:none}
+.reached .face.noimg,.contract .opt .face.noimg{display:none}
 .pcard .pname{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.15;color:var(--white);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:100%}
 .pcard .pmeta{display:block;font-size:12.5px;line-height:1.35;color:#9b9bc2;letter-spacing:.2px;
@@ -186,9 +186,6 @@ body.playing .hdr{display:none}
 .reached .face{position:relative;width:64px;height:64px;flex:none;border-radius:50%;overflow:hidden;
   background:#3a3a44;border:1px solid #26264c}
 .reached .face img{width:100%;height:100%;object-fit:cover;display:block}
-.reached .initials,.contract .opt .initials{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
-  font-family:var(--display);font-weight:700;letter-spacing:.5px;color:#cfcff0;font-size:20px}
-.contract .opt .initials{font-size:17px}
 .reached .pname{font-family:var(--display);font-weight:700;font-size:20px;color:#fff;line-height:1.15}
 .reached .pmeta{font-size:12px;color:#9b9bc2;margin-top:2px}
 .best{font-family:var(--display);font-size:14px;letter-spacing:.4px;color:#bcbce6;margin-top:12px}
